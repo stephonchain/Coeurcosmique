@@ -18,10 +18,42 @@ struct CardDetailView: View {
                         .frame(width: 40, height: 5)
                         .padding(.top, 12)
 
-                    // Card visual
-                    TarotCardFront(card: card, isReversed: false, size: .large)
+                    // Large card image
+                    if let urlString = card.imageURL, let url = URL(string: urlString) {
+                        AsyncImage(url: url) { phase in
+                            switch phase {
+                            case .success(let image):
+                                image
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fit)
+                                    .frame(maxWidth: 260)
+                                    .clipShape(RoundedRectangle(cornerRadius: 16))
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 16)
+                                            .strokeBorder(
+                                                LinearGradient.cosmicGoldGradient,
+                                                lineWidth: 1.5
+                                            )
+                                    )
+                                    .shadow(color: Color.cosmicGold.opacity(0.3), radius: 20)
+                            case .failure:
+                                TarotCardFront(card: card, isReversed: false, size: .large)
+                            case .empty:
+                                RoundedRectangle(cornerRadius: 16)
+                                    .fill(Color.cosmicCard)
+                                    .frame(width: 220, height: 352)
+                                    .overlay(ProgressView().tint(Color.cosmicGold))
+                            @unknown default:
+                                TarotCardFront(card: card, isReversed: false, size: .large)
+                            }
+                        }
                         .scaleEffect(appeared ? 1 : 0.8)
                         .opacity(appeared ? 1 : 0)
+                    } else {
+                        TarotCardFront(card: card, isReversed: false, size: .large)
+                            .scaleEffect(appeared ? 1 : 0.8)
+                            .opacity(appeared ? 1 : 0)
+                    }
 
                     // Card name and arcana
                     VStack(spacing: 8) {

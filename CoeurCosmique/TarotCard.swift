@@ -44,6 +44,7 @@ struct TarotCard: Equatable, Identifiable, Codable, Hashable {
     let uprightMeaning: String
     let reversedMeaning: String
     let interpretation: Interpretation
+    let imageURL: String?
 
     init(
         id: UUID = UUID(),
@@ -53,7 +54,8 @@ struct TarotCard: Equatable, Identifiable, Codable, Hashable {
         keywords: [String],
         uprightMeaning: String,
         reversedMeaning: String,
-        interpretation: Interpretation
+        interpretation: Interpretation,
+        imageURL: String? = nil
     ) {
         self.id = id
         self.number = number
@@ -63,6 +65,7 @@ struct TarotCard: Equatable, Identifiable, Codable, Hashable {
         self.uprightMeaning = uprightMeaning
         self.reversedMeaning = reversedMeaning
         self.interpretation = interpretation
+        self.imageURL = imageURL
     }
 
     func hash(into hasher: inout Hasher) {
