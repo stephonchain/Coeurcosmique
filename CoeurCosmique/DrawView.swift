@@ -327,7 +327,7 @@ struct DrawView: View {
                 for i in 0..<reading.cards.count {
                     DispatchQueue.main.asyncAfter(deadline: .now() + Double(i) * 0.6 + 0.4) {
                         withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
-                            revealedCards.insert(i)
+                            _ = revealedCards.insert(i)
                         }
                     }
                 }
