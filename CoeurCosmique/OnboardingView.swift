@@ -7,7 +7,6 @@ struct OnboardingView: View {
     @State private var showPaywall = false
 
     // Animation states
-    @State private var illustrationScale: CGFloat = 0.3
     @State private var illustrationOpacity: Double = 0
     @State private var titleOffset: CGFloat = 30
     @State private var titleOpacity: Double = 0
@@ -44,115 +43,119 @@ struct OnboardingView: View {
     // MARK: - Onboarding Content
 
     private var onboardingContent: some View {
-        VStack(spacing: 0) {
-            Spacer()
+        GeometryReader { geo in
+            let topHalf = geo.size.height * 0.48
 
-            // Illustration (video or image)
-            pageIllustration
-                .scaleEffect(illustrationScale)
-                .opacity(illustrationOpacity)
+            ZStack(alignment: .top) {
+                // Full-width illustration in top half
+                pageIllustration(height: topHalf)
+                    .opacity(illustrationOpacity)
 
-            Spacer().frame(height: 32)
+                // Gradient fade at bottom of illustration
+                VStack(spacing: 0) {
+                    Spacer()
+                        .frame(height: topHalf - 80)
 
-            // Title
-            Text(pages[currentPage].title)
-                .font(.cosmicTitle(32))
-                .foregroundStyle(Color.cosmicText)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, 32)
-                .offset(y: titleOffset)
-                .opacity(titleOpacity)
+                    LinearGradient(
+                        colors: [
+                            Color.clear,
+                            Color(red: 0.04, green: 0.04, blue: 0.10).opacity(0.6),
+                            Color(red: 0.04, green: 0.04, blue: 0.10)
+                        ],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                    .frame(height: 80)
+                }
+                .allowsHitTesting(false)
 
-            Spacer().frame(height: 16)
+                // Text content in bottom half
+                VStack(spacing: 0) {
+                    Spacer()
+                        .frame(height: topHalf - 16)
 
-            // Subtitle
-            Text(pages[currentPage].subtitle)
-                .font(.cosmicBody(17))
-                .foregroundStyle(Color.cosmicTextSecondary)
-                .multilineTextAlignment(.center)
-                .lineSpacing(4)
-                .padding(.horizontal, 40)
-                .offset(y: subtitleOffset)
-                .opacity(subtitleOpacity)
+                    // Title
+                    Text(pages[currentPage].title)
+                        .font(.cosmicTitle(30))
+                        .foregroundStyle(Color.cosmicText)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, 32)
+                        .offset(y: titleOffset)
+                        .opacity(titleOpacity)
 
-            Spacer().frame(height: 32)
+                    Spacer().frame(height: 14)
 
-            // Feature bullets (pages 1-3)
-            if !pages[currentPage].features.isEmpty {
-                featureList
-                    .opacity(featuresOpacity)
+                    // Subtitle
+                    Text(pages[currentPage].subtitle)
+                        .font(.cosmicBody(16))
+                        .foregroundStyle(Color.cosmicTextSecondary)
+                        .multilineTextAlignment(.center)
+                        .lineSpacing(4)
+                        .padding(.horizontal, 40)
+                        .offset(y: subtitleOffset)
+                        .opacity(subtitleOpacity)
+
+                    Spacer().frame(height: 24)
+
+                    // Feature bullets
+                    if !pages[currentPage].features.isEmpty {
+                        featureList
+                            .opacity(featuresOpacity)
+                    }
+
+                    Spacer()
+
+                    // Page indicators
+                    pageIndicators
+                        .padding(.bottom, 20)
+
+                    // Next button
+                    nextButton
+                        .padding(.horizontal, 32)
+                        .padding(.bottom, 50)
+                }
             }
-
-            Spacer()
-
-            // Page indicators
-            pageIndicators
-                .padding(.bottom, 24)
-
-            // Next button
-            nextButton
-                .padding(.horizontal, 32)
-                .padding(.bottom, 50)
         }
+        .ignoresSafeArea(edges: .top)
         .onAppear { animateIn() }
     }
 
     // MARK: - Page Illustration
 
     @ViewBuilder
-    private var pageIllustration: some View {
+    private func pageIllustration(height: CGFloat) -> some View {
         let page = pages[currentPage]
 
         if let videoName = page.videoFileName {
             LoopingVideoPlayer(fileName: videoName)
-                .frame(width: 240, height: 240)
-                .clipShape(RoundedRectangle(cornerRadius: 32))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 32)
-                        .strokeBorder(
-                            LinearGradient(
-                                colors: [page.accentColor.opacity(0.4), Color.clear],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            ),
-                            lineWidth: 1
-                        )
-                )
-                .shadow(color: page.accentColor.opacity(0.3), radius: 20)
+                .frame(maxWidth: .infinity)
+                .frame(height: height)
+                .clipped()
         } else if let imageName = page.imageName {
             Image(imageName)
                 .resizable()
-                .aspectRatio(contentMode: .fit)
-                .frame(width: 240, height: 240)
-                .clipShape(RoundedRectangle(cornerRadius: 32))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 32)
-                        .strokeBorder(
-                            LinearGradient(
-                                colors: [page.accentColor.opacity(0.4), Color.clear],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            ),
-                            lineWidth: 1
-                        )
-                )
-                .shadow(color: page.accentColor.opacity(0.3), radius: 20)
+                .aspectRatio(contentMode: .fill)
+                .frame(maxWidth: .infinity)
+                .frame(height: height)
+                .clipped()
         } else {
             // Fallback SF Symbol icon
             ZStack {
+                Color.cosmicBackground
+
                 Circle()
                     .fill(
                         RadialGradient(
                             colors: [page.accentColor.opacity(0.3), Color.clear],
                             center: .center,
                             startRadius: 20,
-                            endRadius: 80
+                            endRadius: 120
                         )
                     )
-                    .frame(width: 160, height: 160)
+                    .frame(width: 240, height: 240)
 
                 Image(systemName: page.icon)
-                    .font(.system(size: 64, weight: .thin))
+                    .font(.system(size: 80, weight: .thin))
                     .foregroundStyle(
                         LinearGradient(
                             colors: [page.accentColor, page.accentColorLight],
@@ -162,6 +165,8 @@ struct OnboardingView: View {
                     )
                     .glow(page.accentColor, radius: 12)
             }
+            .frame(maxWidth: .infinity)
+            .frame(height: height)
         }
     }
 
@@ -238,7 +243,6 @@ struct OnboardingView: View {
     // MARK: - Animations
 
     private func resetAnimations() {
-        illustrationScale = 0.3
         illustrationOpacity = 0
         titleOffset = 30
         titleOpacity = 0
@@ -248,8 +252,7 @@ struct OnboardingView: View {
     }
 
     private func animateIn() {
-        withAnimation(.spring(response: 0.6, dampingFraction: 0.7).delay(0.05)) {
-            illustrationScale = 1.0
+        withAnimation(.easeOut(duration: 0.5).delay(0.05)) {
             illustrationOpacity = 1
         }
         withAnimation(.easeOut(duration: 0.5).delay(0.15)) {

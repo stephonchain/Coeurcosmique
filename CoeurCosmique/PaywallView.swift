@@ -33,14 +33,8 @@ struct PaywallView: View {
 
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 0) {
-                    // Close button
-                    closeButton
-                        .padding(.top, 8)
-
-                    Spacer().frame(height: 12)
-
-                    // Crown icon
-                    crownIcon
+                    // Full-width header image with gradient
+                    paywallHeader
                         .opacity(headerOpacity)
 
                     Spacer().frame(height: 20)
@@ -60,19 +54,19 @@ struct PaywallView: View {
                         .foregroundStyle(Color.cosmicTextSecondary)
                         .opacity(headerOpacity)
 
-                    Spacer().frame(height: 32)
+                    Spacer().frame(height: 28)
 
                     // Premium features
                     premiumFeatures
                         .opacity(featuresOpacity)
 
-                    Spacer().frame(height: 32)
+                    Spacer().frame(height: 28)
 
                     // Subscription plans
                     subscriptionPlans
                         .opacity(plansOpacity)
 
-                    Spacer().frame(height: 28)
+                    Spacer().frame(height: 24)
 
                     // Subscribe button
                     subscribeButton
@@ -87,6 +81,13 @@ struct PaywallView: View {
 
                     Spacer().frame(height: 40)
                 }
+            }
+
+            // Close button overlay (always visible)
+            VStack {
+                closeButton
+                    .padding(.top, 8)
+                Spacer()
             }
         }
         .preferredColorScheme(.dark)
@@ -130,24 +131,27 @@ struct PaywallView: View {
 
     // MARK: - Header Illustration
 
-    private var crownIcon: some View {
-        Image("paywall-header")
-            .resizable()
-            .aspectRatio(contentMode: .fit)
-            .frame(maxWidth: 220, maxHeight: 220)
-            .clipShape(RoundedRectangle(cornerRadius: 28))
-            .overlay(
-                RoundedRectangle(cornerRadius: 28)
-                    .strokeBorder(
-                        LinearGradient(
-                            colors: [Color.cosmicGold.opacity(0.4), Color.clear],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        ),
-                        lineWidth: 1
-                    )
+    private var paywallHeader: some View {
+        ZStack(alignment: .bottom) {
+            Image("paywall-header")
+                .resizable()
+                .aspectRatio(contentMode: .fill)
+                .frame(maxWidth: .infinity)
+                .frame(height: 320)
+                .clipped()
+
+            // Bottom gradient fade
+            LinearGradient(
+                colors: [
+                    Color.clear,
+                    Color(red: 0.04, green: 0.04, blue: 0.10).opacity(0.7),
+                    Color(red: 0.04, green: 0.04, blue: 0.10)
+                ],
+                startPoint: .top,
+                endPoint: .bottom
             )
-            .shadow(color: Color.cosmicGold.opacity(0.3), radius: 20)
+            .frame(height: 100)
+        }
     }
 
     // MARK: - Premium Features
