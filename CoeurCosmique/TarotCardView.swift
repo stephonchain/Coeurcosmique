@@ -157,45 +157,19 @@ struct TarotCardBack: View {
     var size: TarotCardFront.CardSize = .medium
 
     var body: some View {
-        ZStack {
-            RoundedRectangle(cornerRadius: size == .large ? 16 : 12)
-                .fill(
-                    LinearGradient(
-                        colors: [
-                            Color(red: 0.15, green: 0.10, blue: 0.30),
-                            Color(red: 0.08, green: 0.05, blue: 0.18)
-                        ],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
+        Image("card-back")
+            .resizable()
+            .aspectRatio(contentMode: .fill)
+            .frame(width: size.width, height: size.height)
+            .clipShape(RoundedRectangle(cornerRadius: size == .large ? 16 : 12))
+            .overlay(
+                RoundedRectangle(cornerRadius: size == .large ? 16 : 12)
+                    .strokeBorder(
+                        LinearGradient.cosmicGoldGradient,
+                        lineWidth: 1.5
                     )
-                )
-                .overlay(
-                    RoundedRectangle(cornerRadius: size == .large ? 16 : 12)
-                        .strokeBorder(
-                            LinearGradient.cosmicGoldGradient,
-                            lineWidth: 1.5
-                        )
-                )
-
-            // Inner decorative border
-            RoundedRectangle(cornerRadius: size == .large ? 12 : 8)
-                .strokeBorder(Color.cosmicGold.opacity(0.3), lineWidth: 0.5)
-                .padding(8)
-
-            // Center motif
-            VStack(spacing: 4) {
-                Text("✦")
-                    .font(.system(size: size == .large ? 32 : size == .medium ? 22 : 16))
-                    .foregroundStyle(Color.cosmicGold)
-
-                Text("C C")
-                    .font(.cosmicCaption(size == .large ? 14 : 10))
-                    .foregroundStyle(Color.cosmicGold.opacity(0.6))
-                    .kerning(4)
-            }
-        }
-        .frame(width: size.width, height: size.height)
-        .shadow(color: Color.cosmicPurple.opacity(0.3), radius: 8)
+            )
+            .shadow(color: Color.cosmicPurple.opacity(0.3), radius: 8)
     }
 }
 
