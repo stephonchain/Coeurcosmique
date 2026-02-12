@@ -379,7 +379,7 @@ struct PaywallView: View {
 
             HStack(spacing: 16) {
                 Link("Conditions d'utilisation",
-                     destination: URL(string: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/")!)
+                     destination: URL(string: "https://oracle.marutea.fr/terms")!)
                     .font(.cosmicCaption(11))
                     .foregroundStyle(Color.cosmicTextSecondary.opacity(0.7))
 
@@ -387,7 +387,7 @@ struct PaywallView: View {
                     .foregroundStyle(Color.cosmicTextSecondary.opacity(0.4))
 
                 Link("Politique de confidentialité",
-                     destination: URL(string: "https://www.apple.com/legal/privacy/")!)
+                     destination: URL(string: "https://oracle.marutea.fr/privacy")!)
                     .font(.cosmicCaption(11))
                     .foregroundStyle(Color.cosmicTextSecondary.opacity(0.7))
             }
