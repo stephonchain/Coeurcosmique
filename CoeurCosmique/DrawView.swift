@@ -2,12 +2,18 @@ import SwiftUI
 
 struct DrawView: View {
     @ObservedObject var viewModel: AppViewModel
+    @EnvironmentObject var storeManager: StoreManager
     @State private var selectedSpread: TarotSpreadType = .pastPresentFuture
     @State private var question: String = ""
     @State private var isDrawing = false
     @State private var revealedCards: Set<Int> = []
     @State private var showReading = false
+    @State private var showPaywall = false
     @FocusState private var isQuestionFocused: Bool
+
+    private var hasReachedFreeLimit: Bool {
+        !storeManager.isPremium && viewModel.todayDrawCount >= AppViewModel.freeDailyDrawLimit
+    }
 
     var body: some View {
         ScrollView(showsIndicators: false) {
@@ -23,6 +29,11 @@ struct DrawView: View {
                         .foregroundStyle(Color.cosmicTextSecondary)
                 }
                 .padding(.top, 16)
+
+                // Free limit banner
+                if hasReachedFreeLimit {
+                    freeLimitBanner
+                }
 
                 // Spread selection
                 spreadSelectionSection
@@ -42,6 +53,53 @@ struct DrawView: View {
             }
             .padding(.horizontal, 20)
         }
+        .onAppear {
+            viewModel.loadTodayDrawCount()
+        }
+        .sheet(isPresented: $showPaywall) {
+            PaywallView(storeManager: storeManager)
+        }
+    }
+
+    // MARK: - Free Limit Banner
+
+    private var freeLimitBanner: some View {
+        VStack(spacing: 10) {
+            HStack(spacing: 8) {
+                Image(systemName: "crown.fill")
+                    .font(.system(size: 14))
+                    .foregroundStyle(Color.cosmicGold)
+
+                Text("Tu as utilisé ton tirage gratuit du jour")
+                    .font(.cosmicBody(14))
+                    .foregroundStyle(Color.cosmicText)
+            }
+
+            Text("Passe en Premium pour des tirages illimités")
+                .font(.cosmicCaption(12))
+                .foregroundStyle(Color.cosmicTextSecondary)
+
+            Button {
+                showPaywall = true
+            } label: {
+                Text("Voir les offres")
+                    .font(.cosmicHeadline(13))
+                    .foregroundStyle(Color.cosmicBackground)
+                    .padding(.horizontal, 20)
+                    .padding(.vertical, 8)
+                    .background(
+                        Capsule().fill(LinearGradient.cosmicGoldGradient)
+                    )
+            }
+            .buttonStyle(.plain)
+        }
+        .padding(16)
+        .frame(maxWidth: .infinity)
+        .cosmicCard(cornerRadius: 14)
+        .overlay(
+            RoundedRectangle(cornerRadius: 14)
+                .strokeBorder(Color.cosmicGold.opacity(0.3), lineWidth: 1)
+        )
     }
 
     // MARK: - Spread Selection
@@ -132,18 +190,29 @@ struct DrawView: View {
 
     private var drawButton: some View {
         Button {
-            performDraw()
+            if hasReachedFreeLimit {
+                showPaywall = true
+            } else {
+                performDraw()
+            }
         } label: {
             HStack(spacing: 10) {
                 if isDrawing {
                     ProgressView()
                         .tint(Color.cosmicBackground)
+                } else if hasReachedFreeLimit {
+                    Image(systemName: "lock.fill")
+                        .font(.system(size: 16, weight: .medium))
                 } else {
                     Image(systemName: "sparkles")
                         .font(.system(size: 16, weight: .medium))
                 }
 
-                Text(isDrawing ? "Consultation en cours..." : "Tirer les cartes")
+                Text(isDrawing
+                     ? "Consultation en cours..."
+                     : hasReachedFreeLimit
+                        ? "Débloquer les tirages illimités"
+                        : "Tirer les cartes")
                     .font(.cosmicHeadline(16))
             }
             .foregroundStyle(Color.cosmicBackground)

@@ -3,8 +3,10 @@ import SwiftUI
 struct CardDetailView: View {
     let card: TarotCard
     let deck: [TarotCard]
+    @EnvironmentObject var storeManager: StoreManager
     @Environment(\.dismiss) private var dismiss
     @State private var appeared = false
+    @State private var showPaywall = false
 
     var body: some View {
         ZStack {
@@ -91,47 +93,13 @@ struct CardDetailView: View {
                     }
                     .opacity(appeared ? 1 : 0)
 
-                    // Meanings
-                    VStack(spacing: 16) {
-                        meaningSection(
-                            title: "Sens droit",
-                            icon: "arrow.up.circle.fill",
-                            color: .cosmicGold,
-                            text: card.uprightMeaning
-                        )
-
-                        meaningSection(
-                            title: "Sens inversé",
-                            icon: "arrow.down.circle.fill",
-                            color: .cosmicRose,
-                            text: card.reversedMeaning
-                        )
+                    if storeManager.isPremium {
+                        // Full content for premium users
+                        premiumContent
+                    } else {
+                        // Locked overlay for free users
+                        lockedContent
                     }
-                    .opacity(appeared ? 1 : 0)
-                    .offset(y: appeared ? 0 : 30)
-
-                    // Divider
-                    HStack(spacing: 12) {
-                        Rectangle().fill(Color.cosmicDivider).frame(height: 1)
-                        Text("✦").font(.system(size: 10)).foregroundStyle(Color.cosmicGold)
-                        Rectangle().fill(Color.cosmicDivider).frame(height: 1)
-                    }
-                    .padding(.horizontal)
-
-                    // Context interpretations
-                    VStack(spacing: 14) {
-                        Text("Interprétations")
-                            .font(.cosmicHeadline(18))
-                            .foregroundStyle(Color.cosmicGold)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-
-                        contextRow(icon: "sparkles", label: "Général", text: card.interpretation.general)
-                        contextRow(icon: "heart.fill", label: "Amour", text: card.interpretation.love)
-                        contextRow(icon: "briefcase.fill", label: "Carrière", text: card.interpretation.career)
-                        contextRow(icon: "leaf.fill", label: "Spirituel", text: card.interpretation.spiritual)
-                    }
-                    .opacity(appeared ? 1 : 0)
-                    .offset(y: appeared ? 0 : 40)
 
                     Spacer(minLength: 40)
                 }
@@ -143,6 +111,151 @@ struct CardDetailView: View {
                 appeared = true
             }
         }
+        .sheet(isPresented: $showPaywall) {
+            PaywallView(storeManager: storeManager)
+        }
+    }
+
+    // MARK: - Premium Content (Unlocked)
+
+    private var premiumContent: some View {
+        VStack(spacing: 16) {
+            // Meanings
+            meaningSection(
+                title: "Sens droit",
+                icon: "arrow.up.circle.fill",
+                color: .cosmicGold,
+                text: card.uprightMeaning
+            )
+
+            meaningSection(
+                title: "Sens inversé",
+                icon: "arrow.down.circle.fill",
+                color: .cosmicRose,
+                text: card.reversedMeaning
+            )
+
+            // Divider
+            HStack(spacing: 12) {
+                Rectangle().fill(Color.cosmicDivider).frame(height: 1)
+                Text("✦").font(.system(size: 10)).foregroundStyle(Color.cosmicGold)
+                Rectangle().fill(Color.cosmicDivider).frame(height: 1)
+            }
+            .padding(.horizontal)
+
+            // Context interpretations
+            VStack(spacing: 14) {
+                Text("Interprétations")
+                    .font(.cosmicHeadline(18))
+                    .foregroundStyle(Color.cosmicGold)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+
+                contextRow(icon: "sparkles", label: "Général", text: card.interpretation.general)
+                contextRow(icon: "heart.fill", label: "Amour", text: card.interpretation.love)
+                contextRow(icon: "briefcase.fill", label: "Carrière", text: card.interpretation.career)
+                contextRow(icon: "leaf.fill", label: "Spirituel", text: card.interpretation.spiritual)
+            }
+        }
+        .opacity(appeared ? 1 : 0)
+        .offset(y: appeared ? 0 : 30)
+    }
+
+    // MARK: - Locked Content (Free Users)
+
+    private var lockedContent: some View {
+        VStack(spacing: 20) {
+            // Blurred preview
+            VStack(spacing: 16) {
+                lockedMeaningPreview(
+                    title: "Sens droit",
+                    icon: "arrow.up.circle.fill",
+                    color: .cosmicGold
+                )
+
+                lockedMeaningPreview(
+                    title: "Sens inversé",
+                    icon: "arrow.down.circle.fill",
+                    color: .cosmicRose
+                )
+            }
+
+            // Premium upsell
+            VStack(spacing: 14) {
+                Image(systemName: "crown.fill")
+                    .font(.system(size: 28))
+                    .foregroundStyle(Color.cosmicGold)
+
+                Text("Contenu Premium")
+                    .font(.cosmicHeadline(18))
+                    .foregroundStyle(Color.cosmicText)
+
+                Text("Débloque les significations détaillées\net les interprétations contextuelles")
+                    .font(.cosmicBody(13))
+                    .foregroundStyle(Color.cosmicTextSecondary)
+                    .multilineTextAlignment(.center)
+                    .lineSpacing(2)
+
+                Button {
+                    showPaywall = true
+                } label: {
+                    HStack(spacing: 8) {
+                        Image(systemName: "lock.open.fill")
+                            .font(.system(size: 13))
+                        Text("Débloquer l'accès")
+                            .font(.cosmicHeadline(15))
+                    }
+                    .foregroundStyle(Color.cosmicBackground)
+                    .padding(.horizontal, 28)
+                    .padding(.vertical, 14)
+                    .background(
+                        Capsule().fill(LinearGradient.cosmicGoldGradient)
+                    )
+                    .glow(.cosmicGold, radius: 6)
+                }
+                .buttonStyle(.plain)
+            }
+            .padding(24)
+            .frame(maxWidth: .infinity)
+            .cosmicCard(cornerRadius: 16)
+            .overlay(
+                RoundedRectangle(cornerRadius: 16)
+                    .strokeBorder(Color.cosmicGold.opacity(0.3), lineWidth: 1)
+            )
+        }
+        .opacity(appeared ? 1 : 0)
+        .offset(y: appeared ? 0 : 30)
+    }
+
+    // MARK: - Locked Meaning Preview
+
+    private func lockedMeaningPreview(title: String, icon: String, color: Color) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(spacing: 8) {
+                Image(systemName: icon)
+                    .font(.system(size: 14))
+                    .foregroundStyle(color)
+
+                Text(title)
+                    .font(.cosmicHeadline(15))
+                    .foregroundStyle(color)
+
+                Spacer()
+
+                Image(systemName: "lock.fill")
+                    .font(.system(size: 11))
+                    .foregroundStyle(Color.cosmicTextSecondary.opacity(0.5))
+            }
+
+            // Blurred placeholder text
+            Text("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore.")
+                .font(.cosmicBody(15))
+                .foregroundStyle(Color.cosmicText.opacity(0.85))
+                .lineSpacing(4)
+                .blur(radius: 6)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(16)
+        .cosmicCard(cornerRadius: 14)
     }
 
     // MARK: - Meaning Section

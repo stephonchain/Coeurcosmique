@@ -2,6 +2,20 @@ import SwiftUI
 
 struct JournalView: View {
     @ObservedObject var viewModel: AppViewModel
+    @EnvironmentObject var storeManager: StoreManager
+    @State private var showPaywall = false
+
+    private var displayedHistory: [ReadingHistoryEntry] {
+        if storeManager.isPremium {
+            return viewModel.history
+        } else {
+            return Array(viewModel.history.prefix(AppViewModel.freeJournalLimit))
+        }
+    }
+
+    private var hasLockedEntries: Bool {
+        !storeManager.isPremium && viewModel.history.count > AppViewModel.freeJournalLimit
+    }
 
     var body: some View {
         ScrollView(showsIndicators: false) {
@@ -22,9 +36,14 @@ struct JournalView: View {
                     emptyState
                 } else {
                     LazyVStack(spacing: 14) {
-                        ForEach(viewModel.history) { entry in
+                        ForEach(displayedHistory) { entry in
                             JournalEntryRow(entry: entry, deck: viewModel.deck)
                         }
+                    }
+
+                    // Premium upsell for locked entries
+                    if hasLockedEntries {
+                        premiumUpsellCard
                     }
                 }
 
@@ -35,6 +54,56 @@ struct JournalView: View {
         .onAppear {
             viewModel.loadHistory()
         }
+        .sheet(isPresented: $showPaywall) {
+            PaywallView(storeManager: storeManager)
+        }
+    }
+
+    // MARK: - Premium Upsell
+
+    private var premiumUpsellCard: some View {
+        VStack(spacing: 14) {
+            let lockedCount = viewModel.history.count - AppViewModel.freeJournalLimit
+
+            Image(systemName: "lock.fill")
+                .font(.system(size: 24))
+                .foregroundStyle(Color.cosmicGold)
+
+            Text("\(lockedCount) lecture\(lockedCount > 1 ? "s" : "") masquée\(lockedCount > 1 ? "s" : "")")
+                .font(.cosmicHeadline(16))
+                .foregroundStyle(Color.cosmicText)
+
+            Text("Accède à tout ton historique\navec l'abonnement Premium")
+                .font(.cosmicBody(13))
+                .foregroundStyle(Color.cosmicTextSecondary)
+                .multilineTextAlignment(.center)
+                .lineSpacing(2)
+
+            Button {
+                showPaywall = true
+            } label: {
+                HStack(spacing: 8) {
+                    Image(systemName: "crown.fill")
+                        .font(.system(size: 12))
+                    Text("Débloquer le journal")
+                        .font(.cosmicHeadline(14))
+                }
+                .foregroundStyle(Color.cosmicBackground)
+                .padding(.horizontal, 24)
+                .padding(.vertical, 12)
+                .background(
+                    Capsule().fill(LinearGradient.cosmicGoldGradient)
+                )
+            }
+            .buttonStyle(.plain)
+        }
+        .padding(20)
+        .frame(maxWidth: .infinity)
+        .cosmicCard(cornerRadius: 16)
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .strokeBorder(Color.cosmicGold.opacity(0.3), lineWidth: 1)
+        )
     }
 
     // MARK: - Empty State

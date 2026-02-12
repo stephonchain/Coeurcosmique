@@ -4,11 +4,28 @@ import StoreKit
 struct PaywallView: View {
     @Binding var hasCompletedOnboarding: Bool
     @ObservedObject var storeManager: StoreManager
+    @Environment(\.dismiss) private var dismiss
     @State private var selectedPlan: String = StoreManager.yearlyID
     @State private var headerOpacity: Double = 0
     @State private var featuresOpacity: Double = 0
     @State private var plansOpacity: Double = 0
     @State private var buttonOpacity: Double = 0
+
+    private let isSheet: Bool
+
+    // Onboarding mode
+    init(hasCompletedOnboarding: Binding<Bool>, storeManager: StoreManager) {
+        self._hasCompletedOnboarding = hasCompletedOnboarding
+        self.storeManager = storeManager
+        self.isSheet = false
+    }
+
+    // Sheet mode (in-app upsell)
+    init(storeManager: StoreManager) {
+        self._hasCompletedOnboarding = .constant(false)
+        self.storeManager = storeManager
+        self.isSheet = true
+    }
 
     var body: some View {
         ZStack {
@@ -79,13 +96,23 @@ struct PaywallView: View {
         }
     }
 
+    // MARK: - Dismiss Helper
+
+    private func handleDismiss() {
+        if isSheet {
+            dismiss()
+        } else {
+            hasCompletedOnboarding = true
+        }
+    }
+
     // MARK: - Close Button
 
     private var closeButton: some View {
         HStack {
             Spacer()
             Button {
-                hasCompletedOnboarding = true
+                handleDismiss()
             } label: {
                 Image(systemName: "xmark")
                     .font(.system(size: 16, weight: .medium))
@@ -301,7 +328,7 @@ struct PaywallView: View {
                 if let product = storeManager.product(for: selectedPlan) {
                     await storeManager.purchase(product)
                     if storeManager.isPremium {
-                        hasCompletedOnboarding = true
+                        handleDismiss()
                     }
                 }
             }
@@ -335,7 +362,12 @@ struct PaywallView: View {
     private var footerLinks: some View {
         VStack(spacing: 8) {
             Button {
-                Task { await storeManager.restorePurchases() }
+                Task {
+                    await storeManager.restorePurchases()
+                    if storeManager.isPremium {
+                        handleDismiss()
+                    }
+                }
             } label: {
                 Text("Restaurer mes achats")
                     .font(.cosmicCaption(13))
