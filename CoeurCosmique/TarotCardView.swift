@@ -1,30 +1,67 @@
 import SwiftUI
 
+// MARK: - Image Loader (handles Wikimedia User-Agent + caching)
+
+@MainActor
+final class CardImageLoader: ObservableObject {
+    @Published var image: UIImage?
+    @Published var isLoading = false
+
+    private static let cache = NSCache<NSString, UIImage>()
+
+    private static let session: URLSession = {
+        let config = URLSessionConfiguration.default
+        config.httpAdditionalHeaders = [
+            "User-Agent": "CoeurCosmique/1.0 (iOS; Tarot App)"
+        ]
+        return URLSession(configuration: config)
+    }()
+
+    func load(from urlString: String) {
+        let key = urlString as NSString
+        if let cached = Self.cache.object(forKey: key) {
+            self.image = cached
+            return
+        }
+
+        guard let url = URL(string: urlString) else { return }
+        isLoading = true
+
+        Task {
+            do {
+                let (data, _) = try await Self.session.data(from: url)
+                if let loaded = UIImage(data: data) {
+                    Self.cache.setObject(loaded, forKey: key)
+                    self.image = loaded
+                }
+            } catch {}
+            self.isLoading = false
+        }
+    }
+}
+
 // MARK: - Card Image (loads from URL)
 
 struct CardImage: View {
     let url: String?
     var size: TarotCardFront.CardSize = .medium
+    @StateObject private var loader = CardImageLoader()
 
     var body: some View {
-        if let urlString = url, let imageURL = URL(string: urlString) {
-            AsyncImage(url: imageURL) { phase in
-                switch phase {
-                case .success(let image):
-                    image
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                case .failure:
-                    fallbackView
-                case .empty:
-                    ProgressView()
-                        .tint(Color.cosmicGold)
-                @unknown default:
-                    fallbackView
-                }
+        Group {
+            if let uiImage = loader.image {
+                Image(uiImage: uiImage)
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+            } else if loader.isLoading {
+                ProgressView()
+                    .tint(Color.cosmicGold)
+            } else {
+                fallbackView
             }
-        } else {
-            fallbackView
+        }
+        .onAppear {
+            if let url { loader.load(from: url) }
         }
     }
 
