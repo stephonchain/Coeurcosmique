@@ -31,6 +31,8 @@
 		AA00000001000022 /* PaywallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000002000023 /* PaywallView.swift */; };
 		AA00000001000023 /* StoreManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000002000024 /* StoreManager.swift */; };
 		AA00000001000024 /* LoopingVideoPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000002000025 /* LoopingVideoPlayer.swift */; };
+		AA00000001000025 /* onboarding-welcome.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = AA00000002000026 /* onboarding-welcome.mp4 */; };
+		AA00000001000026 /* onboarding-spreads.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = AA00000002000027 /* onboarding-spreads.mp4 */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -59,6 +61,8 @@
 		AA00000002000023 /* PaywallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallView.swift; sourceTree = "<group>"; };
 		AA00000002000024 /* StoreManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreManager.swift; sourceTree = "<group>"; };
 		AA00000002000025 /* LoopingVideoPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoopingVideoPlayer.swift; sourceTree = "<group>"; };
+		AA00000002000026 /* onboarding-welcome.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "onboarding-welcome.mp4"; sourceTree = "<group>"; };
+		AA00000002000027 /* onboarding-spreads.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "onboarding-spreads.mp4"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -105,6 +109,7 @@
 				AA00000002000023 /* PaywallView.swift */,
 				AA00000002000024 /* StoreManager.swift */,
 				AA00000002000025 /* LoopingVideoPlayer.swift */,
+				AA00000003000005 /* Videos */,
 				AA00000002000019 /* Assets.xcassets */,
 				AA00000003000003 /* Preview Content */,
 			);
@@ -125,6 +130,15 @@
 				AA00000002000021 /* CoeurCosmique.app */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		AA00000003000005 /* Videos */ = {
+			isa = PBXGroup;
+			children = (
+				AA00000002000026 /* onboarding-welcome.mp4 */,
+				AA00000002000027 /* onboarding-spreads.mp4 */,
+			);
+			path = Videos;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -187,6 +201,8 @@
 			files = (
 				AA00000001000020 /* Preview Assets.xcassets in Resources */,
 				AA00000001000019 /* Assets.xcassets in Resources */,
+				AA00000001000025 /* onboarding-welcome.mp4 in Resources */,
+				AA00000001000026 /* onboarding-spreads.mp4 in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
