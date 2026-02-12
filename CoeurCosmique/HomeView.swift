@@ -215,9 +215,20 @@ struct HomeView: View {
                 }
 
                 QuickActionButton(
+                    icon: "heart.circle.fill",
+                    title: "Oracle",
+                    subtitle: "42 cartes",
+                    color: .cosmicRose
+                ) {
+                    viewModel.selectedTab = .oracle
+                }
+            }
+
+            HStack(spacing: 12) {
+                QuickActionButton(
                     icon: "square.grid.2x2",
                     title: "Collection",
-                    subtitle: "78 cartes",
+                    subtitle: "78 + 42 cartes",
                     color: .cosmicGold
                 ) {
                     viewModel.selectedTab = .collection

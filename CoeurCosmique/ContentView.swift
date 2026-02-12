@@ -14,6 +14,9 @@ struct ContentView: View {
                 DrawView(viewModel: viewModel)
                     .tag(AppTab.draw)
 
+                OracleDrawView(viewModel: viewModel)
+                    .tag(AppTab.oracle)
+
                 CollectionView(viewModel: viewModel)
                     .tag(AppTab.collection)
 
@@ -86,6 +89,7 @@ struct ContentView: View {
         switch tab {
         case .home: return viewModel.selectedTab == tab ? "sun.max.fill" : "sun.max"
         case .draw: return viewModel.selectedTab == tab ? "sparkles" : "sparkles"
+        case .oracle: return viewModel.selectedTab == tab ? "heart.circle.fill" : "heart.circle"
         case .collection: return viewModel.selectedTab == tab ? "square.grid.2x2.fill" : "square.grid.2x2"
         case .journal: return viewModel.selectedTab == tab ? "book.fill" : "book"
         }
@@ -95,6 +99,7 @@ struct ContentView: View {
         switch tab {
         case .home: return "Accueil"
         case .draw: return "Tirage"
+        case .oracle: return "Oracle"
         case .collection: return "Collection"
         case .journal: return "Journal"
         }
