@@ -7,8 +7,8 @@ struct OnboardingView: View {
     @State private var showPaywall = false
 
     // Animation states
-    @State private var iconScale: CGFloat = 0.3
-    @State private var iconOpacity: Double = 0
+    @State private var illustrationScale: CGFloat = 0.3
+    @State private var illustrationOpacity: Double = 0
     @State private var titleOffset: CGFloat = 30
     @State private var titleOpacity: Double = 0
     @State private var subtitleOffset: CGFloat = 20
@@ -47,12 +47,12 @@ struct OnboardingView: View {
         VStack(spacing: 0) {
             Spacer()
 
-            // Icon
-            pageIcon
-                .scaleEffect(iconScale)
-                .opacity(iconOpacity)
+            // Illustration (video or image)
+            pageIllustration
+                .scaleEffect(illustrationScale)
+                .opacity(illustrationOpacity)
 
-            Spacer().frame(height: 40)
+            Spacer().frame(height: 32)
 
             // Title
             Text(pages[currentPage].title)
@@ -75,7 +75,7 @@ struct OnboardingView: View {
                 .offset(y: subtitleOffset)
                 .opacity(subtitleOpacity)
 
-            Spacer().frame(height: 40)
+            Spacer().frame(height: 32)
 
             // Feature bullets (pages 1-3)
             if !pages[currentPage].features.isEmpty {
@@ -97,33 +97,71 @@ struct OnboardingView: View {
         .onAppear { animateIn() }
     }
 
-    // MARK: - Page Icon
+    // MARK: - Page Illustration
 
     @ViewBuilder
-    private var pageIcon: some View {
+    private var pageIllustration: some View {
         let page = pages[currentPage]
-        ZStack {
-            Circle()
-                .fill(
-                    RadialGradient(
-                        colors: [page.accentColor.opacity(0.3), Color.clear],
-                        center: .center,
-                        startRadius: 20,
-                        endRadius: 80
-                    )
-                )
-                .frame(width: 160, height: 160)
 
-            Image(systemName: page.icon)
-                .font(.system(size: 64, weight: .thin))
-                .foregroundStyle(
-                    LinearGradient(
-                        colors: [page.accentColor, page.accentColorLight],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
+        if let videoName = page.videoFileName {
+            LoopingVideoPlayer(fileName: videoName)
+                .frame(width: 240, height: 240)
+                .clipShape(RoundedRectangle(cornerRadius: 32))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 32)
+                        .strokeBorder(
+                            LinearGradient(
+                                colors: [page.accentColor.opacity(0.4), Color.clear],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            ),
+                            lineWidth: 1
+                        )
                 )
-                .glow(page.accentColor, radius: 12)
+                .shadow(color: page.accentColor.opacity(0.3), radius: 20)
+        } else if let imageName = page.imageName {
+            Image(imageName)
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(width: 240, height: 240)
+                .clipShape(RoundedRectangle(cornerRadius: 32))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 32)
+                        .strokeBorder(
+                            LinearGradient(
+                                colors: [page.accentColor.opacity(0.4), Color.clear],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            ),
+                            lineWidth: 1
+                        )
+                )
+                .shadow(color: page.accentColor.opacity(0.3), radius: 20)
+        } else {
+            // Fallback SF Symbol icon
+            ZStack {
+                Circle()
+                    .fill(
+                        RadialGradient(
+                            colors: [page.accentColor.opacity(0.3), Color.clear],
+                            center: .center,
+                            startRadius: 20,
+                            endRadius: 80
+                        )
+                    )
+                    .frame(width: 160, height: 160)
+
+                Image(systemName: page.icon)
+                    .font(.system(size: 64, weight: .thin))
+                    .foregroundStyle(
+                        LinearGradient(
+                            colors: [page.accentColor, page.accentColorLight],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .glow(page.accentColor, radius: 12)
+            }
         }
     }
 
@@ -200,8 +238,8 @@ struct OnboardingView: View {
     // MARK: - Animations
 
     private func resetAnimations() {
-        iconScale = 0.3
-        iconOpacity = 0
+        illustrationScale = 0.3
+        illustrationOpacity = 0
         titleOffset = 30
         titleOpacity = 0
         subtitleOffset = 20
@@ -211,8 +249,8 @@ struct OnboardingView: View {
 
     private func animateIn() {
         withAnimation(.spring(response: 0.6, dampingFraction: 0.7).delay(0.05)) {
-            iconScale = 1.0
-            iconOpacity = 1
+            illustrationScale = 1.0
+            illustrationOpacity = 1
         }
         withAnimation(.easeOut(duration: 0.5).delay(0.15)) {
             titleOffset = 0
@@ -237,6 +275,8 @@ struct OnboardingPage {
     let features: [String]
     let accentColor: Color
     let accentColorLight: Color
+    let videoFileName: String?
+    let imageName: String?
 
     static let allPages: [OnboardingPage] = [
         OnboardingPage(
@@ -245,7 +285,9 @@ struct OnboardingPage {
             subtitle: "Ton guide de Tarot personnel.\nDécouvre les messages que l'univers a pour toi.",
             features: [],
             accentColor: .cosmicGold,
-            accentColorLight: .cosmicGoldLight
+            accentColorLight: .cosmicGoldLight,
+            videoFileName: "onboarding-welcome",
+            imageName: "onboarding-welcome"
         ),
         OnboardingPage(
             icon: "suit.heart.fill",
@@ -258,7 +300,9 @@ struct OnboardingPage {
                 "Oui / Non instantané"
             ],
             accentColor: .cosmicRose,
-            accentColorLight: Color(red: 0.93, green: 0.73, blue: 0.73)
+            accentColorLight: Color(red: 0.93, green: 0.73, blue: 0.73),
+            videoFileName: "onboarding-spreads",
+            imageName: "onboarding-spreads"
         ),
         OnboardingPage(
             icon: "square.grid.2x2.fill",
@@ -271,7 +315,9 @@ struct OnboardingPage {
                 "Mots-clés pour chaque carte"
             ],
             accentColor: .cosmicPurple,
-            accentColorLight: .cosmicPurpleLight
+            accentColorLight: .cosmicPurpleLight,
+            videoFileName: nil,
+            imageName: "onboarding-collection"
         ),
         OnboardingPage(
             icon: "book.fill",
@@ -284,7 +330,9 @@ struct OnboardingPage {
                 "Relis tes interprétations"
             ],
             accentColor: .cosmicGold,
-            accentColorLight: .cosmicGoldLight
+            accentColorLight: .cosmicGoldLight,
+            videoFileName: nil,
+            imageName: "onboarding-journal"
         )
     ]
 }

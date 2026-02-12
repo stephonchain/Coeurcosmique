@@ -128,28 +128,26 @@ struct PaywallView: View {
         }
     }
 
-    // MARK: - Crown Icon
+    // MARK: - Header Illustration
 
     private var crownIcon: some View {
-        ZStack {
-            Circle()
-                .fill(
-                    RadialGradient(
-                        colors: [Color.cosmicGold.opacity(0.25), Color.clear],
-                        center: .center,
-                        startRadius: 15,
-                        endRadius: 70
+        Image("paywall-header")
+            .resizable()
+            .aspectRatio(contentMode: .fit)
+            .frame(maxWidth: 220, maxHeight: 220)
+            .clipShape(RoundedRectangle(cornerRadius: 28))
+            .overlay(
+                RoundedRectangle(cornerRadius: 28)
+                    .strokeBorder(
+                        LinearGradient(
+                            colors: [Color.cosmicGold.opacity(0.4), Color.clear],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ),
+                        lineWidth: 1
                     )
-                )
-                .frame(width: 130, height: 130)
-
-            Image(systemName: "crown.fill")
-                .font(.system(size: 56, weight: .thin))
-                .foregroundStyle(
-                    LinearGradient.cosmicGoldGradient
-                )
-                .glow(.cosmicGold, radius: 14)
-        }
+            )
+            .shadow(color: Color.cosmicGold.opacity(0.3), radius: 20)
     }
 
     // MARK: - Premium Features
