@@ -27,6 +27,10 @@
 		AA00000001000018 /* CosmicBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000002000018 /* CosmicBackground.swift */; };
 		AA00000001000019 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AA00000002000019 /* Assets.xcassets */; };
 		AA00000001000020 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AA00000002000020 /* Preview Assets.xcassets */; };
+		AA00000001000021 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000002000022 /* OnboardingView.swift */; };
+		AA00000001000022 /* PaywallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000002000023 /* PaywallView.swift */; };
+		AA00000001000023 /* StoreManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000002000024 /* StoreManager.swift */; };
+		AA00000001000024 /* LoopingVideoPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000002000025 /* LoopingVideoPlayer.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -51,6 +55,10 @@
 		AA00000002000019 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		AA00000002000020 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		AA00000002000021 /* CoeurCosmique.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CoeurCosmique.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		AA00000002000022 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
+		AA00000002000023 /* PaywallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallView.swift; sourceTree = "<group>"; };
+		AA00000002000024 /* StoreManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreManager.swift; sourceTree = "<group>"; };
+		AA00000002000025 /* LoopingVideoPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoopingVideoPlayer.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -93,6 +101,10 @@
 				AA00000002000016 /* JournalView.swift */,
 				AA00000002000017 /* TarotCardView.swift */,
 				AA00000002000018 /* CosmicBackground.swift */,
+				AA00000002000022 /* OnboardingView.swift */,
+				AA00000002000023 /* PaywallView.swift */,
+				AA00000002000024 /* StoreManager.swift */,
+				AA00000002000025 /* LoopingVideoPlayer.swift */,
 				AA00000002000019 /* Assets.xcassets */,
 				AA00000003000003 /* Preview Content */,
 			);
@@ -203,6 +215,10 @@
 				AA00000001000016 /* JournalView.swift in Sources */,
 				AA00000001000017 /* TarotCardView.swift in Sources */,
 				AA00000001000018 /* CosmicBackground.swift in Sources */,
+				AA00000001000021 /* OnboardingView.swift in Sources */,
+				AA00000001000022 /* PaywallView.swift in Sources */,
+				AA00000001000023 /* StoreManager.swift in Sources */,
+				AA00000001000024 /* LoopingVideoPlayer.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
