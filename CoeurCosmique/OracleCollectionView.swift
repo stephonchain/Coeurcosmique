@@ -26,17 +26,11 @@ struct OracleCollectionView: View {
     var body: some View {
         ScrollView(showsIndicators: false) {
             VStack(spacing: 20) {
-                // Header
-                VStack(spacing: 6) {
-                    Text("Oracle")
-                        .font(.cosmicTitle(28))
-                        .foregroundStyle(Color.cosmicText)
-
-                    Text("36 cartes · Cœur Cosmique")
-                        .font(.cosmicCaption())
-                        .foregroundStyle(Color.cosmicTextSecondary)
-                }
-                .padding(.top, 16)
+                // Subtitle
+                Text("\(viewModel.oracleDeck.count) cartes")
+                    .font(.cosmicCaption())
+                    .foregroundStyle(Color.cosmicTextSecondary)
+                    .padding(.top, 8)
 
                 // Search
                 HStack(spacing: 10) {

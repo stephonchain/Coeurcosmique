@@ -128,6 +128,7 @@ struct OnboardingView: View {
 
         if let videoName = page.videoFileName {
             LoopingVideoPlayer(fileName: videoName)
+                .id(videoName)
                 .frame(maxWidth: .infinity)
                 .frame(height: height)
                 .clipped()

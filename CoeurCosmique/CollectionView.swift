@@ -1,6 +1,88 @@
 import SwiftUI
 
+// MARK: - Deck Picker Enum
+
+enum CollectionDeck: String, CaseIterable {
+    case tarot
+    case oracle
+
+    var label: String {
+        switch self {
+        case .tarot: return "Tarot de Marseille"
+        case .oracle: return "Oracle Cœur Cosmique"
+        }
+    }
+}
+
+// MARK: - Collection Container
+
 struct CollectionView: View {
+    @ObservedObject var viewModel: AppViewModel
+    @State private var selectedDeck: CollectionDeck = .tarot
+
+    var body: some View {
+        VStack(spacing: 0) {
+            // Header + deck picker
+            VStack(spacing: 14) {
+                Text("Collection")
+                    .font(.cosmicTitle(28))
+                    .foregroundStyle(Color.cosmicText)
+                    .padding(.top, 16)
+
+                deckPicker
+                    .padding(.horizontal, 20)
+            }
+
+            // Deck content
+            if selectedDeck == .tarot {
+                TarotCollectionContent(viewModel: viewModel)
+                    .transition(.opacity)
+            } else {
+                OracleCollectionView(viewModel: viewModel)
+                    .transition(.opacity)
+            }
+        }
+    }
+
+    // MARK: - Deck Picker
+
+    private var deckPicker: some View {
+        HStack(spacing: 0) {
+            ForEach(CollectionDeck.allCases, id: \.self) { deck in
+                Button {
+                    withAnimation(.easeInOut(duration: 0.25)) {
+                        selectedDeck = deck
+                    }
+                } label: {
+                    Text(deck.label)
+                        .font(.cosmicCaption(13))
+                        .foregroundStyle(
+                            selectedDeck == deck ? Color.cosmicBackground : Color.cosmicTextSecondary
+                        )
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 10)
+                        .background(
+                            Capsule()
+                                .fill(selectedDeck == deck ? Color.cosmicGold : Color.clear)
+                        )
+                }
+                .buttonStyle(.plain)
+            }
+        }
+        .background(
+            Capsule()
+                .fill(Color.cosmicCard)
+                .overlay(
+                    Capsule()
+                        .strokeBorder(Color.white.opacity(0.08), lineWidth: 0.5)
+                )
+        )
+    }
+}
+
+// MARK: - Tarot Collection Content
+
+struct TarotCollectionContent: View {
     @ObservedObject var viewModel: AppViewModel
     @State private var selectedFilter: TarotCard.Arcana? = nil
     @State private var searchText = ""
@@ -15,17 +97,11 @@ struct CollectionView: View {
     var body: some View {
         ScrollView(showsIndicators: false) {
             VStack(spacing: 20) {
-                // Header
-                VStack(spacing: 6) {
-                    Text("Collection")
-                        .font(.cosmicTitle(28))
-                        .foregroundStyle(Color.cosmicText)
-
-                    Text("\(viewModel.deck.count) cartes du Tarot de Marseille")
-                        .font(.cosmicCaption())
-                        .foregroundStyle(Color.cosmicTextSecondary)
-                }
-                .padding(.top, 16)
+                // Subtitle
+                Text("\(viewModel.deck.count) cartes")
+                    .font(.cosmicCaption())
+                    .foregroundStyle(Color.cosmicTextSecondary)
+                    .padding(.top, 8)
 
                 // Search
                 searchBar
