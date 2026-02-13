@@ -5,6 +5,7 @@ struct OracleCollectionView: View {
     @EnvironmentObject var storeManager: StoreManager
     @State private var searchText = ""
     @State private var selectedCard: OracleCard?
+    @State private var showAbout = false
 
     private var filteredCards: [OracleCard] {
         if searchText.isEmpty {
@@ -31,6 +32,49 @@ struct OracleCollectionView: View {
                     .font(.cosmicCaption())
                     .foregroundStyle(Color.cosmicTextSecondary)
                     .padding(.top, 8)
+
+                // About button
+                Button {
+                    showAbout = true
+                } label: {
+                    HStack(spacing: 12) {
+                        Text("♡")
+                            .font(.system(size: 18))
+
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Découvrir l'Oracle Cœur Cosmique")
+                                .font(.cosmicHeadline(14))
+                                .foregroundStyle(Color.cosmicText)
+
+                            Text("L'histoire, le sens et l'énergie des 42 cartes")
+                                .font(.cosmicCaption(11))
+                                .foregroundStyle(Color.cosmicTextSecondary)
+                        }
+
+                        Spacer()
+
+                        Image(systemName: "chevron.right")
+                            .font(.system(size: 12, weight: .medium))
+                            .foregroundStyle(Color.cosmicRose.opacity(0.6))
+                    }
+                    .padding(14)
+                    .cosmicCard(cornerRadius: 14)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 14)
+                            .strokeBorder(
+                                LinearGradient(
+                                    colors: [
+                                        Color.cosmicRose.opacity(0.3),
+                                        Color.cosmicPurple.opacity(0.15)
+                                    ],
+                                    startPoint: .leading,
+                                    endPoint: .trailing
+                                ),
+                                lineWidth: 1
+                            )
+                    )
+                }
+                .buttonStyle(.plain)
 
                 // Search
                 HStack(spacing: 10) {
@@ -80,6 +124,9 @@ struct OracleCollectionView: View {
         .sheet(item: $selectedCard) { card in
             OracleDetailView(card: card)
                 .environmentObject(storeManager)
+        }
+        .sheet(isPresented: $showAbout) {
+            OracleAboutView()
         }
     }
 }
