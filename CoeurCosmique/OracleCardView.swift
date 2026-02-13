@@ -153,6 +153,7 @@ struct FlippableOracleCard: View {
     let card: OracleCard
     @Binding var isFlipped: Bool
     var size: OracleCardFront.CardSize = .medium
+    var onFullScreen: (() -> Void)? = nil
 
     var body: some View {
         ZStack {
@@ -171,8 +172,12 @@ struct FlippableOracleCard: View {
                 )
         }
         .onTapGesture {
-            withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
-                isFlipped.toggle()
+            if isFlipped, let onFullScreen {
+                onFullScreen()
+            } else {
+                withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
+                    isFlipped.toggle()
+                }
             }
         }
     }

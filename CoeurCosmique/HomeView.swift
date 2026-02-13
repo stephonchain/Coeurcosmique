@@ -5,6 +5,8 @@ struct HomeView: View {
     @State private var isCardFlipped = false
     @State private var showMotivation = false
     @State private var appeared = false
+    @State private var fullScreenTarotCard: TarotCard? = nil
+    @State private var fullScreenIsReversed = false
 
     var body: some View {
         ScrollView(showsIndicators: false) {
@@ -41,6 +43,13 @@ struct HomeView: View {
             }
             withAnimation(.easeOut(duration: 0.8).delay(0.3)) {
                 showMotivation = true
+            }
+        }
+        .overlay {
+            if let card = fullScreenTarotCard {
+                FullScreenCardView(content: .tarot(card, isReversed: fullScreenIsReversed)) {
+                    fullScreenTarotCard = nil
+                }
             }
         }
     }
@@ -121,7 +130,11 @@ struct HomeView: View {
                         card: card,
                         isReversed: drawn.isReversed,
                         isFlipped: $isCardFlipped,
-                        size: .large
+                        size: .large,
+                        onFullScreen: {
+                            fullScreenTarotCard = card
+                            fullScreenIsReversed = drawn.isReversed
+                        }
                     )
                     .onAppear {
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {

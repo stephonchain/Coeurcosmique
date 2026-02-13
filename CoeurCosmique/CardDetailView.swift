@@ -7,6 +7,7 @@ struct CardDetailView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var appeared = false
     @State private var showPaywall = false
+    @State private var showFullScreen = false
 
     var body: some View {
         ZStack {
@@ -51,10 +52,12 @@ struct CardDetailView: View {
                         }
                         .scaleEffect(appeared ? 1 : 0.8)
                         .opacity(appeared ? 1 : 0)
+                        .onTapGesture { showFullScreen = true }
                     } else {
                         TarotCardFront(card: card, isReversed: false, size: .large)
                             .scaleEffect(appeared ? 1 : 0.8)
                             .opacity(appeared ? 1 : 0)
+                            .onTapGesture { showFullScreen = true }
                     }
 
                     // Card name and arcana
@@ -113,6 +116,13 @@ struct CardDetailView: View {
         }
         .sheet(isPresented: $showPaywall) {
             PaywallView(storeManager: storeManager)
+        }
+        .overlay {
+            if showFullScreen {
+                FullScreenCardView(content: .tarot(card, isReversed: false)) {
+                    showFullScreen = false
+                }
+            }
         }
     }
 

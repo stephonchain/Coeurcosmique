@@ -217,6 +217,7 @@ struct FlippableTarotCard: View {
     let isReversed: Bool
     @Binding var isFlipped: Bool
     var size: TarotCardFront.CardSize = .medium
+    var onFullScreen: (() -> Void)? = nil
 
     var body: some View {
         ZStack {
@@ -235,8 +236,12 @@ struct FlippableTarotCard: View {
                 )
         }
         .onTapGesture {
-            withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
-                isFlipped.toggle()
+            if isFlipped, let onFullScreen {
+                onFullScreen()
+            } else {
+                withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
+                    isFlipped.toggle()
+                }
             }
         }
     }

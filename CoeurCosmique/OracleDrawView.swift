@@ -84,6 +84,7 @@ struct OracleDrawView: View {
     @State private var isDrawing = false
     @State private var revealedCards: Set<Int> = []
     @State private var showPaywall = false
+    @State private var fullScreenOracleCard: OracleCard? = nil
     @FocusState private var isQuestionFocused: Bool
 
     private var hasReachedFreeLimit: Bool {
@@ -133,6 +134,13 @@ struct OracleDrawView: View {
         }
         .sheet(isPresented: $showPaywall) {
             PaywallView(storeManager: storeManager)
+        }
+        .overlay {
+            if let card = fullScreenOracleCard {
+                FullScreenCardView(content: .oracle(card)) {
+                    fullScreenOracleCard = nil
+                }
+            }
         }
     }
 
@@ -370,7 +378,8 @@ struct OracleDrawView: View {
                         get: { isRevealed },
                         set: { if $0 { revealedCards.insert(index) } else { revealedCards.remove(index) } }
                     ),
-                    size: .large
+                    size: .large,
+                    onFullScreen: { fullScreenOracleCard = card }
                 )
 
                 if isRevealed {
@@ -408,7 +417,8 @@ struct OracleDrawView: View {
                         get: { isRevealed },
                         set: { if $0 { revealedCards.insert(index) } else { revealedCards.remove(index) } }
                     ),
-                    size: .medium
+                    size: .medium,
+                    onFullScreen: { fullScreenOracleCard = card }
                 )
 
                 if isRevealed {

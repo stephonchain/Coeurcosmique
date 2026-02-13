@@ -4,6 +4,7 @@ struct OracleDetailView: View {
     let card: OracleCard
     @EnvironmentObject var storeManager: StoreManager
     @State private var showPaywall = false
+    @State private var showFullScreen = false
 
     var body: some View {
         ScrollView(showsIndicators: false) {
@@ -11,6 +12,7 @@ struct OracleDetailView: View {
                 // Card image
                 OracleCardFront(card: card, size: .large)
                     .padding(.top, 16)
+                    .onTapGesture { showFullScreen = true }
 
                 // Card info
                 VStack(spacing: 12) {
@@ -129,6 +131,13 @@ struct OracleDetailView: View {
         .background(Color.cosmicBackground)
         .sheet(isPresented: $showPaywall) {
             PaywallView(storeManager: storeManager)
+        }
+        .overlay {
+            if showFullScreen {
+                FullScreenCardView(content: .oracle(card)) {
+                    showFullScreen = false
+                }
+            }
         }
     }
 }

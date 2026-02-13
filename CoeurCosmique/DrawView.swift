@@ -9,6 +9,8 @@ struct DrawView: View {
     @State private var revealedCards: Set<Int> = []
     @State private var showReading = false
     @State private var showPaywall = false
+    @State private var fullScreenTarotCard: TarotCard? = nil
+    @State private var fullScreenIsReversed = false
     @FocusState private var isQuestionFocused: Bool
 
     private var hasReachedFreeLimit: Bool {
@@ -58,6 +60,13 @@ struct DrawView: View {
         }
         .sheet(isPresented: $showPaywall) {
             PaywallView(storeManager: storeManager)
+        }
+        .overlay {
+            if let card = fullScreenTarotCard {
+                FullScreenCardView(content: .tarot(card, isReversed: fullScreenIsReversed)) {
+                    fullScreenTarotCard = nil
+                }
+            }
         }
     }
 
@@ -290,7 +299,11 @@ struct DrawView: View {
                         get: { isRevealed },
                         set: { if $0 { revealedCards.insert(index) } else { revealedCards.remove(index) } }
                     ),
-                    size: .large
+                    size: .large,
+                    onFullScreen: {
+                        fullScreenTarotCard = card
+                        fullScreenIsReversed = drawn.isReversed
+                    }
                 )
 
                 if isRevealed {
@@ -329,7 +342,11 @@ struct DrawView: View {
                         get: { isRevealed },
                         set: { if $0 { revealedCards.insert(index) } else { revealedCards.remove(index) } }
                     ),
-                    size: .medium
+                    size: .medium,
+                    onFullScreen: {
+                        fullScreenTarotCard = card
+                        fullScreenIsReversed = drawn.isReversed
+                    }
                 )
 
                 if isRevealed {

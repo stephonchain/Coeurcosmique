@@ -39,6 +39,7 @@
 		AA00000001000033 /* OracleDrawView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000002000033 /* OracleDrawView.swift */; };
 		AA00000001000034 /* OracleDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000002000034 /* OracleDetailView.swift */; };
 		AA00000001000035 /* OracleCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000002000035 /* OracleCollectionView.swift */; };
+		AA00000001000036 /* FullScreenCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000002000036 /* FullScreenCardView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -75,6 +76,7 @@
 		AA00000002000033 /* OracleDrawView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OracleDrawView.swift; sourceTree = "<group>"; };
 		AA00000002000034 /* OracleDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OracleDetailView.swift; sourceTree = "<group>"; };
 		AA00000002000035 /* OracleCollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OracleCollectionView.swift; sourceTree = "<group>"; };
+		AA00000002000036 /* FullScreenCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FullScreenCardView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -127,6 +129,7 @@
 				AA00000002000033 /* OracleDrawView.swift */,
 				AA00000002000034 /* OracleDetailView.swift */,
 				AA00000002000035 /* OracleCollectionView.swift */,
+				AA00000002000036 /* FullScreenCardView.swift */,
 				AA00000003000005 /* Videos */,
 				AA00000002000019 /* Assets.xcassets */,
 				AA00000003000003 /* Preview Content */,
@@ -259,6 +262,7 @@
 				AA00000001000033 /* OracleDrawView.swift in Sources */,
 				AA00000001000034 /* OracleDetailView.swift in Sources */,
 				AA00000001000035 /* OracleCollectionView.swift in Sources */,
+				AA00000001000036 /* FullScreenCardView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
