@@ -16,6 +16,7 @@ final class AppViewModel: ObservableObject {
     @Published var dailyCard: DrawnCard?
     @Published var currentReading: TarotReading?
     @Published var history: [ReadingHistoryEntry] = []
+    @Published var oracleHistory: [OracleReadingHistoryEntry] = []
     @Published var todayDrawCount: Int = 0
 
     // Oracle state
@@ -72,6 +73,10 @@ final class AppViewModel: ObservableObject {
         history = historyStore.load()
     }
 
+    func loadOracleHistory() {
+        oracleHistory = historyStore.loadOracle()
+    }
+
     // MARK: - Draw Tracking
 
     func loadTodayDrawCount() {
@@ -112,7 +117,12 @@ final class AppViewModel: ObservableObject {
                 drawnCards.append(DrawnOracleCard(card: card))
             }
         }
-        currentOracleReading = OracleReading(spread: spread, cards: drawnCards, question: question)
+        let reading = OracleReading(spread: spread, cards: drawnCards, question: question)
+        currentOracleReading = reading
+
+        let entry = OracleReadingHistoryEntry(from: reading, deck: oracleDeck)
+        historyStore.appendOracle(entry)
+        loadOracleHistory()
         incrementOracleDrawCount()
     }
 
