@@ -1,67 +1,18 @@
 import SwiftUI
 
-// MARK: - Image Loader (handles Wikimedia User-Agent + caching)
-
-@MainActor
-final class CardImageLoader: ObservableObject {
-    @Published var image: UIImage?
-    @Published var isLoading = false
-
-    private static let cache = NSCache<NSString, UIImage>()
-
-    private static let session: URLSession = {
-        let config = URLSessionConfiguration.default
-        config.httpAdditionalHeaders = [
-            "User-Agent": "CoeurCosmique/1.0 (iOS; Tarot App)"
-        ]
-        return URLSession(configuration: config)
-    }()
-
-    func load(from urlString: String) {
-        let key = urlString as NSString
-        if let cached = Self.cache.object(forKey: key) {
-            self.image = cached
-            return
-        }
-
-        guard let url = URL(string: urlString) else { return }
-        isLoading = true
-
-        Task {
-            do {
-                let (data, _) = try await Self.session.data(from: url)
-                if let loaded = UIImage(data: data) {
-                    Self.cache.setObject(loaded, forKey: key)
-                    self.image = loaded
-                }
-            } catch {}
-            self.isLoading = false
-        }
-    }
-}
-
-// MARK: - Card Image (loads from URL)
+// MARK: - Card Image (loads from local asset)
 
 struct CardImage: View {
-    let url: String?
+    let imageName: String
     var size: TarotCardFront.CardSize = .medium
-    @StateObject private var loader = CardImageLoader()
 
     var body: some View {
-        Group {
-            if let uiImage = loader.image {
-                Image(uiImage: uiImage)
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-            } else if loader.isLoading {
-                ProgressView()
-                    .tint(Color.cosmicGold)
-            } else {
-                fallbackView
-            }
-        }
-        .onAppear {
-            if let url { loader.load(from: url) }
+        if !imageName.isEmpty, UIImage(named: imageName) != nil {
+            Image(imageName)
+                .resizable()
+                .aspectRatio(contentMode: .fill)
+        } else {
+            fallbackView
         }
     }
 
@@ -133,7 +84,7 @@ struct TarotCardFront: View {
                 )
 
             // Card image
-            CardImage(url: card.imageURL, size: size)
+            CardImage(imageName: card.imageName, size: size)
                 .clipShape(RoundedRectangle(cornerRadius: size == .large ? 12 : 8))
                 .padding(size == .large ? 8 : 5)
 

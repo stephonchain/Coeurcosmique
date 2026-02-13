@@ -91,24 +91,10 @@ struct FullScreenCardView: View {
 
     private func tarotImage(card: TarotCard, isReversed: Bool) -> some View {
         Group {
-            if let urlString = card.imageURL, let url = URL(string: urlString) {
-                AsyncImage(url: url) { phase in
-                    switch phase {
-                    case .success(let image):
-                        image
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                    case .failure:
-                        tarotFallback(card: card)
-                    case .empty:
-                        RoundedRectangle(cornerRadius: 20)
-                            .fill(Color.cosmicCard)
-                            .aspectRatio(0.6, contentMode: .fit)
-                            .overlay(ProgressView().tint(.cosmicGold))
-                    @unknown default:
-                        tarotFallback(card: card)
-                    }
-                }
+            if !card.imageName.isEmpty, UIImage(named: card.imageName) != nil {
+                Image(card.imageName)
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
             } else {
                 tarotFallback(card: card)
             }

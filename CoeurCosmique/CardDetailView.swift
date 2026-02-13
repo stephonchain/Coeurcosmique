@@ -22,43 +22,28 @@ struct CardDetailView: View {
                         .padding(.top, 12)
 
                     // Large card image
-                    if let urlString = card.imageURL, let url = URL(string: urlString) {
-                        AsyncImage(url: url) { phase in
-                            switch phase {
-                            case .success(let image):
-                                image
-                                    .resizable()
-                                    .aspectRatio(contentMode: .fit)
-                                    .frame(maxWidth: 260)
-                                    .clipShape(RoundedRectangle(cornerRadius: 16))
-                                    .overlay(
-                                        RoundedRectangle(cornerRadius: 16)
-                                            .strokeBorder(
-                                                LinearGradient.cosmicGoldGradient,
-                                                lineWidth: 1.5
-                                            )
-                                    )
-                                    .shadow(color: Color.cosmicGold.opacity(0.3), radius: 20)
-                            case .failure:
-                                TarotCardFront(card: card, isReversed: false, size: .large)
-                            case .empty:
-                                RoundedRectangle(cornerRadius: 16)
-                                    .fill(Color.cosmicCard)
-                                    .frame(width: 220, height: 352)
-                                    .overlay(ProgressView().tint(Color.cosmicGold))
-                            @unknown default:
-                                TarotCardFront(card: card, isReversed: false, size: .large)
-                            }
+                    Group {
+                        if !card.imageName.isEmpty, UIImage(named: card.imageName) != nil {
+                            Image(card.imageName)
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(maxWidth: 260)
+                                .clipShape(RoundedRectangle(cornerRadius: 16))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 16)
+                                        .strokeBorder(
+                                            LinearGradient.cosmicGoldGradient,
+                                            lineWidth: 1.5
+                                        )
+                                )
+                                .shadow(color: Color.cosmicGold.opacity(0.3), radius: 20)
+                        } else {
+                            TarotCardFront(card: card, isReversed: false, size: .large)
                         }
-                        .scaleEffect(appeared ? 1 : 0.8)
-                        .opacity(appeared ? 1 : 0)
-                        .onTapGesture { showFullScreen = true }
-                    } else {
-                        TarotCardFront(card: card, isReversed: false, size: .large)
-                            .scaleEffect(appeared ? 1 : 0.8)
-                            .opacity(appeared ? 1 : 0)
-                            .onTapGesture { showFullScreen = true }
                     }
+                    .scaleEffect(appeared ? 1 : 0.8)
+                    .opacity(appeared ? 1 : 0)
+                    .onTapGesture { showFullScreen = true }
 
                     // Card name and arcana
                     VStack(spacing: 8) {
