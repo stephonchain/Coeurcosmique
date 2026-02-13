@@ -11,7 +11,7 @@ struct FullScreenCardView: View {
     let content: CardContent
     let onDismiss: () -> Void
 
-    @State private var appear: CGFloat = 0
+    @State private var appear: Double = 0
 
     var body: some View {
         ZStack {
