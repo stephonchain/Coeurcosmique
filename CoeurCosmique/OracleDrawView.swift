@@ -433,7 +433,7 @@ struct OracleDrawView: View {
 
     private func oracleInterpretationView(card: OracleCard) -> some View {
         VStack(spacing: 10) {
-            Text(card.name)
+            Text("\(card.number). \(card.name)")
                 .font(.cosmicHeadline(16))
                 .foregroundStyle(Color.cosmicText)
 

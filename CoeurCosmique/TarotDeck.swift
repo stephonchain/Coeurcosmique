@@ -219,6 +219,8 @@ enum TarotDeck {
     private static func minorArcana(for suit: TarotCard.Arcana) -> [TarotCard] {
         let suitName = suit.displayName
         let suitEnergy: String
+        let suitEnergyM: String
+        let suitEnergyMP: String
         let loveFlavor: String
         let careerFlavor: String
         let spiritFlavor: String
@@ -227,30 +229,40 @@ enum TarotDeck {
         switch suit {
         case .cups:
             suitEnergy = "émotionnelle"
+            suitEnergyM = "émotionnel"
+            suitEnergyMP = "émotionnels"
             loveFlavor = "la tendresse et la profondeur des sentiments"
             careerFlavor = "l'harmonie au sein de l'équipe et la satisfaction"
             spiritFlavor = "l'ouverture du cœur et la compassion"
             imageKey = "Cups"
         case .wands:
             suitEnergy = "créative"
+            suitEnergyM = "créatif"
+            suitEnergyMP = "créatifs"
             loveFlavor = "la passion et l'élan qui vivifient la relation"
             careerFlavor = "l'initiative audacieuse et l'ambition inspirée"
             spiritFlavor = "le feu intérieur et l'enthousiasme sacré"
             imageKey = "Wands"
         case .swords:
             suitEnergy = "mentale"
+            suitEnergyM = "mental"
+            suitEnergyMP = "mentaux"
             loveFlavor = "la clarté et l'honnêteté dans les échanges"
             careerFlavor = "la stratégie et l'analyse pour avancer"
             spiritFlavor = "le discernement et la vérité intérieure"
             imageKey = "Swords"
         case .pentacles:
             suitEnergy = "matérielle"
+            suitEnergyM = "matériel"
+            suitEnergyMP = "matériels"
             loveFlavor = "la stabilité et l'engagement concret"
             careerFlavor = "la prospérité et la construction durable"
             spiritFlavor = "l'ancrage et la connexion à la terre"
             imageKey = "Pents"
         default:
             suitEnergy = "globale"
+            suitEnergyM = "global"
+            suitEnergyMP = "globaux"
             loveFlavor = "l'amour"
             careerFlavor = "le travail"
             spiritFlavor = "la spiritualité"
@@ -261,10 +273,10 @@ enum TarotDeck {
 
         let ranks: [(String, [String], String, String)] = [
             ("As", ["commencement", "potentiel", "graine"],
-             "Un nouveau départ \(suitEnergy) plein de promesses.",
-             "Un blocage empêche l'élan \(suitEnergy) de s'exprimer."),
+             "Un nouveau départ \(suitEnergyM) plein de promesses.",
+             "Un blocage empêche l'élan \(suitEnergyM) de s'exprimer."),
             ("Deux", ["dualité", "équilibre", "choix"],
-             "Un partenariat ou un choix \(suitEnergy) s'offre à toi.",
+             "Un partenariat ou un choix \(suitEnergyM) s'offre à toi.",
              "L'indécision freine ton énergie \(suitEnergy)."),
             ("Trois", ["expansion", "collaboration", "croissance"],
              "L'énergie \(suitEnergy) s'épanouit et porte ses premiers fruits.",
@@ -274,31 +286,31 @@ enum TarotDeck {
              "La stagnation ou l'excès de prudence bloque l'énergie \(suitEnergy)."),
             ("Cinq", ["conflit", "épreuve", "transformation"],
              "Une épreuve \(suitEnergy) invite à la résilience.",
-             "Le conflit intérieur \(suitEnergy) demande une résolution."),
+             "Le conflit \(suitEnergyM) intérieur demande une résolution."),
             ("Six", ["harmonie", "générosité", "réconciliation"],
              "L'harmonie \(suitEnergy) est retrouvée, partage cette énergie.",
-             "Un déséquilibre dans les échanges \(suitEnergy) persiste."),
+             "Un déséquilibre dans les échanges \(suitEnergyMP) persiste."),
             ("Sept", ["réflexion", "stratégie", "patience"],
              "La réflexion \(suitEnergy) guide une stratégie gagnante.",
-             "L'impatience ou la confusion brouille tes plans \(suitEnergy)."),
+             "L'impatience ou la confusion brouille tes plans \(suitEnergyMP)."),
             ("Huit", ["mouvement", "progrès", "maîtrise"],
-             "Un progrès rapide \(suitEnergy) se manifeste.",
+             "Un progrès \(suitEnergyM) rapide se manifeste.",
              "La précipitation ou le manque de direction \(suitEnergy) ralentit."),
             ("Neuf", ["accomplissement", "abondance", "maturité"],
-             "L'aboutissement \(suitEnergy) est proche, savoure le chemin.",
+             "L'aboutissement \(suitEnergyM) est proche, savoure le chemin.",
              "L'isolement ou le doute entache ta réussite \(suitEnergy)."),
             ("Dix", ["plénitude", "cycle complet", "transition"],
-             "Un cycle \(suitEnergy) se boucle, ouvre-toi à la suite.",
-             "Le poids d'un cycle \(suitEnergy) achevé appelle le lâcher-prise."),
+             "Un cycle \(suitEnergyM) se boucle, ouvre-toi à la suite.",
+             "Le poids d'un cycle \(suitEnergyM) achevé appelle le lâcher-prise."),
             ("Valet", ["curiosité", "apprentissage", "message"],
-             "Un message ou un apprentissage \(suitEnergy) arrive.",
+             "Un message ou un apprentissage \(suitEnergyM) arrive.",
              "L'immaturité ou la naïveté \(suitEnergy) demande vigilance."),
             ("Cavalier", ["action", "élan", "quête"],
              "L'action \(suitEnergy) dynamise ta quête.",
              "L'impulsivité \(suitEnergy) risque de te déséquilibrer."),
             ("Reine", ["réceptivité", "intuition", "nourriture"],
              "L'énergie \(suitEnergy) s'exprime avec grâce et intuition.",
-             "L'excès \(suitEnergy) ou la dépendance guette."),
+             "L'excès \(suitEnergyM) ou la dépendance guette."),
             ("Roi", ["maîtrise", "leadership", "sagesse"],
              "La maîtrise \(suitEnergy) te positionne en leader sage.",
              "L'autoritarisme ou la rigidité \(suitEnergy) isole.")

@@ -81,7 +81,7 @@ struct FullScreenCardView: View {
                 }
             }
         case .oracle(let card):
-            Text(card.name)
+            Text("\(card.number). \(card.name)")
                 .font(.cosmicTitle(22))
                 .foregroundStyle(.white)
         }
@@ -123,7 +123,7 @@ struct FullScreenCardView: View {
                     Text("✦")
                         .font(.system(size: 50))
                         .foregroundStyle(Color.cosmicGold.opacity(0.5))
-                    Text(card.name)
+                    Text("\(card.number). \(card.name)")
                         .font(.cosmicHeadline(18))
                         .foregroundStyle(.white.opacity(0.7))
                 }

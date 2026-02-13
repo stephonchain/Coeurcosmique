@@ -68,7 +68,7 @@ struct OracleCardFront: View {
             VStack {
                 Spacer()
 
-                Text(card.name)
+                Text("\(card.number). \(card.name)")
                     .font(size.titleFont)
                     .foregroundStyle(.white)
                     .lineLimit(1)

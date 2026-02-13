@@ -22,7 +22,7 @@ struct OracleDetailView: View {
                         .textCase(.uppercase)
                         .kerning(2)
 
-                    Text(card.name)
+                    Text("\(card.number). \(card.name)")
                         .font(.cosmicTitle(26))
                         .foregroundStyle(Color.cosmicText)
                         .multilineTextAlignment(.center)
