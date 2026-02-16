@@ -115,6 +115,18 @@ struct CardDetailView: View {
 
     private var premiumContent: some View {
         VStack(spacing: 16) {
+            // Element & Numerology
+            if !card.element.isEmpty || !card.numerology.isEmpty {
+                HStack(spacing: 12) {
+                    if !card.element.isEmpty {
+                        infoChip(icon: "flame.fill", label: "Élément", value: card.element)
+                    }
+                    if !card.numerology.isEmpty {
+                        infoChip(icon: "number.circle.fill", label: "Numérologie", value: card.numerology)
+                    }
+                }
+            }
+
             // Meanings
             meaningSection(
                 title: "Sens droit",
@@ -301,6 +313,32 @@ struct CardDetailView: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(14)
+        .cosmicCard(cornerRadius: 12)
+    }
+
+    // MARK: - Info Chip
+
+    private func infoChip(icon: String, label: String, value: String) -> some View {
+        VStack(spacing: 6) {
+            HStack(spacing: 5) {
+                Image(systemName: icon)
+                    .font(.system(size: 10))
+                    .foregroundStyle(Color.cosmicGold)
+                Text(label)
+                    .font(.cosmicCaption(10))
+                    .foregroundStyle(Color.cosmicTextSecondary)
+                    .textCase(.uppercase)
+                    .kerning(0.8)
+            }
+            Text(value)
+                .font(.cosmicBody(12))
+                .foregroundStyle(Color.cosmicText.opacity(0.85))
+                .multilineTextAlignment(.center)
+                .lineSpacing(2)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 10)
         .cosmicCard(cornerRadius: 12)
     }
 }
