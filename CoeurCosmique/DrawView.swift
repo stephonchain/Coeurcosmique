@@ -18,6 +18,34 @@ struct DrawView: View {
     }
 
     var body: some View {
+        Group {
+            if let reading = viewModel.currentReading, showReading {
+                readingResultScreen(reading)
+                    .transition(.opacity)
+            } else {
+                drawMenuScreen
+                    .transition(.opacity)
+            }
+        }
+        .animation(.easeInOut(duration: 0.4), value: showReading)
+        .onAppear {
+            viewModel.loadTodayDrawCount()
+        }
+        .sheet(isPresented: $showPaywall) {
+            PaywallView(storeManager: storeManager)
+        }
+        .overlay {
+            if let card = fullScreenTarotCard {
+                FullScreenCardView(content: .tarot(card, isReversed: fullScreenIsReversed)) {
+                    fullScreenTarotCard = nil
+                }
+            }
+        }
+    }
+
+    // MARK: - Draw Menu Screen
+
+    private var drawMenuScreen: some View {
         ScrollView(showsIndicators: false) {
             VStack(spacing: 24) {
                 // Title
@@ -46,27 +74,72 @@ struct DrawView: View {
                 // Draw button
                 drawButton
 
-                // Reading display
-                if let reading = viewModel.currentReading {
-                    readingSection(reading)
-                }
-
                 Spacer(minLength: 100)
             }
             .padding(.horizontal, 20)
         }
-        .onAppear {
-            viewModel.loadTodayDrawCount()
-        }
-        .sheet(isPresented: $showPaywall) {
-            PaywallView(storeManager: storeManager)
-        }
-        .overlay {
-            if let card = fullScreenTarotCard {
-                FullScreenCardView(content: .tarot(card, isReversed: fullScreenIsReversed)) {
-                    fullScreenTarotCard = nil
+    }
+
+    // MARK: - Reading Result Screen
+
+    private func readingResultScreen(_ reading: TarotReading) -> some View {
+        ScrollView(showsIndicators: false) {
+            VStack(spacing: 24) {
+                // Spread title
+                VStack(spacing: 8) {
+                    Text(reading.spread.title)
+                        .font(.cosmicTitle(26))
+                        .foregroundStyle(Color.cosmicGold)
+
+                    if let q = reading.question, !q.isEmpty {
+                        Text("« \(q) »")
+                            .font(.cosmicBody(14))
+                            .foregroundStyle(Color.cosmicTextSecondary)
+                            .italic()
+                    }
                 }
+                .padding(.top, 16)
+
+                // Cards
+                if reading.cards.count == 1 {
+                    singleCardView(reading.cards[0], label: reading.spread.labels[0], index: 0)
+                } else {
+                    ForEach(Array(reading.cards.enumerated()), id: \.element.id) { index, drawn in
+                        let label = index < reading.spread.labels.count
+                            ? reading.spread.labels[index]
+                            : ""
+                        cardReadingView(drawn, label: label, index: index)
+                    }
+                }
+
+                // New draw button
+                Button {
+                    withAnimation {
+                        showReading = false
+                        viewModel.currentReading = nil
+                        revealedCards = []
+                        question = ""
+                    }
+                } label: {
+                    HStack(spacing: 10) {
+                        Image(systemName: "arrow.counterclockwise")
+                            .font(.system(size: 15, weight: .medium))
+                        Text("Nouveau tirage")
+                            .font(.cosmicHeadline(16))
+                    }
+                    .foregroundStyle(Color.cosmicGold)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 16)
+                    .background(
+                        RoundedRectangle(cornerRadius: 16)
+                            .strokeBorder(Color.cosmicGold.opacity(0.5), lineWidth: 1.5)
+                    )
+                }
+                .buttonStyle(.plain)
+
+                Spacer(minLength: 100)
             }
+            .padding(.horizontal, 20)
         }
     }
 
@@ -237,50 +310,6 @@ struct DrawView: View {
         .disabled(isDrawing)
     }
 
-    // MARK: - Reading Display
-
-    private func readingSection(_ reading: TarotReading) -> some View {
-        VStack(spacing: 24) {
-            // Divider
-            HStack(spacing: 12) {
-                Rectangle()
-                    .fill(Color.cosmicDivider)
-                    .frame(height: 1)
-                Text("✦")
-                    .font(.system(size: 12))
-                    .foregroundStyle(Color.cosmicGold)
-                Rectangle()
-                    .fill(Color.cosmicDivider)
-                    .frame(height: 1)
-            }
-
-            // Spread title
-            Text(reading.spread.title)
-                .font(.cosmicHeadline(18))
-                .foregroundStyle(Color.cosmicGold)
-
-            if let q = reading.question, !q.isEmpty {
-                Text("« \(q) »")
-                    .font(.cosmicBody(14))
-                    .foregroundStyle(Color.cosmicTextSecondary)
-                    .italic()
-            }
-
-            // Cards
-            if reading.cards.count == 1 {
-                singleCardView(reading.cards[0], label: reading.spread.labels[0], index: 0)
-            } else {
-                ForEach(Array(reading.cards.enumerated()), id: \.element.id) { index, drawn in
-                    let label = index < reading.spread.labels.count
-                        ? reading.spread.labels[index]
-                        : ""
-                    cardReadingView(drawn, label: label, index: index)
-                }
-            }
-        }
-        .transition(.opacity.combined(with: .move(edge: .bottom)))
-    }
-
     private func singleCardView(_ drawn: DrawnCard, label: String, index: Int) -> some View {
         VStack(spacing: 16) {
             if let card = drawn.resolve(from: viewModel.deck) {
@@ -398,7 +427,6 @@ struct DrawView: View {
         isQuestionFocused = false
         isDrawing = true
         revealedCards = []
-        showReading = false
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
             viewModel.performReading(
@@ -406,7 +434,9 @@ struct DrawView: View {
                 question: question.isEmpty ? nil : question
             )
             isDrawing = false
-            showReading = true
+            withAnimation {
+                showReading = true
+            }
 
             // Auto-reveal cards sequentially
             if let reading = viewModel.currentReading {

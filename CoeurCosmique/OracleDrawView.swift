@@ -83,6 +83,7 @@ struct OracleDrawView: View {
     @State private var question: String = ""
     @State private var isDrawing = false
     @State private var revealedCards: Set<Int> = []
+    @State private var showReading = false
     @State private var showPaywall = false
     @State private var fullScreenOracleCard: OracleCard? = nil
     @FocusState private var isQuestionFocused: Bool
@@ -92,6 +93,34 @@ struct OracleDrawView: View {
     }
 
     var body: some View {
+        Group {
+            if let reading = viewModel.currentOracleReading, showReading {
+                oracleReadingResultScreen(reading)
+                    .transition(.opacity)
+            } else {
+                oracleMenuScreen
+                    .transition(.opacity)
+            }
+        }
+        .animation(.easeInOut(duration: 0.4), value: showReading)
+        .onAppear {
+            viewModel.loadTodayOracleDrawCount()
+        }
+        .sheet(isPresented: $showPaywall) {
+            PaywallView(storeManager: storeManager)
+        }
+        .overlay {
+            if let card = fullScreenOracleCard {
+                FullScreenCardView(content: .oracle(card)) {
+                    fullScreenOracleCard = nil
+                }
+            }
+        }
+    }
+
+    // MARK: - Oracle Menu Screen
+
+    private var oracleMenuScreen: some View {
         ScrollView(showsIndicators: false) {
             VStack(spacing: 24) {
                 // Title
@@ -120,27 +149,72 @@ struct OracleDrawView: View {
                 // Draw button
                 oracleDrawButton
 
-                // Reading display
-                if let reading = viewModel.currentOracleReading {
-                    oracleReadingSection(reading)
-                }
-
                 Spacer(minLength: 100)
             }
             .padding(.horizontal, 20)
         }
-        .onAppear {
-            viewModel.loadTodayOracleDrawCount()
-        }
-        .sheet(isPresented: $showPaywall) {
-            PaywallView(storeManager: storeManager)
-        }
-        .overlay {
-            if let card = fullScreenOracleCard {
-                FullScreenCardView(content: .oracle(card)) {
-                    fullScreenOracleCard = nil
+    }
+
+    // MARK: - Oracle Reading Result Screen
+
+    private func oracleReadingResultScreen(_ reading: OracleReading) -> some View {
+        ScrollView(showsIndicators: false) {
+            VStack(spacing: 24) {
+                // Spread title
+                VStack(spacing: 8) {
+                    Text(reading.spread.title)
+                        .font(.cosmicTitle(26))
+                        .foregroundStyle(Color.cosmicRose)
+
+                    if let q = reading.question, !q.isEmpty {
+                        Text("« \(q) »")
+                            .font(.cosmicBody(14))
+                            .foregroundStyle(Color.cosmicTextSecondary)
+                            .italic()
+                    }
                 }
+                .padding(.top, 16)
+
+                // Cards
+                if reading.cards.count == 1 {
+                    singleOracleCardView(reading.cards[0], label: reading.spread.labels[0], index: 0)
+                } else {
+                    ForEach(Array(reading.cards.enumerated()), id: \.element.id) { index, drawn in
+                        let label = index < reading.spread.labels.count
+                            ? reading.spread.labels[index]
+                            : ""
+                        multiOracleCardView(drawn, label: label, index: index, total: reading.cards.count)
+                    }
+                }
+
+                // New draw button
+                Button {
+                    withAnimation {
+                        showReading = false
+                        viewModel.currentOracleReading = nil
+                        revealedCards = []
+                        question = ""
+                    }
+                } label: {
+                    HStack(spacing: 10) {
+                        Image(systemName: "arrow.counterclockwise")
+                            .font(.system(size: 15, weight: .medium))
+                        Text("Nouveau tirage")
+                            .font(.cosmicHeadline(16))
+                    }
+                    .foregroundStyle(Color.cosmicRose)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 16)
+                    .background(
+                        RoundedRectangle(cornerRadius: 16)
+                            .strokeBorder(Color.cosmicRose.opacity(0.5), lineWidth: 1.5)
+                    )
+                }
+                .buttonStyle(.plain)
+
+                Spacer(minLength: 100)
             }
+            .padding(.horizontal, 20)
         }
     }
 
@@ -317,50 +391,6 @@ struct OracleDrawView: View {
         .disabled(isDrawing)
     }
 
-    // MARK: - Reading Display
-
-    private func oracleReadingSection(_ reading: OracleReading) -> some View {
-        VStack(spacing: 24) {
-            // Divider
-            HStack(spacing: 12) {
-                Rectangle()
-                    .fill(Color.cosmicDivider)
-                    .frame(height: 1)
-                Text("♡")
-                    .font(.system(size: 14))
-                    .foregroundStyle(Color.cosmicRose)
-                Rectangle()
-                    .fill(Color.cosmicDivider)
-                    .frame(height: 1)
-            }
-
-            // Spread title
-            Text(reading.spread.title)
-                .font(.cosmicHeadline(18))
-                .foregroundStyle(Color.cosmicRose)
-
-            if let q = reading.question, !q.isEmpty {
-                Text("« \(q) »")
-                    .font(.cosmicBody(14))
-                    .foregroundStyle(Color.cosmicTextSecondary)
-                    .italic()
-            }
-
-            // Cards
-            if reading.cards.count == 1 {
-                singleOracleCardView(reading.cards[0], label: reading.spread.labels[0], index: 0)
-            } else {
-                ForEach(Array(reading.cards.enumerated()), id: \.element.id) { index, drawn in
-                    let label = index < reading.spread.labels.count
-                        ? reading.spread.labels[index]
-                        : ""
-                    multiOracleCardView(drawn, label: label, index: index, total: reading.cards.count)
-                }
-            }
-        }
-        .transition(.opacity.combined(with: .move(edge: .bottom)))
-    }
-
     private func singleOracleCardView(_ drawn: DrawnOracleCard, label: String, index: Int) -> some View {
         VStack(spacing: 16) {
             if let card = drawn.resolve(from: viewModel.oracleDeck) {
@@ -481,6 +511,9 @@ struct OracleDrawView: View {
                 question: question.isEmpty ? nil : question
             )
             isDrawing = false
+            withAnimation {
+                showReading = true
+            }
 
             // Auto-reveal cards sequentially
             if let reading = viewModel.currentOracleReading {
