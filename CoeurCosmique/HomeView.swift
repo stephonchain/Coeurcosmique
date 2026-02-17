@@ -3,11 +3,13 @@ import SwiftUI
 struct HomeView: View {
     @ObservedObject var viewModel: AppViewModel
     @StateObject private var affirmationEngine = AffirmationEngine()
+    @StateObject private var gratitudeStore = GratitudeStore()
     @State private var isCardFlipped = false
     @State private var showMotivation = false
     @State private var appeared = false
     @State private var fullScreenTarotCard: TarotCard? = nil
     @State private var fullScreenIsReversed = false
+    @State private var showGratitudeSheet = false
 
     var body: some View {
         ScrollView(showsIndicators: false) {
@@ -33,6 +35,11 @@ struct HomeView: View {
                 dailyCardSection
                     .opacity(appeared ? 1 : 0)
                     .offset(y: appeared ? 0 : 40)
+                
+                // Gratitude Quick-Add
+                gratitudeSection
+                    .opacity(appeared ? 1 : 0)
+                    .offset(y: appeared ? 0 : 45)
 
                 // Quick actions
                 quickActionsSection
@@ -59,6 +66,9 @@ struct HomeView: View {
                     fullScreenTarotCard = nil
                 }
             }
+        }
+        .sheet(isPresented: $showGratitudeSheet) {
+            GratitudeQuickView(isPresented: $showGratitudeSheet)
         }
     }
 
@@ -155,7 +165,75 @@ struct HomeView: View {
             }
         }
     }
-
+    
+    // MARK: - Gratitude Quick-Add
+    
+    private var gratitudeSection: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            HStack(spacing: 8) {
+                Image(systemName: "sparkles")
+                    .font(.system(size: 14))
+                    .foregroundStyle(Color.cosmicGold)
+                
+                Text("Gratitude")
+                    .font(.cosmicHeadline(16))
+                    .foregroundStyle(Color.cosmicText)
+                
+                Spacer()
+                
+                Button {
+                    showGratitudeSheet = true
+                } label: {
+                    Image(systemName: "plus.circle.fill")
+                        .font(.system(size: 20))
+                        .foregroundStyle(Color.cosmicGold)
+                }
+                .buttonStyle(.plain)
+            }
+            
+            if !gratitudeStore.entries.isEmpty {
+                VStack(spacing: 8) {
+                    ForEach(gratitudeStore.entries.prefix(3)) { entry in
+                        HStack(spacing: 10) {
+                            Text("✨")
+                                .font(.system(size: 14))
+                            
+                            Text(entry.text)
+                                .font(.cosmicBody(13))
+                                .foregroundStyle(Color.cosmicTextSecondary)
+                                .lineLimit(1)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                        }
+                        .padding(.vertical, 8)
+                        .padding(.horizontal, 12)
+                        .background(
+                            RoundedRectangle(cornerRadius: 10)
+                                .fill(Color.cosmicGold.opacity(0.06))
+                        )
+                    }
+                }
+            } else {
+                VStack(spacing: 6) {
+                    Text("Ajoute tes premières gratitudes")
+                        .font(.cosmicCaption(13))
+                        .foregroundStyle(Color.cosmicTextSecondary.opacity(0.7))
+                    
+                    Text("Cultive un état d'esprit positif ✨")
+                        .font(.cosmicCaption(11))
+                        .foregroundStyle(Color.cosmicTextSecondary.opacity(0.5))
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 24)
+            }
+        }
+        .padding(16)
+        .cosmicCard(cornerRadius: 16)
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .strokeBorder(Color.cosmicGold.opacity(0.15), lineWidth: 1)
+        )
+    }
+    
     // MARK: - Daily Card
 
     private var dailyCardSection: some View {
@@ -262,13 +340,8 @@ struct HomeView: View {
                             .foregroundStyle(Color.cosmicGold)
                     }
                 }
-                .buttonStyle(.plain)
-            }
-        }
-        .padding(20)
-        .cosmicCard()
     }
-
+    
     // MARK: - Quick Actions
 
     private var quickActionsSection: some View {
