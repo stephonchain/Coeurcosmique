@@ -12,8 +12,6 @@ struct JournalView: View {
     @EnvironmentObject var storeManager: StoreManager
     @State private var showPaywall = false
     @State private var selectedSection: JournalSection = .tarot
-    @State private var showPDFExporter = false
-    @State private var exportPDFURL: URL?
 
     private var displayedTarotHistory: [ReadingHistoryEntry] {
         if storeManager.isPremium {
@@ -43,41 +41,14 @@ struct JournalView: View {
         ScrollView(showsIndicators: false) {
             VStack(spacing: 20) {
                 // Header
-                HStack {
-                    VStack(alignment: .leading, spacing: 6) {
-                        Text("Journal")
-                            .font(.cosmicTitle(28))
-                            .foregroundStyle(Color.cosmicText)
+                VStack(spacing: 6) {
+                    Text("Journal")
+                        .font(.cosmicTitle(28))
+                        .foregroundStyle(Color.cosmicText)
 
-                        Text("Tes lectures passées")
-                            .font(.cosmicCaption())
-                            .foregroundStyle(Color.cosmicTextSecondary)
-                    }
-                    
-                    Spacer()
-                    
-                    // PDF Export Button
-                    if !viewModel.history.isEmpty {
-                        Button {
-                            exportPDFURL = JournalPDFExporter.generatePDF(entries: viewModel.history)
-                            showPDFExporter = true
-                        } label: {
-                            HStack(spacing: 6) {
-                                Image(systemName: "square.and.arrow.up")
-                                    .font(.system(size: 14))
-                                Text("PDF")
-                                    .font(.cosmicCaption(12))
-                            }
-                            .foregroundStyle(Color.cosmicGold)
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 8)
-                            .background(
-                                Capsule()
-                                    .fill(Color.cosmicGold.opacity(0.15))
-                            )
-                        }
-                        .buttonStyle(.plain)
-                    }
+                    Text("Tes lectures passées")
+                        .font(.cosmicCaption())
+                        .foregroundStyle(Color.cosmicTextSecondary)
                 }
                 .padding(.top, 16)
 
@@ -102,11 +73,6 @@ struct JournalView: View {
         }
         .sheet(isPresented: $showPaywall) {
             PaywallView(storeManager: storeManager)
-        }
-        .sheet(isPresented: $showPDFExporter) {
-            if let url = exportPDFURL {
-                ActivityViewController(activityItems: [url])
-            }
         }
     }
 
