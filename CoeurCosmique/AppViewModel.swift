@@ -5,6 +5,7 @@ enum AppTab: String, CaseIterable {
     case draw
     case oracle
     case collection
+    case insights
     case journal
 }
 
