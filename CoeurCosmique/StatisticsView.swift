@@ -96,7 +96,7 @@ struct StatisticsView: View {
         HStack(spacing: 16) {
             Image(systemName: "book.fill")
                 .font(.system(size: 32))
-                .foregroundStyle(.cosmicGold)
+                .foregroundStyle(Color.cosmicGold)
             
             VStack(alignment: .leading, spacing: 4) {
                 Text("\(totalReadings)")
@@ -285,7 +285,7 @@ struct StatisticsView: View {
                             HStack(spacing: 4) {
                                 Text(String(format: "%.1f", correlation.avgEnergy))
                                     .font(.cosmicHeadline(16))
-                                    .foregroundStyle(.cosmicPurple)
+                                    .foregroundStyle(Color.cosmicPurple)
                                 Text("/6")
                                     .font(.cosmicCaption(12))
                                     .foregroundStyle(Color.cosmicTextSecondary)
