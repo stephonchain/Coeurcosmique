@@ -169,18 +169,6 @@ class JournalPDFExporter {
                     )
                     yPosition += 30
                     
-                    // Notes
-                    if !entry.notes.isEmpty {
-                        let notesHeight = drawText(
-                            entry.notes,
-                            at: CGPoint(x: margin, y: yPosition),
-                            width: contentWidth,
-                            font: UIFont.systemFont(ofSize: 13),
-                            color: .label
-                        )
-                        yPosition += notesHeight + 20
-                    }
-                    
                     // Separator
                     context.cgContext.setStrokeColor(UIColor.separator.cgColor)
                     context.cgContext.setLineWidth(0.5)
