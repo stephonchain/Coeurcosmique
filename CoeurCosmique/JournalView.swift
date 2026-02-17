@@ -105,12 +105,7 @@ struct JournalView: View {
         }
         .sheet(isPresented: $showPDFExporter) {
             if let url = exportPDFURL {
-                ShareLink(item: url, preview: SharePreview("Mon Journal Cosmique")) {
-                    Label("Partager le PDF", systemImage: "square.and.arrow.up")
-                        .font(.cosmicBody())
-                        .foregroundStyle(Color.cosmicGold)
-                        .padding(20)
-                }
+                ActivityViewController(activityItems: [url])
             }
         }
     }
