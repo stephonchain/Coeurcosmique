@@ -21,6 +21,8 @@ struct InsightsTabView: View {
             }
             .tabViewStyle(.page(indexDisplayMode: .never))
         }
+        .navigationBarHidden(true)
+        .navigationBarBackButtonHidden(true)
     }
     
     // MARK: - Section Picker
