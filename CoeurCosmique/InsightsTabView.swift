@@ -42,7 +42,7 @@ struct InsightsTabView: View {
                     }
                     .foregroundStyle(
                         selectedSection == section
-                            ? Color.cosmicBackground
+                            ? .white
                             : Color.cosmicTextSecondary
                     )
                     .frame(maxWidth: .infinity)
