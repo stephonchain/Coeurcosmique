@@ -442,14 +442,14 @@ struct QuantumOracleDrawView: View {
         positionIndex: Int
     ) -> String {
         switch spread {
-        case .intricationAmes:
+        case .intricationDesAmes:
             switch positionIndex {
             case 0: return card.interpretation.alphaYou
             case 1: return card.interpretation.betaOther
             case 2: return card.interpretation.linkResult
             default: return ""
             }
-        case .chatSchrodinger:
+        case .chatDeSchrodinger:
             switch positionIndex {
             case 0: return card.interpretation.situation
             case 1: return card.interpretation.actionBoxA
