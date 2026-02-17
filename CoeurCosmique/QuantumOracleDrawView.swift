@@ -1,29 +1,5 @@
 import SwiftUI
 
-// MARK: - Quantum Oracle Reading
-
-struct QuantumOracleReading: Equatable, Identifiable, Codable {
-    let id: UUID
-    let spread: QuantumSpreadType
-    let cards: [DrawnQuantumOracleCard]
-    let generatedAt: Date
-    let question: String?
-    
-    init(
-        id: UUID = UUID(),
-        spread: QuantumSpreadType,
-        cards: [DrawnQuantumOracleCard],
-        generatedAt: Date = Date(),
-        question: String? = nil
-    ) {
-        self.id = id
-        self.spread = spread
-        self.cards = cards
-        self.generatedAt = generatedAt
-        self.question = question
-    }
-}
-
 // MARK: - Quantum Oracle Draw View
 
 struct QuantumOracleDrawView: View {
