@@ -6,6 +6,7 @@ struct FullScreenCardView: View {
     enum CardContent {
         case tarot(TarotCard, isReversed: Bool)
         case oracle(OracleCard)
+        case quantumOracle(QuantumOracleCard)
     }
 
     let content: CardContent
@@ -61,6 +62,8 @@ struct FullScreenCardView: View {
             tarotImage(card: card, isReversed: isReversed)
         case .oracle(let card):
             oracleImage(card: card)
+        case .quantumOracle(let card):
+            quantumOracleImage(card: card)
         }
     }
 
@@ -84,6 +87,22 @@ struct FullScreenCardView: View {
             Text("\(card.number). \(card.name)")
                 .font(.cosmicTitle(22))
                 .foregroundStyle(.white)
+        case .quantumOracle(let card):
+            VStack(spacing: 6) {
+                HStack(spacing: 8) {
+                    Text(card.family.icon)
+                        .font(.system(size: 18))
+                    Text("\(card.number). \(card.name)")
+                        .font(.cosmicTitle(22))
+                }
+                .foregroundStyle(.white)
+                
+                Text(card.family.rawValue)
+                    .font(.cosmicCaption(12))
+                    .foregroundStyle(card.family.color)
+                    .textCase(.uppercase)
+                    .kerning(1.5)
+            }
         }
     }
 
@@ -177,6 +196,55 @@ struct FullScreenCardView: View {
                 )
         )
         .shadow(color: .cosmicRose.opacity(0.4), radius: 30)
+    }
+    
+    // MARK: - Quantum Oracle Image
+    
+    private func quantumOracleImage(card: QuantumOracleCard) -> some View {
+        Group {
+            if UIImage(named: card.imageName) != nil {
+                Image(card.imageName)
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+            } else {
+                Rectangle()
+                    .fill(
+                        LinearGradient(
+                            colors: [
+                                card.family.color.opacity(0.25),
+                                Color.cosmicPurple.opacity(0.2),
+                                Color.cosmicCard
+                            ],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .aspectRatio(0.6, contentMode: .fit)
+                    .overlay(
+                        VStack(spacing: 12) {
+                            Text(card.family.icon)
+                                .font(.system(size: 50))
+                                .foregroundStyle(card.family.color.opacity(0.5))
+                            Text(card.name)
+                                .font(.cosmicHeadline(18))
+                                .foregroundStyle(.white.opacity(0.7))
+                        }
+                    )
+            }
+        }
+        .clipShape(RoundedRectangle(cornerRadius: 20))
+        .overlay(
+            RoundedRectangle(cornerRadius: 20)
+                .strokeBorder(
+                    LinearGradient(
+                        colors: [card.family.color, .cosmicPurple, card.family.color],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 2
+                )
+        )
+        .shadow(color: card.family.color.opacity(0.4), radius: 30)
     }
 
     // MARK: - Dismiss

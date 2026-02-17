@@ -14,7 +14,7 @@ struct ContentView: View {
                 DrawView(viewModel: viewModel)
                     .tag(AppTab.draw)
 
-                OracleDrawView(viewModel: viewModel)
+                OracleTabView(viewModel: viewModel)
                     .tag(AppTab.oracle)
 
                 CollectionView(viewModel: viewModel)

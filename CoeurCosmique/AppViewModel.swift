@@ -22,11 +22,16 @@ final class AppViewModel: ObservableObject {
     // Oracle state
     @Published var currentOracleReading: OracleReading?
     @Published var todayOracleDrawCount: Int = 0
+    
+    // Quantum Oracle state
+    @Published var currentQuantumReading: QuantumOracleReading?
+    @Published var todayQuantumDrawCount: Int = 0
 
     // MARK: - Dependencies
 
     let deck: [TarotCard] = TarotDeck.allCards
     let oracleDeck: [OracleCard] = OracleDeck.allCards
+    let quantumOracleDeck: [QuantumOracleCard] = QuantumOracleDeck.allCards
     private let engine = TarotReadingEngine()
     private let dailyStore = DailyCardStore()
     private let historyStore = ReadingHistoryStore()
@@ -35,6 +40,8 @@ final class AppViewModel: ObservableObject {
     private static let drawDateKey = "lastDrawDate"
     private static let oracleDrawCountKey = "oracleDailyDrawCount"
     private static let oracleDrawDateKey = "oracleLastDrawDate"
+    private static let quantumDrawCountKey = "quantumDailyDrawCount"
+    private static let quantumDrawDateKey = "quantumLastDrawDate"
 
     static let freeDailyDrawLimit = 1
     static let freeJournalLimit = 3
@@ -148,5 +155,47 @@ final class AppViewModel: ObservableObject {
             todayOracleDrawCount += 1
         }
         UserDefaults.standard.set(todayOracleDrawCount, forKey: Self.oracleDrawCountKey)
+    }
+    
+    // MARK: - Quantum Oracle Readings
+    
+    func performQuantumReading(spread: QuantumSpreadType, question: String? = nil) {
+        var available = quantumOracleDeck.shuffled()
+        var drawnCards: [DrawnQuantumOracleCard] = []
+        for _ in 0..<spread.cardCount {
+            if let card = available.popLast() {
+                drawnCards.append(DrawnQuantumOracleCard(card: card))
+            }
+        }
+        let reading = QuantumOracleReading(spread: spread, cards: drawnCards, question: question)
+        currentQuantumReading = reading
+        
+        // Note: Quantum Oracle is premium-only, no limits
+        // History tracking can be added when needed
+        incrementQuantumDrawCount()
+    }
+    
+    // MARK: - Quantum Oracle Draw Tracking
+    
+    func loadTodayQuantumDrawCount() {
+        let today = todayString
+        let lastDate = UserDefaults.standard.string(forKey: Self.quantumDrawDateKey) ?? ""
+        if lastDate == today {
+            todayQuantumDrawCount = UserDefaults.standard.integer(forKey: Self.quantumDrawCountKey)
+        } else {
+            todayQuantumDrawCount = 0
+        }
+    }
+    
+    private func incrementQuantumDrawCount() {
+        let today = todayString
+        let lastDate = UserDefaults.standard.string(forKey: Self.quantumDrawDateKey) ?? ""
+        if lastDate != today {
+            todayQuantumDrawCount = 1
+            UserDefaults.standard.set(today, forKey: Self.quantumDrawDateKey)
+        } else {
+            todayQuantumDrawCount += 1
+        }
+        UserDefaults.standard.set(todayQuantumDrawCount, forKey: Self.quantumDrawCountKey)
     }
 }
