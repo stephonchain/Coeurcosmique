@@ -147,8 +147,12 @@
 				AA00000002000009 /* DailyCardStore.swift */,
 				AA00000002000013 /* DrawView.swift */,
 				AA00000002000036 /* FullScreenCardView.swift */,
+				977970E32F44BE01000A502D /* GratitudeQuickView.swift */,
+				977970E42F44BE01000A502D /* GratitudeStore.swift */,
 				AA00000002000012 /* HomeView.swift */,
 				9703C1112F44AC0F005D49C6 /* InsightsTabView.swift */,
+				977970E52F44BE01000A502D /* JournalComponents.swift */,
+				977970E62F44BE01000A502D /* JournalEnhancements.swift */,
 				AA00000002000016 /* JournalView.swift */,
 				AA00000002000025 /* LoopingVideoPlayer.swift */,
 				9703C10E2F44ABAB005D49C6 /* MoodTracker.swift */,
@@ -180,10 +184,6 @@
 				AA00000002000008 /* TarotReadingEngine.swift */,
 				AA00000002000007 /* TarotSpread.swift */,
 				AA00000003000005 /* Videos */,
-				977970E32F44BE01000A502D /* GratitudeQuickView.swift */,
-				977970E42F44BE01000A502D /* GratitudeStore.swift */,
-				977970E52F44BE01000A502D /* JournalComponents.swift */,
-				977970E62F44BE01000A502D /* JournalEnhancements.swift */,
 			);
 			path = CoeurCosmique;
 			sourceTree = "<group>";

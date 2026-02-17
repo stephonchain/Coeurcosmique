@@ -12,6 +12,7 @@ struct JournalView: View {
     @EnvironmentObject var storeManager: StoreManager
     @State private var showPaywall = false
     @State private var selectedSection: JournalSection = .tarot
+    @State private var pdfURL: URL?
 
     private var displayedTarotHistory: [ReadingHistoryEntry] {
         if storeManager.isPremium {
@@ -41,14 +42,40 @@ struct JournalView: View {
         ScrollView(showsIndicators: false) {
             VStack(spacing: 20) {
                 // Header
-                VStack(spacing: 6) {
-                    Text("Journal")
-                        .font(.cosmicTitle(28))
-                        .foregroundStyle(Color.cosmicText)
+                HStack {
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text("Journal")
+                            .font(.cosmicTitle(28))
+                            .foregroundStyle(Color.cosmicText)
 
-                    Text("Tes lectures passées")
-                        .font(.cosmicCaption())
-                        .foregroundStyle(Color.cosmicTextSecondary)
+                        Text("Tes lectures passées")
+                            .font(.cosmicCaption())
+                            .foregroundStyle(Color.cosmicTextSecondary)
+                    }
+                    
+                    Spacer()
+                    
+                    // PDF Export Button
+                    if !viewModel.history.isEmpty {
+                        Button {
+                            pdfURL = JournalPDFExporter.generatePDF(entries: viewModel.history)
+                        } label: {
+                            HStack(spacing: 6) {
+                                Image(systemName: "square.and.arrow.up")
+                                    .font(.system(size: 14))
+                                Text("PDF")
+                                    .font(.cosmicCaption(12))
+                            }
+                            .foregroundStyle(Color.cosmicGold)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 8)
+                            .background(
+                                Capsule()
+                                    .fill(Color.cosmicGold.opacity(0.15))
+                            )
+                        }
+                        .buttonStyle(.plain)
+                    }
                 }
                 .padding(.top, 16)
 
@@ -73,6 +100,9 @@ struct JournalView: View {
         }
         .sheet(isPresented: $showPaywall) {
             PaywallView(storeManager: storeManager)
+        }
+        .sheet(item: $pdfURL) { url in
+            ShareLink(item: url, preview: SharePreview("Mon Journal Cosmique", image: Image(systemName: "book.fill")))
         }
     }
 
