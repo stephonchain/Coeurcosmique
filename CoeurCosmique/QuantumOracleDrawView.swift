@@ -5,7 +5,7 @@ import SwiftUI
 struct QuantumOracleDrawView: View {
     @ObservedObject var viewModel: AppViewModel
     @EnvironmentObject var storeManager: StoreManager
-    @State private var selectedSpread: QuantumSpreadType = .intricationAmes
+    @State private var selectedSpread: QuantumSpreadType = .intricationDesAmes
     @State private var question: String = ""
     @State private var isDrawing = false
     @State private var revealedCards: Set<Int> = []
@@ -192,7 +192,7 @@ struct QuantumOracleDrawView: View {
     
     private var quantumSpreadSelection: some View {
         VStack(spacing: 12) {
-            ForEach([QuantumSpreadType.intricationAmes, .chatSchrodinger, .sautQuantique]) { spread in
+            ForEach([QuantumSpreadType.intricationDesAmes, .chatDeSchrodinger, .sautQuantique]) { spread in
                 Button {
                     withAnimation(.spring(response: 0.3)) {
                         selectedSpread = spread
