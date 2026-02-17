@@ -12,7 +12,8 @@ struct JournalView: View {
     @EnvironmentObject var storeManager: StoreManager
     @State private var showPaywall = false
     @State private var selectedSection: JournalSection = .tarot
-    @State private var pdfURL: URL?
+    @State private var showPDFExporter = false
+    @State private var exportPDFURL: URL?
 
     private var displayedTarotHistory: [ReadingHistoryEntry] {
         if storeManager.isPremium {
@@ -58,7 +59,8 @@ struct JournalView: View {
                     // PDF Export Button
                     if !viewModel.history.isEmpty {
                         Button {
-                            pdfURL = JournalPDFExporter.generatePDF(entries: viewModel.history)
+                            exportPDFURL = JournalPDFExporter.generatePDF(entries: viewModel.history)
+                            showPDFExporter = true
                         } label: {
                             HStack(spacing: 6) {
                                 Image(systemName: "square.and.arrow.up")
@@ -101,8 +103,15 @@ struct JournalView: View {
         .sheet(isPresented: $showPaywall) {
             PaywallView(storeManager: storeManager)
         }
-        .sheet(item: $pdfURL) { url in
-            ShareLink(item: url, preview: SharePreview("Mon Journal Cosmique", image: Image(systemName: "book.fill")))
+        .sheet(isPresented: $showPDFExporter) {
+            if let url = exportPDFURL {
+                ShareLink(item: url, preview: SharePreview("Mon Journal Cosmique")) {
+                    Label("Partager le PDF", systemImage: "square.and.arrow.up")
+                        .font(.cosmicBody())
+                        .foregroundStyle(Color.cosmicGold)
+                        .padding(20)
+                }
+            }
         }
     }
 
