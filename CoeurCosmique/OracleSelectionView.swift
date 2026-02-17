@@ -11,7 +11,7 @@ enum OracleType: String, CaseIterable, Identifiable {
     var title: String {
         switch self {
         case .cosmicHeart:
-            return "Cosmic Heart Oracle"
+            return "Oracle Cœur Cosmique"
         case .quantumEntanglement:
             return "Oracle Quantique"
         }
@@ -52,6 +52,29 @@ enum OracleType: String, CaseIterable, Identifiable {
             return true
         }
     }
+    
+    // Sample cards to display in preview
+    var previewCards: [PreviewCardData] {
+        switch self {
+        case .cosmicHeart:
+            return [
+                PreviewCardData(imageName: "oracle-heart-01", color: .cosmicRose),
+                PreviewCardData(imageName: "oracle-heart-15", color: .cosmicRose),
+                PreviewCardData(imageName: "oracle-heart-28", color: .cosmicRose)
+            ]
+        case .quantumEntanglement:
+            return [
+                PreviewCardData(imageName: "quantum-oracle-01", color: .cosmicPurple),
+                PreviewCardData(imageName: "quantum-oracle-21", color: .cosmicPurple),
+                PreviewCardData(imageName: "quantum-oracle-42", color: .cosmicPurple)
+            ]
+        }
+    }
+}
+
+struct PreviewCardData {
+    let imageName: String
+    let color: Color
 }
 
 // MARK: - Oracle Selection View
@@ -59,9 +82,15 @@ enum OracleType: String, CaseIterable, Identifiable {
 struct OracleSelectionView: View {
     @ObservedObject var viewModel: AppViewModel
     @EnvironmentObject var storeManager: StoreManager
-    @State private var selection: OracleType = .cosmicHeart
+    @State private var currentIndex: Int = 0
+    @State private var dragOffset: CGFloat = 0
     @State private var showPremiumAlert = false
     @Binding var selectedOracle: OracleType?
+    
+    private let oracles = OracleType.allCases
+    private var selection: OracleType {
+        oracles[currentIndex]
+    }
     
     var body: some View {
         VStack(spacing: 0) {
@@ -76,29 +105,43 @@ struct OracleSelectionView: View {
                     .foregroundStyle(Color.cosmicTextSecondary)
             }
             .padding(.top, 16)
-            .padding(.bottom, 24)
+            .padding(.bottom, 32)
             
-            // Oracle Cards Carousel
-            TabView(selection: $selection) {
-                ForEach(OracleType.allCases) { oracle in
-                    oracleCard(oracle)
-                        .padding(.horizontal, 30)
-                        .tag(oracle)
+            // iPod-style Carousel
+            ZStack {
+                ForEach(Array(oracles.enumerated()), id: \.element) { index, oracle in
+                    oracleCarouselItem(oracle, at: index)
                 }
             }
-            .tabViewStyle(.page(indexDisplayMode: .never))
-            .frame(height: 380)
+            .frame(height: 450)
+            .gesture(
+                DragGesture()
+                    .onChanged { value in
+                        dragOffset = value.translation.width
+                    }
+                    .onEnded { value in
+                        let threshold: CGFloat = 50
+                        withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+                            if value.translation.width > threshold && currentIndex > 0 {
+                                currentIndex -= 1
+                            } else if value.translation.width < -threshold && currentIndex < oracles.count - 1 {
+                                currentIndex += 1
+                            }
+                            dragOffset = 0
+                        }
+                    }
+            )
             
             // Carousel Indicators
             HStack(spacing: 8) {
-                ForEach(OracleType.allCases) { oracle in
+                ForEach(Array(oracles.enumerated()), id: \.element) { index, oracle in
                     Circle()
-                        .fill(selection == oracle ? oracle.color : Color.gray.opacity(0.3))
+                        .fill(currentIndex == index ? oracle.color : Color.gray.opacity(0.3))
                         .frame(width: 8, height: 8)
-                        .animation(.spring(response: 0.3), value: selection)
+                        .animation(.spring(response: 0.3), value: currentIndex)
                 }
             }
-            .padding(.top, 16)
+            .padding(.top, 24)
             
             Spacer()
             
@@ -112,85 +155,151 @@ struct OracleSelectionView: View {
         }
     }
     
-    // MARK: - Oracle Card
+    // MARK: - iPod Carousel Item
     
-    private func oracleCard(_ oracle: OracleType) -> some View {
-        VStack(spacing: 20) {
-            // Icon
-            VStack(spacing: 16) {
-                Text(oracle.icon)
-                    .font(.system(size: 60))
-                    .foregroundStyle(
-                        LinearGradient(
-                            colors: [oracle.color, oracle.color.opacity(0.6)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-                
-                VStack(spacing: 8) {
-                    HStack(spacing: 8) {
-                        Text(oracle.title)
-                            .font(.cosmicTitle(24))
-                            .foregroundStyle(Color.cosmicText)
-                        
-                        if oracle.isPremium && !storeManager.isPremium {
-                            Image(systemName: "crown.fill")
-                                .font(.system(size: 14))
-                                .foregroundStyle(Color.cosmicGold)
-                        }
-                    }
-                    
-                    Text(oracle.subtitle)
-                        .font(.cosmicBody(14))
-                        .foregroundStyle(Color.cosmicTextSecondary)
-                        .multilineTextAlignment(.center)
-                }
-            }
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 40)
-            .background(
-                RoundedRectangle(cornerRadius: 24)
-                    .fill(Color.cosmicCard)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 24)
-                            .strokeBorder(
-                                oracle.color.opacity(0.3),
-                                lineWidth: 1.5
-                            )
-                    )
-            )
-            .glow(oracle.color.opacity(selection == oracle ? 0.3 : 0), radius: 20)
-            .scaleEffect(selection == oracle ? 1.0 : 0.92)
-            .animation(.spring(response: 0.4, dampingFraction: 0.75), value: selection)
+    private func oracleCarouselItem(_ oracle: OracleType, at index: Int) -> some View {
+        let offset = CGFloat(index - currentIndex)
+        let screenWidth = UIScreen.main.bounds.width
+        let spacing: CGFloat = screenWidth * 0.85
+        
+        return VStack(spacing: 20) {
+            // Visual card preview (3 cards fanned out)
+            cardFanPreview(oracle)
+                .frame(height: 280)
             
-            // Description
-            VStack(alignment: .leading, spacing: 12) {
+            // Oracle info
+            VStack(spacing: 8) {
+                HStack(spacing: 8) {
+                    Text(oracle.title)
+                        .font(.cosmicTitle(20))
+                        .foregroundStyle(Color.cosmicText)
+                    
+                    if oracle.isPremium && !storeManager.isPremium {
+                        Image(systemName: "crown.fill")
+                            .font(.system(size: 12))
+                            .foregroundStyle(Color.cosmicGold)
+                    }
+                }
+                
+                Text(oracle.subtitle)
+                    .font(.cosmicBody(13))
+                    .foregroundStyle(Color.cosmicTextSecondary)
+                    .multilineTextAlignment(.center)
+            }
+            
+            // Features
+            VStack(alignment: .leading, spacing: 10) {
                 switch oracle {
                 case .cosmicHeart:
-                    descriptionItem(icon: "heart.fill", text: "Messages guidants")
-                    descriptionItem(icon: "sparkles", text: "3 tirages uniques")
-                    descriptionItem(icon: "star.fill", text: "42 cartes cosmiques")
+                    featureItem(icon: "heart.fill", text: "Messages guidants", color: oracle.color)
+                    featureItem(icon: "sparkles", text: "3 tirages uniques", color: oracle.color)
+                    featureItem(icon: "star.fill", text: "42 cartes cosmiques", color: oracle.color)
                     
                 case .quantumEntanglement:
-                    descriptionItem(icon: "infinity", text: "Lois quantiques")
-                    descriptionItem(icon: "waveform.path", text: "3 tirages spéciaux")
-                    descriptionItem(icon: "sparkle.magnifyingglass", text: "42 cartes quantiques")
+                    featureItem(icon: "infinity", text: "Lois quantiques", color: oracle.color)
+                    featureItem(icon: "waveform.path", text: "3 tirages spéciaux", color: oracle.color)
+                    featureItem(icon: "sparkle.magnifyingglass", text: "42 cartes quantiques", color: oracle.color)
                 }
             }
-            .padding(.horizontal, 8)
+            .padding(.horizontal, 40)
+        }
+        .offset(x: (offset * spacing) + dragOffset)
+        .scaleEffect(offset == 0 ? 1.0 : 0.75)
+        .opacity(offset == 0 ? 1.0 : 0.4)
+        .animation(.spring(response: 0.4, dampingFraction: 0.8), value: currentIndex)
+        .animation(.spring(response: 0.4, dampingFraction: 0.8), value: dragOffset)
+    }
+    
+    // MARK: - Card Fan Preview
+    
+    private func cardFanPreview(_ oracle: OracleType) -> some View {
+        ZStack {
+            // Back card (left)
+            previewCard(oracle.previewCards[0], color: oracle.color)
+                .rotationEffect(.degrees(-8))
+                .offset(x: -60, y: 10)
+                .scaleEffect(0.85)
+                .zIndex(1)
+            
+            // Back card (right)
+            previewCard(oracle.previewCards[2], color: oracle.color)
+                .rotationEffect(.degrees(8))
+                .offset(x: 60, y: 10)
+                .scaleEffect(0.85)
+                .zIndex(1)
+            
+            // Front card (center)
+            previewCard(oracle.previewCards[1], color: oracle.color)
+                .zIndex(2)
+                .glow(oracle.color.opacity(0.4), radius: 20)
         }
     }
     
-    private func descriptionItem(icon: String, text: String) -> some View {
+    private func previewCard(_ cardData: PreviewCardData, color: Color) -> some View {
+        RoundedRectangle(cornerRadius: 16)
+            .fill(
+                LinearGradient(
+                    colors: [
+                        Color.cosmicCard,
+                        color.opacity(0.15)
+                    ],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 16)
+                    .strokeBorder(
+                        LinearGradient(
+                            colors: [color.opacity(0.6), color.opacity(0.2)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ),
+                        lineWidth: 2
+                    )
+            )
+            .overlay(
+                // Card back pattern
+                VStack(spacing: 12) {
+                    Text(cardData.color == .cosmicRose ? "♡" : "∞")
+                        .font(.system(size: 50))
+                        .foregroundStyle(
+                            LinearGradient(
+                                colors: [color, color.opacity(0.5)],
+                                startPoint: .top,
+                                endPoint: .bottom
+                            )
+                        )
+                    
+                    // Geometric pattern
+                    ZStack {
+                        Circle()
+                            .strokeBorder(color.opacity(0.3), lineWidth: 1)
+                            .frame(width: 60, height: 60)
+                        
+                        Circle()
+                            .strokeBorder(color.opacity(0.2), lineWidth: 1)
+                            .frame(width: 40, height: 40)
+                        
+                        Circle()
+                            .fill(color.opacity(0.1))
+                            .frame(width: 20, height: 20)
+                    }
+                }
+            )
+            .frame(width: 140, height: 220)
+            .shadow(color: color.opacity(0.3), radius: 10, x: 0, y: 5)
+    }
+    
+    private func featureItem(icon: String, text: String, color: Color) -> some View {
         HStack(spacing: 12) {
             Image(systemName: icon)
-                .font(.system(size: 14))
-                .foregroundStyle(selection.color)
-                .frame(width: 20)
+                .font(.system(size: 13))
+                .foregroundStyle(color)
+                .frame(width: 18)
             
             Text(text)
-                .font(.cosmicBody(13))
+                .font(.cosmicBody(12))
                 .foregroundStyle(Color.cosmicTextSecondary)
             
             Spacer()
@@ -241,7 +350,6 @@ struct OracleSelectionView: View {
         if selection.isPremium && !storeManager.isPremium {
             showPremiumAlert = true
         } else {
-            // Navigate to the selected oracle
             selectedOracle = selection
         }
     }
