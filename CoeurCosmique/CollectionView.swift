@@ -5,11 +5,13 @@ import SwiftUI
 enum CollectionDeck: String, CaseIterable {
     case tarot
     case oracle
+    case quantumOracle
 
     var label: String {
         switch self {
         case .tarot: return "Tarot de Marseille"
         case .oracle: return "Oracle Cœur Cosmique"
+        case .quantumOracle: return "Oracle Quantique"
         }
     }
 }
@@ -37,8 +39,11 @@ struct CollectionView: View {
             if selectedDeck == .tarot {
                 TarotCollectionContent(viewModel: viewModel)
                     .transition(.opacity)
-            } else {
+            } else if selectedDeck == .oracle {
                 OracleCollectionView(viewModel: viewModel)
+                    .transition(.opacity)
+            } else {
+                QuantumOracleCollectionContent(viewModel: viewModel)
                     .transition(.opacity)
             }
         }
