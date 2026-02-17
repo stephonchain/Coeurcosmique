@@ -19,6 +19,10 @@
 		9703C1232F44AC0F005D49C6 /* QuantumOracleCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9703C1172F44AC0F005D49C6 /* QuantumOracleCollectionView.swift */; };
 		9703C1242F44AC0F005D49C6 /* AffirmationEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9703C1102F44AC0F005D49C6 /* AffirmationEngine.swift */; };
 		9703C1252F44AC0F005D49C6 /* InsightsTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9703C1112F44AC0F005D49C6 /* InsightsTabView.swift */; };
+		977970E72F44BE01000A502D /* GratitudeQuickView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 977970E32F44BE01000A502D /* GratitudeQuickView.swift */; };
+		977970E82F44BE01000A502D /* GratitudeStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 977970E42F44BE01000A502D /* GratitudeStore.swift */; };
+		977970E92F44BE01000A502D /* JournalEnhancements.swift in Sources */ = {isa = PBXBuildFile; fileRef = 977970E62F44BE01000A502D /* JournalEnhancements.swift */; };
+		977970EA2F44BE01000A502D /* JournalComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 977970E52F44BE01000A502D /* JournalComponents.swift */; };
 		AA00000001000001 /* CoeurCosmiqueApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000002000001 /* CoeurCosmiqueApp.swift */; };
 		AA00000001000002 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000002000002 /* ContentView.swift */; };
 		AA00000001000003 /* AppViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000002000003 /* AppViewModel.swift */; };
@@ -68,6 +72,10 @@
 		9703C1182F44AC0F005D49C6 /* QuantumOracleDeck.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuantumOracleDeck.swift; sourceTree = "<group>"; };
 		9703C1192F44AC0F005D49C6 /* QuantumOracleDrawView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuantumOracleDrawView.swift; sourceTree = "<group>"; };
 		9703C11A2F44AC0F005D49C6 /* StatisticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsView.swift; sourceTree = "<group>"; };
+		977970E32F44BE01000A502D /* GratitudeQuickView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GratitudeQuickView.swift; sourceTree = "<group>"; };
+		977970E42F44BE01000A502D /* GratitudeStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GratitudeStore.swift; sourceTree = "<group>"; };
+		977970E52F44BE01000A502D /* JournalComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JournalComponents.swift; sourceTree = "<group>"; };
+		977970E62F44BE01000A502D /* JournalEnhancements.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JournalEnhancements.swift; sourceTree = "<group>"; };
 		AA00000002000001 /* CoeurCosmiqueApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoeurCosmiqueApp.swift; sourceTree = "<group>"; };
 		AA00000002000002 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		AA00000002000003 /* AppViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppViewModel.swift; sourceTree = "<group>"; };
@@ -127,6 +135,7 @@
 		AA00000003000002 /* CoeurCosmique */ = {
 			isa = PBXGroup;
 			children = (
+				9703C1102F44AC0F005D49C6 /* AffirmationEngine.swift */,
 				AA00000002000003 /* AppViewModel.swift */,
 				AA00000002000019 /* Assets.xcassets */,
 				AA00000002000015 /* CardDetailView.swift */,
@@ -139,9 +148,11 @@
 				AA00000002000013 /* DrawView.swift */,
 				AA00000002000036 /* FullScreenCardView.swift */,
 				AA00000002000012 /* HomeView.swift */,
+				9703C1112F44AC0F005D49C6 /* InsightsTabView.swift */,
 				AA00000002000016 /* JournalView.swift */,
 				AA00000002000025 /* LoopingVideoPlayer.swift */,
 				9703C10E2F44ABAB005D49C6 /* MoodTracker.swift */,
+				9703C1122F44AC0F005D49C6 /* MoodTrackerView.swift */,
 				AA00000002000011 /* MotivationalMessages.swift */,
 				AA00000002000022 /* OnboardingView.swift */,
 				AA00000002000037 /* OracleAboutView.swift */,
@@ -151,9 +162,17 @@
 				AA00000002000031 /* OracleDeck.swift */,
 				AA00000002000034 /* OracleDetailView.swift */,
 				AA00000002000033 /* OracleDrawView.swift */,
+				9703C1132F44AC0F005D49C6 /* OracleSelectionView.swift */,
+				9703C1142F44AC0F005D49C6 /* OracleTabView.swift */,
 				AA00000002000023 /* PaywallView.swift */,
 				AA00000003000003 /* Preview Content */,
+				9703C1152F44AC0F005D49C6 /* QuantumOracleCard.swift */,
+				9703C1162F44AC0F005D49C6 /* QuantumOracleCardView.swift */,
+				9703C1172F44AC0F005D49C6 /* QuantumOracleCollectionView.swift */,
+				9703C1182F44AC0F005D49C6 /* QuantumOracleDeck.swift */,
+				9703C1192F44AC0F005D49C6 /* QuantumOracleDrawView.swift */,
 				AA00000002000010 /* ReadingHistoryStore.swift */,
+				9703C11A2F44AC0F005D49C6 /* StatisticsView.swift */,
 				AA00000002000024 /* StoreManager.swift */,
 				AA00000002000005 /* TarotCard.swift */,
 				AA00000002000017 /* TarotCardView.swift */,
@@ -161,17 +180,10 @@
 				AA00000002000008 /* TarotReadingEngine.swift */,
 				AA00000002000007 /* TarotSpread.swift */,
 				AA00000003000005 /* Videos */,
-				9703C1102F44AC0F005D49C6 /* AffirmationEngine.swift */,
-				9703C1112F44AC0F005D49C6 /* InsightsTabView.swift */,
-				9703C1122F44AC0F005D49C6 /* MoodTrackerView.swift */,
-				9703C1132F44AC0F005D49C6 /* OracleSelectionView.swift */,
-				9703C1142F44AC0F005D49C6 /* OracleTabView.swift */,
-				9703C1152F44AC0F005D49C6 /* QuantumOracleCard.swift */,
-				9703C1162F44AC0F005D49C6 /* QuantumOracleCardView.swift */,
-				9703C1172F44AC0F005D49C6 /* QuantumOracleCollectionView.swift */,
-				9703C1182F44AC0F005D49C6 /* QuantumOracleDeck.swift */,
-				9703C1192F44AC0F005D49C6 /* QuantumOracleDrawView.swift */,
-				9703C11A2F44AC0F005D49C6 /* StatisticsView.swift */,
+				977970E32F44BE01000A502D /* GratitudeQuickView.swift */,
+				977970E42F44BE01000A502D /* GratitudeStore.swift */,
+				977970E52F44BE01000A502D /* JournalComponents.swift */,
+				977970E62F44BE01000A502D /* JournalEnhancements.swift */,
 			);
 			path = CoeurCosmique;
 			sourceTree = "<group>";
@@ -291,6 +303,10 @@
 				9703C11C2F44AC0F005D49C6 /* QuantumOracleCard.swift in Sources */,
 				9703C11D2F44AC0F005D49C6 /* QuantumOracleCardView.swift in Sources */,
 				9703C11E2F44AC0F005D49C6 /* QuantumOracleDeck.swift in Sources */,
+				977970E72F44BE01000A502D /* GratitudeQuickView.swift in Sources */,
+				977970E82F44BE01000A502D /* GratitudeStore.swift in Sources */,
+				977970E92F44BE01000A502D /* JournalEnhancements.swift in Sources */,
+				977970EA2F44BE01000A502D /* JournalComponents.swift in Sources */,
 				9703C11F2F44AC0F005D49C6 /* OracleSelectionView.swift in Sources */,
 				9703C1202F44AC0F005D49C6 /* StatisticsView.swift in Sources */,
 				9703C1212F44AC0F005D49C6 /* QuantumOracleDrawView.swift in Sources */,
