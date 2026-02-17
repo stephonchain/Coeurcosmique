@@ -23,7 +23,7 @@ struct ContentView: View {
                 JournalView(viewModel: viewModel)
                     .tag(AppTab.journal)
             }
-            .tabViewStyle(.automatic)
+            .toolbar(.hidden, for: .tabBar, .navigationBar)
             .overlay(alignment: .bottom) {
                 cosmicTabBar
             }
