@@ -165,7 +165,7 @@ class MoodTrackerStore: ObservableObject {
         
         guard !cardEntries.isEmpty else { return nil }
         
-        let total = cardEntries.reduce(0) { $0 + $0.energy.rawValue }
+        let total = cardEntries.reduce(0) { $0 + $1.energy.rawValue }
         return Double(total) / Double(cardEntries.count)
     }
     
