@@ -54,19 +54,22 @@ enum OracleType: String, CaseIterable, Identifiable {
     }
     
     // Sample cards to display in preview
-    var previewCards: [PreviewCardData] {
+    func previewCards(viewModel: AppViewModel) -> [PreviewCardData] {
         switch self {
         case .cosmicHeart:
+            // Pick 3 random cards from the Oracle deck
+            let allCards = viewModel.oracleDeck.shuffled()
             return [
-                PreviewCardData(imageName: "oracle-heart-01", color: .cosmicRose),
-                PreviewCardData(imageName: "oracle-heart-15", color: .cosmicRose),
-                PreviewCardData(imageName: "oracle-heart-28", color: .cosmicRose)
+                PreviewCardData(imageName: allCards[0].imageName, color: .cosmicRose, showImage: true),
+                PreviewCardData(imageName: allCards[1].imageName, color: .cosmicRose, showImage: true),
+                PreviewCardData(imageName: allCards[2].imageName, color: .cosmicRose, showImage: true)
             ]
         case .quantumEntanglement:
+            // Placeholders for Quantum Oracle (no images yet)
             return [
-                PreviewCardData(imageName: "quantum-oracle-01", color: .cosmicPurple),
-                PreviewCardData(imageName: "quantum-oracle-21", color: .cosmicPurple),
-                PreviewCardData(imageName: "quantum-oracle-42", color: .cosmicPurple)
+                PreviewCardData(imageName: "quantum-oracle-01", color: .cosmicPurple, showImage: false),
+                PreviewCardData(imageName: "quantum-oracle-21", color: .cosmicPurple, showImage: false),
+                PreviewCardData(imageName: "quantum-oracle-42", color: .cosmicPurple, showImage: false)
             ]
         }
     }
@@ -75,6 +78,7 @@ enum OracleType: String, CaseIterable, Identifiable {
 struct PreviewCardData {
     let imageName: String
     let color: Color
+    let showImage: Bool // true if we have actual images
 }
 
 // MARK: - Oracle Selection View
@@ -164,7 +168,7 @@ struct OracleSelectionView: View {
         
         return VStack(spacing: 20) {
             // Visual card preview (3 cards fanned out)
-            cardFanPreview(oracle)
+            cardFanPreview(oracle, viewModel: viewModel)
                 .frame(height: 280)
             
             // Oracle info
@@ -212,54 +216,55 @@ struct OracleSelectionView: View {
     
     // MARK: - Card Fan Preview
     
-    private func cardFanPreview(_ oracle: OracleType) -> some View {
-        ZStack {
+    private func cardFanPreview(_ oracle: OracleType, viewModel: AppViewModel) -> some View {
+        let cards = oracle.previewCards(viewModel: viewModel)
+        return ZStack {
             // Back card (left)
-            previewCard(oracle.previewCards[0], color: oracle.color)
+            previewCard(cards[0], color: oracle.color)
                 .rotationEffect(.degrees(-8))
                 .offset(x: -60, y: 10)
                 .scaleEffect(0.85)
                 .zIndex(1)
             
             // Back card (right)
-            previewCard(oracle.previewCards[2], color: oracle.color)
+            previewCard(cards[2], color: oracle.color)
                 .rotationEffect(.degrees(8))
                 .offset(x: 60, y: 10)
                 .scaleEffect(0.85)
                 .zIndex(1)
             
             // Front card (center)
-            previewCard(oracle.previewCards[1], color: oracle.color)
+            previewCard(cards[1], color: oracle.color)
                 .zIndex(2)
                 .glow(oracle.color.opacity(0.4), radius: 20)
         }
     }
     
     private func previewCard(_ cardData: PreviewCardData, color: Color) -> some View {
-        RoundedRectangle(cornerRadius: 16)
-            .fill(
-                LinearGradient(
-                    colors: [
-                        Color.cosmicCard,
-                        color.opacity(0.15)
-                    ],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
+        ZStack {
+            RoundedRectangle(cornerRadius: 16)
+                .fill(Color.cosmicCard)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16)
+                        .strokeBorder(
+                            LinearGradient(
+                                colors: [color.opacity(0.6), color.opacity(0.2)],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            ),
+                            lineWidth: 2
+                        )
                 )
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: 16)
-                    .strokeBorder(
-                        LinearGradient(
-                            colors: [color.opacity(0.6), color.opacity(0.2)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        ),
-                        lineWidth: 2
-                    )
-            )
-            .overlay(
-                // Card back pattern
+            
+            if cardData.showImage {
+                // Display actual oracle card image
+                Image(cardData.imageName)
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(width: 140, height: 220)
+                    .clipShape(RoundedRectangle(cornerRadius: 16))
+            } else {
+                // Fallback placeholder pattern for cards without images
                 VStack(spacing: 12) {
                     Text(cardData.color == .cosmicRose ? "♡" : "∞")
                         .font(.system(size: 50))
@@ -286,9 +291,10 @@ struct OracleSelectionView: View {
                             .frame(width: 20, height: 20)
                     }
                 }
-            )
-            .frame(width: 140, height: 220)
-            .shadow(color: color.opacity(0.3), radius: 10, x: 0, y: 5)
+            }
+        }
+        .frame(width: 140, height: 220)
+        .shadow(color: color.opacity(0.3), radius: 10, x: 0, y: 5)
     }
     
     private func featureItem(icon: String, text: String, color: Color) -> some View {
