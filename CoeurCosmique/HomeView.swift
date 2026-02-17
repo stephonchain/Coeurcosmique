@@ -138,7 +138,7 @@ struct HomeView: View {
                         Text(affirmationEngine.isFavorite(affirmation) ? "Favoris" : "Ajouter aux favoris")
                             .font(.cosmicCaption(12))
                     }
-                    .foregroundStyle(.cosmicRose)
+                    .foregroundStyle(Color.cosmicRose)
                 }
             }
         }
@@ -150,8 +150,8 @@ struct HomeView: View {
         )
         .onAppear {
             if let dailyCard = viewModel.dailyCard,
-               let oracleCard = viewModel.oracleDeck.first(where: { $0.number == dailyCard.cardNumber }) {
-                _ = affirmationEngine.generateAffirmation(forCard: oracleCard.name)
+               let tarotCard = dailyCard.resolve(from: viewModel.deck) {
+                _ = affirmationEngine.generateAffirmation(forCard: tarotCard.name)
             }
         }
     }
