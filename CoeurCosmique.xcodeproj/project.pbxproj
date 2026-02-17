@@ -7,6 +7,18 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		9703C10F2F44ABAB005D49C6 /* MoodTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9703C10E2F44ABAB005D49C6 /* MoodTracker.swift */; };
+		9703C11B2F44AC0F005D49C6 /* OracleTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9703C1142F44AC0F005D49C6 /* OracleTabView.swift */; };
+		9703C11C2F44AC0F005D49C6 /* QuantumOracleCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9703C1152F44AC0F005D49C6 /* QuantumOracleCard.swift */; };
+		9703C11D2F44AC0F005D49C6 /* QuantumOracleCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9703C1162F44AC0F005D49C6 /* QuantumOracleCardView.swift */; };
+		9703C11E2F44AC0F005D49C6 /* QuantumOracleDeck.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9703C1182F44AC0F005D49C6 /* QuantumOracleDeck.swift */; };
+		9703C11F2F44AC0F005D49C6 /* OracleSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9703C1132F44AC0F005D49C6 /* OracleSelectionView.swift */; };
+		9703C1202F44AC0F005D49C6 /* StatisticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9703C11A2F44AC0F005D49C6 /* StatisticsView.swift */; };
+		9703C1212F44AC0F005D49C6 /* QuantumOracleDrawView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9703C1192F44AC0F005D49C6 /* QuantumOracleDrawView.swift */; };
+		9703C1222F44AC0F005D49C6 /* MoodTrackerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9703C1122F44AC0F005D49C6 /* MoodTrackerView.swift */; };
+		9703C1232F44AC0F005D49C6 /* QuantumOracleCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9703C1172F44AC0F005D49C6 /* QuantumOracleCollectionView.swift */; };
+		9703C1242F44AC0F005D49C6 /* AffirmationEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9703C1102F44AC0F005D49C6 /* AffirmationEngine.swift */; };
+		9703C1252F44AC0F005D49C6 /* InsightsTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9703C1112F44AC0F005D49C6 /* InsightsTabView.swift */; };
 		AA00000001000001 /* CoeurCosmiqueApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000002000001 /* CoeurCosmiqueApp.swift */; };
 		AA00000001000002 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000002000002 /* ContentView.swift */; };
 		AA00000001000003 /* AppViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000002000003 /* AppViewModel.swift */; };
@@ -44,6 +56,18 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		9703C10E2F44ABAB005D49C6 /* MoodTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodTracker.swift; sourceTree = "<group>"; };
+		9703C1102F44AC0F005D49C6 /* AffirmationEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AffirmationEngine.swift; sourceTree = "<group>"; };
+		9703C1112F44AC0F005D49C6 /* InsightsTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightsTabView.swift; sourceTree = "<group>"; };
+		9703C1122F44AC0F005D49C6 /* MoodTrackerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodTrackerView.swift; sourceTree = "<group>"; };
+		9703C1132F44AC0F005D49C6 /* OracleSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OracleSelectionView.swift; sourceTree = "<group>"; };
+		9703C1142F44AC0F005D49C6 /* OracleTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OracleTabView.swift; sourceTree = "<group>"; };
+		9703C1152F44AC0F005D49C6 /* QuantumOracleCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuantumOracleCard.swift; sourceTree = "<group>"; };
+		9703C1162F44AC0F005D49C6 /* QuantumOracleCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuantumOracleCardView.swift; sourceTree = "<group>"; };
+		9703C1172F44AC0F005D49C6 /* QuantumOracleCollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuantumOracleCollectionView.swift; sourceTree = "<group>"; };
+		9703C1182F44AC0F005D49C6 /* QuantumOracleDeck.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuantumOracleDeck.swift; sourceTree = "<group>"; };
+		9703C1192F44AC0F005D49C6 /* QuantumOracleDrawView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuantumOracleDrawView.swift; sourceTree = "<group>"; };
+		9703C11A2F44AC0F005D49C6 /* StatisticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsView.swift; sourceTree = "<group>"; };
 		AA00000002000001 /* CoeurCosmiqueApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoeurCosmiqueApp.swift; sourceTree = "<group>"; };
 		AA00000002000002 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		AA00000002000003 /* AppViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppViewModel.swift; sourceTree = "<group>"; };
@@ -92,7 +116,7 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		AA00000003000001 /* root */ = {
+		AA00000003000001 = {
 			isa = PBXGroup;
 			children = (
 				AA00000003000002 /* CoeurCosmique */,
@@ -103,39 +127,51 @@
 		AA00000003000002 /* CoeurCosmique */ = {
 			isa = PBXGroup;
 			children = (
-				AA00000002000001 /* CoeurCosmiqueApp.swift */,
-				AA00000002000002 /* ContentView.swift */,
 				AA00000002000003 /* AppViewModel.swift */,
-				AA00000002000004 /* CosmicTheme.swift */,
-				AA00000002000005 /* TarotCard.swift */,
-				AA00000002000006 /* TarotDeck.swift */,
-				AA00000002000007 /* TarotSpread.swift */,
-				AA00000002000008 /* TarotReadingEngine.swift */,
-				AA00000002000009 /* DailyCardStore.swift */,
-				AA00000002000010 /* ReadingHistoryStore.swift */,
-				AA00000002000011 /* MotivationalMessages.swift */,
-				AA00000002000012 /* HomeView.swift */,
-				AA00000002000013 /* DrawView.swift */,
-				AA00000002000014 /* CollectionView.swift */,
-				AA00000002000015 /* CardDetailView.swift */,
-				AA00000002000016 /* JournalView.swift */,
-				AA00000002000017 /* TarotCardView.swift */,
-				AA00000002000018 /* CosmicBackground.swift */,
-				AA00000002000022 /* OnboardingView.swift */,
-				AA00000002000023 /* PaywallView.swift */,
-				AA00000002000024 /* StoreManager.swift */,
-				AA00000002000025 /* LoopingVideoPlayer.swift */,
-				AA00000002000030 /* OracleCard.swift */,
-				AA00000002000031 /* OracleDeck.swift */,
-				AA00000002000032 /* OracleCardView.swift */,
-				AA00000002000033 /* OracleDrawView.swift */,
-				AA00000002000034 /* OracleDetailView.swift */,
-				AA00000002000035 /* OracleCollectionView.swift */,
-				AA00000002000036 /* FullScreenCardView.swift */,
-				AA00000002000037 /* OracleAboutView.swift */,
-				AA00000003000005 /* Videos */,
 				AA00000002000019 /* Assets.xcassets */,
+				AA00000002000015 /* CardDetailView.swift */,
+				AA00000002000001 /* CoeurCosmiqueApp.swift */,
+				AA00000002000014 /* CollectionView.swift */,
+				AA00000002000002 /* ContentView.swift */,
+				AA00000002000018 /* CosmicBackground.swift */,
+				AA00000002000004 /* CosmicTheme.swift */,
+				AA00000002000009 /* DailyCardStore.swift */,
+				AA00000002000013 /* DrawView.swift */,
+				AA00000002000036 /* FullScreenCardView.swift */,
+				AA00000002000012 /* HomeView.swift */,
+				AA00000002000016 /* JournalView.swift */,
+				AA00000002000025 /* LoopingVideoPlayer.swift */,
+				9703C10E2F44ABAB005D49C6 /* MoodTracker.swift */,
+				AA00000002000011 /* MotivationalMessages.swift */,
+				AA00000002000022 /* OnboardingView.swift */,
+				AA00000002000037 /* OracleAboutView.swift */,
+				AA00000002000030 /* OracleCard.swift */,
+				AA00000002000032 /* OracleCardView.swift */,
+				AA00000002000035 /* OracleCollectionView.swift */,
+				AA00000002000031 /* OracleDeck.swift */,
+				AA00000002000034 /* OracleDetailView.swift */,
+				AA00000002000033 /* OracleDrawView.swift */,
+				AA00000002000023 /* PaywallView.swift */,
 				AA00000003000003 /* Preview Content */,
+				AA00000002000010 /* ReadingHistoryStore.swift */,
+				AA00000002000024 /* StoreManager.swift */,
+				AA00000002000005 /* TarotCard.swift */,
+				AA00000002000017 /* TarotCardView.swift */,
+				AA00000002000006 /* TarotDeck.swift */,
+				AA00000002000008 /* TarotReadingEngine.swift */,
+				AA00000002000007 /* TarotSpread.swift */,
+				AA00000003000005 /* Videos */,
+				9703C1102F44AC0F005D49C6 /* AffirmationEngine.swift */,
+				9703C1112F44AC0F005D49C6 /* InsightsTabView.swift */,
+				9703C1122F44AC0F005D49C6 /* MoodTrackerView.swift */,
+				9703C1132F44AC0F005D49C6 /* OracleSelectionView.swift */,
+				9703C1142F44AC0F005D49C6 /* OracleTabView.swift */,
+				9703C1152F44AC0F005D49C6 /* QuantumOracleCard.swift */,
+				9703C1162F44AC0F005D49C6 /* QuantumOracleCardView.swift */,
+				9703C1172F44AC0F005D49C6 /* QuantumOracleCollectionView.swift */,
+				9703C1182F44AC0F005D49C6 /* QuantumOracleDeck.swift */,
+				9703C1192F44AC0F005D49C6 /* QuantumOracleDrawView.swift */,
+				9703C11A2F44AC0F005D49C6 /* StatisticsView.swift */,
 			);
 			path = CoeurCosmique;
 			sourceTree = "<group>";
@@ -208,7 +244,7 @@
 				fr,
 				Base,
 			);
-			mainGroup = AA00000003000001 /* root */;
+			mainGroup = AA00000003000001;
 			productRefGroup = AA00000003000004 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -248,8 +284,20 @@
 				AA00000001000009 /* DailyCardStore.swift in Sources */,
 				AA00000001000010 /* ReadingHistoryStore.swift in Sources */,
 				AA00000001000011 /* MotivationalMessages.swift in Sources */,
+				9703C10F2F44ABAB005D49C6 /* MoodTracker.swift in Sources */,
 				AA00000001000012 /* HomeView.swift in Sources */,
 				AA00000001000013 /* DrawView.swift in Sources */,
+				9703C11B2F44AC0F005D49C6 /* OracleTabView.swift in Sources */,
+				9703C11C2F44AC0F005D49C6 /* QuantumOracleCard.swift in Sources */,
+				9703C11D2F44AC0F005D49C6 /* QuantumOracleCardView.swift in Sources */,
+				9703C11E2F44AC0F005D49C6 /* QuantumOracleDeck.swift in Sources */,
+				9703C11F2F44AC0F005D49C6 /* OracleSelectionView.swift in Sources */,
+				9703C1202F44AC0F005D49C6 /* StatisticsView.swift in Sources */,
+				9703C1212F44AC0F005D49C6 /* QuantumOracleDrawView.swift in Sources */,
+				9703C1222F44AC0F005D49C6 /* MoodTrackerView.swift in Sources */,
+				9703C1232F44AC0F005D49C6 /* QuantumOracleCollectionView.swift in Sources */,
+				9703C1242F44AC0F005D49C6 /* AffirmationEngine.swift in Sources */,
+				9703C1252F44AC0F005D49C6 /* InsightsTabView.swift in Sources */,
 				AA00000001000014 /* CollectionView.swift in Sources */,
 				AA00000001000015 /* CardDetailView.swift in Sources */,
 				AA00000001000016 /* JournalView.swift in Sources */,
