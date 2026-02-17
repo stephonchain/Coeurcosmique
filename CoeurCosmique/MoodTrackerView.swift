@@ -102,7 +102,7 @@ struct MoodTrackerView: View {
             HStack {
                 Image(systemName: "checkmark.circle.fill")
                     .font(.system(size: 20))
-                    .foregroundStyle(.cosmicGold)
+                    .foregroundStyle(Color.cosmicGold)
                 
                 Text("Entrée d'aujourd'hui enregistrée")
                     .font(.cosmicHeadline(15))
@@ -151,7 +151,7 @@ struct MoodTrackerView: View {
         HStack(spacing: 12) {
             Image(systemName: "flame.fill")
                 .font(.system(size: 24))
-                .foregroundStyle(.cosmicGold)
+                .foregroundStyle(Color.cosmicGold)
             
             VStack(alignment: .leading, spacing: 2) {
                 Text("\(store.currentStreak()) jour\(store.currentStreak() > 1 ? "s" : "") consécutif\(store.currentStreak() > 1 ? "s" : "")")
@@ -186,7 +186,7 @@ struct MoodTrackerView: View {
                 VStack(spacing: 8) {
                     Text(String(format: "%.1f", store.averageEnergy()))
                         .font(.cosmicTitle(28))
-                        .foregroundStyle(.cosmicPurple)
+                        .foregroundStyle(Color.cosmicPurple)
                     
                     Text("Énergie moyenne")
                         .font(.cosmicCaption(11))
@@ -439,7 +439,7 @@ struct MoodTrackerView: View {
                         saveEntry()
                     }
                     .font(.cosmicHeadline(16))
-                    .foregroundStyle(.cosmicPurple)
+                    .foregroundStyle(Color.cosmicPurple)
                 }
             }
         }
