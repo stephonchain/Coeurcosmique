@@ -65,17 +65,3 @@ struct OracleTabView: View {
         }
     }
 }
-
-// MARK: - Updated Oracle Selection View
-
-extension OracleSelectionView {
-    init(viewModel: AppViewModel, selectedOracle: Binding<OracleType?>) {
-        self.init(viewModel: viewModel)
-        self._selectedOracle = State(initialValue: nil)
-        self.onSelection = { oracle in
-            selectedOracle.wrappedValue = oracle
-        }
-    }
-    
-    private var onSelection: ((OracleType) -> Void)? { nil }
-}
