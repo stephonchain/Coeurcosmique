@@ -340,6 +340,11 @@ struct HomeView: View {
                             .foregroundStyle(Color.cosmicGold)
                     }
                 }
+                .buttonStyle(.plain)
+            }
+        }
+        .padding(20)
+        .cosmicCard()
     }
     
     // MARK: - Quick Actions
