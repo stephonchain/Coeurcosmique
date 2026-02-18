@@ -2,7 +2,6 @@ import SwiftUI
 
 struct HomeView: View {
     @ObservedObject var viewModel: AppViewModel
-    @StateObject private var affirmationEngine = AffirmationEngine()
     @StateObject private var gratitudeStore = GratitudeStore()
     @State private var isCardFlipped = false
     @State private var showMotivation = false
@@ -23,13 +22,6 @@ struct HomeView: View {
                 motivationSection
                     .opacity(appeared ? 1 : 0)
                     .offset(y: appeared ? 0 : 30)
-
-                // Daily Affirmation (if daily card exists)
-                if let _ = viewModel.dailyCard {
-                    affirmationSection
-                        .opacity(appeared ? 1 : 0)
-                        .offset(y: appeared ? 0 : 35)
-                }
 
                 // Daily card
                 dailyCardSection
@@ -111,61 +103,6 @@ struct HomeView: View {
         .cosmicCard()
     }
 
-    // MARK: - Daily Affirmation
-
-    private var affirmationSection: some View {
-        VStack(spacing: 14) {
-            HStack {
-                Text("Affirmation du jour")
-                    .font(.cosmicHeadline(16))
-                    .foregroundStyle(Color.cosmicRose)
-                
-                Spacer()
-                
-                Button {
-                    affirmationEngine.regenerateCurrentAffirmation()
-                } label: {
-                    Image(systemName: "arrow.clockwise")
-                        .font(.system(size: 13, weight: .medium))
-                        .foregroundStyle(Color.cosmicTextSecondary)
-                }
-            }
-            
-            if let affirmation = affirmationEngine.currentAffirmation {
-                Text(affirmation.text)
-                    .font(.cosmicBody(15))
-                    .foregroundStyle(Color.cosmicText)
-                    .multilineTextAlignment(.center)
-                    .lineSpacing(4)
-                    .padding(.vertical, 8)
-                
-                Button {
-                    affirmationEngine.toggleFavorite(affirmation)
-                } label: {
-                    HStack(spacing: 6) {
-                        Image(systemName: affirmationEngine.isFavorite(affirmation) ? "heart.fill" : "heart")
-                            .font(.system(size: 12))
-                        Text(affirmationEngine.isFavorite(affirmation) ? "Favoris" : "Ajouter aux favoris")
-                            .font(.cosmicCaption(12))
-                    }
-                    .foregroundStyle(Color.cosmicRose)
-                }
-            }
-        }
-        .padding(16)
-        .cosmicCard(cornerRadius: 16)
-        .overlay(
-            RoundedRectangle(cornerRadius: 16)
-                .strokeBorder(Color.cosmicRose.opacity(0.2), lineWidth: 1)
-        )
-        .onAppear {
-            if let dailyCard = viewModel.dailyCard,
-               let tarotCard = dailyCard.resolve(from: viewModel.deck) {
-                _ = affirmationEngine.generateAffirmation(forCard: tarotCard.name)
-            }
-        }
-    }
-    
     // MARK: - Gratitude Quick-Add
     
     private var gratitudeSection: some View {
