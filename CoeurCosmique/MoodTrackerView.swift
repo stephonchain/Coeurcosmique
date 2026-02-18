@@ -52,10 +52,6 @@ struct MoodTrackerView: View {
             }
             .padding(.horizontal, 20)
         }
-        .navigationBarHidden(true)
-        .navigationBarBackButtonHidden(true)
-        .navigationTitle("")
-        .navigationBarTitleDisplayMode(.inline)
         .sheet(isPresented: $showAddEntry) {
             addEntrySheet
         }

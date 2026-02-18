@@ -74,8 +74,6 @@ struct JournalView: View {
         .sheet(isPresented: $showPaywall) {
             PaywallView(storeManager: storeManager)
         }
-        .navigationBarHidden(true)
-        .navigationBarBackButtonHidden(true)
     }
 
     // MARK: - Section Picker
