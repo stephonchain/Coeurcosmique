@@ -9,6 +9,7 @@ struct QuantumOracleCollectionContent: View {
     @State private var searchText = ""
     @State private var selectedCard: QuantumOracleCard? = nil
     @State private var showPaywall = false
+    @State private var showAbout = false
     
     private let columns = [
         GridItem(.flexible(), spacing: 12),
@@ -100,7 +101,50 @@ struct QuantumOracleCollectionContent: View {
                     .font(.cosmicCaption())
                     .foregroundStyle(Color.cosmicTextSecondary)
                     .padding(.top, 8)
-                
+
+                // Discover button
+                Button {
+                    showAbout = true
+                } label: {
+                    HStack(spacing: 12) {
+                        Text("∞")
+                            .font(.system(size: 18))
+
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Découvrir l'Oracle du Lien Quantique")
+                                .font(.cosmicHeadline(14))
+                                .foregroundStyle(Color.cosmicText)
+
+                            Text("La science de l'âme et les 42 cartes quantiques")
+                                .font(.cosmicCaption(11))
+                                .foregroundStyle(Color.cosmicTextSecondary)
+                        }
+
+                        Spacer()
+
+                        Image(systemName: "chevron.right")
+                            .font(.system(size: 12, weight: .medium))
+                            .foregroundStyle(Color.cosmicPurple.opacity(0.6))
+                    }
+                    .padding(14)
+                    .cosmicCard(cornerRadius: 14)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 14)
+                            .strokeBorder(
+                                LinearGradient(
+                                    colors: [
+                                        Color.cosmicPurple.opacity(0.3),
+                                        Color.cosmicRose.opacity(0.15)
+                                    ],
+                                    startPoint: .leading,
+                                    endPoint: .trailing
+                                ),
+                                lineWidth: 1
+                            )
+                    )
+                }
+                .buttonStyle(.plain)
+
                 // Search
                 searchBar
                 
@@ -124,6 +168,9 @@ struct QuantumOracleCollectionContent: View {
         }
         .sheet(item: $selectedCard) { card in
             QuantumCardDetailView(card: card, deck: viewModel.quantumOracleDeck)
+        }
+        .sheet(isPresented: $showAbout) {
+            QuantumOracleAboutView()
         }
     }
     
