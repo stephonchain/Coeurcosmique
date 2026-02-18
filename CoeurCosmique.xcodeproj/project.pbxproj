@@ -57,6 +57,7 @@
 		AA00000001000035 /* OracleCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000002000035 /* OracleCollectionView.swift */; };
 		AA00000001000036 /* FullScreenCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000002000036 /* FullScreenCardView.swift */; };
 		AA00000001000037 /* OracleAboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000002000037 /* OracleAboutView.swift */; };
+		AA00000001000038 /* AIInterpretationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000002000038 /* AIInterpretationService.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -111,6 +112,7 @@
 		AA00000002000035 /* OracleCollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OracleCollectionView.swift; sourceTree = "<group>"; };
 		AA00000002000036 /* FullScreenCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FullScreenCardView.swift; sourceTree = "<group>"; };
 		AA00000002000037 /* OracleAboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OracleAboutView.swift; sourceTree = "<group>"; };
+		AA00000002000038 /* AIInterpretationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIInterpretationService.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -135,6 +137,7 @@
 		AA00000003000002 /* CoeurCosmique */ = {
 			isa = PBXGroup;
 			children = (
+				AA00000002000038 /* AIInterpretationService.swift */,
 				9703C1102F44AC0F005D49C6 /* AffirmationEngine.swift */,
 				AA00000002000003 /* AppViewModel.swift */,
 				AA00000002000019 /* Assets.xcassets */,
@@ -331,6 +334,7 @@
 				AA00000001000035 /* OracleCollectionView.swift in Sources */,
 				AA00000001000036 /* FullScreenCardView.swift in Sources */,
 				AA00000001000037 /* OracleAboutView.swift in Sources */,
+				AA00000001000038 /* AIInterpretationService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
