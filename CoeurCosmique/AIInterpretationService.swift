@@ -18,7 +18,20 @@ private struct ProxyRequest: Encodable {
 }
 
 private struct ProxyResponse: Decodable {
-    let interpretation: String
+    // Format proxy : { "interpretation": "..." }
+    let interpretation: String?
+    // Format brut Anthropic : { "content": [{ "type": "text", "text": "..." }] }
+    let content: [ContentBlock]?
+
+    struct ContentBlock: Decodable {
+        let type: String
+        let text: String?
+    }
+
+    var text: String? {
+        if let interpretation { return interpretation }
+        return content?.first(where: { $0.type == "text" })?.text
+    }
 }
 
 // MARK: - Errors
@@ -91,7 +104,10 @@ actor AIInterpretationService {
         }
 
         let decoded = try JSONDecoder().decode(ProxyResponse.self, from: data)
-        return decoded.interpretation
+        guard let result = decoded.text else {
+            throw AIInterpretationError.invalidResponse
+        }
+        return result
     }
 
     // MARK: - Build Payload
