@@ -7,27 +7,28 @@ struct ContentView: View {
         ZStack {
             CosmicBackground()
 
-            TabView(selection: $viewModel.selectedTab) {
-                HomeView(viewModel: viewModel)
-                    .tag(AppTab.home)
-
-                DrawView(viewModel: viewModel)
-                    .tag(AppTab.draw)
-
-                OracleTabView(viewModel: viewModel)
-                    .tag(AppTab.oracle)
-
-                CollectionView(viewModel: viewModel)
-                    .tag(AppTab.collection)
-
-                InsightsTabView(viewModel: viewModel)
-                    .tag(AppTab.insights)
-
-                JournalView(viewModel: viewModel)
-                    .tag(AppTab.journal)
+            // Manual tab switching (avoids iOS 18 TabView "More"/"Autre" bug with 6+ tabs)
+            Group {
+                switch viewModel.selectedTab {
+                case .home:
+                    HomeView(viewModel: viewModel)
+                case .draw:
+                    DrawView(viewModel: viewModel)
+                case .oracle:
+                    OracleTabView(viewModel: viewModel)
+                case .collection:
+                    CollectionView(viewModel: viewModel)
+                case .insights:
+                    InsightsTabView(viewModel: viewModel)
+                case .journal:
+                    JournalView(viewModel: viewModel)
+                }
             }
-            .toolbar(.hidden, for: .tabBar, .navigationBar)
-            .overlay(alignment: .bottom) {
+            .animation(.easeInOut(duration: 0.15), value: viewModel.selectedTab)
+
+            // Custom tab bar
+            VStack {
+                Spacer()
                 cosmicTabBar
             }
         }
