@@ -24,6 +24,12 @@ naturellement, sans forcer.
 - N'utilise pas d'émojis.`;
 
 function buildUserPrompt(body) {
+  // Prefer the pre-built userMessage from the iOS app (contains all card data)
+  if (body.userMessage && typeof body.userMessage === "string" && body.userMessage.length > 0) {
+    return body.userMessage;
+  }
+
+  // Fallback: build from structured cards array
   const lines = [];
 
   lines.push(`Tirage : ${body.spread}`);
@@ -32,14 +38,16 @@ function buildUserPrompt(body) {
   }
   lines.push("");
 
-  for (const card of body.cards) {
-    lines.push(`--- ${card.position} ---`);
-    lines.push(`Carte : ${card.name}`);
-    lines.push(`Famille : ${card.family}`);
-    lines.push(`Essence : ${card.essence.join(", ")}`);
-    lines.push(`Message profond : ${card.messageProfond}`);
-    lines.push(`Interprétation positionnelle : ${card.spreadInterpretation}`);
-    lines.push("");
+  if (Array.isArray(body.cards)) {
+    for (const card of body.cards) {
+      lines.push(`--- ${card.position} ---`);
+      lines.push(`Carte : ${card.name}`);
+      lines.push(`Famille : ${card.family}`);
+      lines.push(`Essence : ${Array.isArray(card.essence) ? card.essence.join(", ") : card.essence}`);
+      lines.push(`Message profond : ${card.messageProfond}`);
+      lines.push(`Interprétation positionnelle : ${card.spreadInterpretation}`);
+      lines.push("");
+    }
   }
 
   lines.push("Fournis une synthèse unifiée de ce tirage.");
@@ -71,8 +79,12 @@ export default async function handler(req, res) {
   try {
     const body = req.body;
 
-    if (!body.spread || !Array.isArray(body.cards) || body.cards.length === 0) {
-      return res.status(400).json({ error: "Invalid request: spread and cards required" });
+    // Accept either pre-built userMessage or structured cards
+    const hasUserMessage = body.userMessage && typeof body.userMessage === "string" && body.userMessage.length > 0;
+    const hasCards = Array.isArray(body.cards) && body.cards.length > 0;
+
+    if (!body.spread || (!hasUserMessage && !hasCards)) {
+      return res.status(400).json({ error: "Invalid request: spread and (cards or userMessage) required" });
     }
 
     const userPrompt = buildUserPrompt(body);

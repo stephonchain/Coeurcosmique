@@ -6,6 +6,8 @@ private struct ProxyRequest: Encodable {
     let spread: String
     let question: String?
     let cards: [CardPosition]
+    /// Pre-built user prompt so the proxy can forward it directly to Claude
+    let userMessage: String
 
     struct CardPosition: Encodable {
         let position: String
@@ -41,6 +43,7 @@ enum AIInterpretationError: LocalizedError {
     case networkError(Error)
     case invalidResponse
     case serverError(String)
+    case noCardsResolved
 
     var errorDescription: String? {
         switch self {
@@ -52,6 +55,8 @@ enum AIInterpretationError: LocalizedError {
             return "Réponse invalide du serveur."
         case .serverError(let message):
             return message
+        case .noCardsResolved:
+            return "Impossible de résoudre les cartes tirées."
         }
     }
 }
@@ -75,7 +80,7 @@ actor AIInterpretationService {
             throw AIInterpretationError.noEndpoint
         }
 
-        let payload = buildPayload(reading: reading, deck: deck)
+        let payload = try buildPayload(reading: reading, deck: deck)
         let body = try JSONEncoder().encode(payload)
 
         var request = URLRequest(url: url)
@@ -112,7 +117,7 @@ actor AIInterpretationService {
 
     // MARK: - Build Payload
 
-    private func buildPayload(reading: QuantumOracleReading, deck: [QuantumOracleCard]) -> ProxyRequest {
+    private func buildPayload(reading: QuantumOracleReading, deck: [QuantumOracleCard]) throws -> ProxyRequest {
         let cards = reading.cards.enumerated().compactMap { index, drawn -> ProxyRequest.CardPosition? in
             guard let card = drawn.resolve(from: deck) else { return nil }
             let label = index < reading.spread.labels.count ? reading.spread.labels[index] : "Position \(index + 1)"
@@ -128,11 +133,43 @@ actor AIInterpretationService {
             )
         }
 
+        guard !cards.isEmpty else {
+            throw AIInterpretationError.noCardsResolved
+        }
+
+        let userMessage = buildUserMessage(spread: reading.spread.title, question: reading.question, cards: cards)
+
         return ProxyRequest(
             spread: reading.spread.title,
             question: reading.question,
-            cards: cards
+            cards: cards,
+            userMessage: userMessage
         )
+    }
+
+    // MARK: - Build User Prompt (mirrors proxy-side buildUserPrompt)
+
+    private func buildUserMessage(spread: String, question: String?, cards: [ProxyRequest.CardPosition]) -> String {
+        var lines: [String] = []
+
+        lines.append("Tirage : \(spread)")
+        if let question, !question.isEmpty {
+            lines.append("Question : \(question)")
+        }
+        lines.append("")
+
+        for card in cards {
+            lines.append("--- \(card.position) ---")
+            lines.append("Carte : \(card.name)")
+            lines.append("Famille : \(card.family)")
+            lines.append("Essence : \(card.essence.joined(separator: ", "))")
+            lines.append("Message profond : \(card.messageProfond)")
+            lines.append("Interprétation positionnelle : \(card.spreadInterpretation)")
+            lines.append("")
+        }
+
+        lines.append("Fournis une synthèse unifiée de ce tirage.")
+        return lines.joined(separator: "\n")
     }
 
     // MARK: - Helpers

@@ -119,14 +119,16 @@ struct QuantumOracleCard: Equatable, Identifiable, Codable, Hashable {
 struct DrawnQuantumOracleCard: Equatable, Identifiable, Codable, Hashable {
     let id: UUID
     let cardID: UUID
+    let cardNumber: Int
 
     init(card: QuantumOracleCard) {
         self.id = UUID()
         self.cardID = card.id
+        self.cardNumber = card.number
     }
 
     func resolve(from deck: [QuantumOracleCard]) -> QuantumOracleCard? {
-        deck.first { $0.id == cardID }
+        deck.first { $0.id == cardID } ?? deck.first { $0.number == cardNumber }
     }
 
     func hash(into hasher: inout Hasher) {
