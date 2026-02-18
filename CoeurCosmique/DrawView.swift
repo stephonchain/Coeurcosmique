@@ -3,6 +3,7 @@ import SwiftUI
 struct DrawView: View {
     @ObservedObject var viewModel: AppViewModel
     @EnvironmentObject var storeManager: StoreManager
+    @EnvironmentObject var creditManager: CreditManager
     @State private var selectedSpread: TarotSpreadType = .pastPresentFuture
     @State private var question: String = ""
     @State private var isDrawing = false
@@ -12,6 +13,11 @@ struct DrawView: View {
     @State private var fullScreenTarotCard: TarotCard? = nil
     @State private var fullScreenIsReversed = false
     @FocusState private var isQuestionFocused: Bool
+
+    // AI Interpretation
+    @State private var aiInterpretation: String?
+    @State private var isLoadingAI = false
+    @State private var aiError: String?
 
     private var hasReachedFreeLimit: Bool {
         !storeManager.isPremium && viewModel.todayDrawCount >= AppViewModel.freeDailyDrawLimit
@@ -112,6 +118,11 @@ struct DrawView: View {
                     }
                 }
 
+                // AI Interpretation section
+                if storeManager.isPremium {
+                    tarotAIInterpretationSection(reading)
+                }
+
                 // New draw button
                 Button {
                     withAnimation {
@@ -119,6 +130,8 @@ struct DrawView: View {
                         viewModel.currentReading = nil
                         revealedCards = []
                         question = ""
+                        aiInterpretation = nil
+                        aiError = nil
                     }
                 } label: {
                     HStack(spacing: 10) {
@@ -418,6 +431,133 @@ struct DrawView: View {
                         )
                 }
             }
+        }
+    }
+
+    // MARK: - AI Interpretation
+
+    private func tarotAIInterpretationSection(_ reading: TarotReading) -> some View {
+        VStack(spacing: 16) {
+            if let interpretation = aiInterpretation {
+                // Display AI result
+                VStack(spacing: 12) {
+                    HStack(spacing: 8) {
+                        Image(systemName: "sparkles")
+                            .font(.system(size: 14))
+                            .foregroundStyle(Color.cosmicGold)
+
+                        Text("Synthese IA du Tirage")
+                            .font(.cosmicHeadline(16))
+                            .foregroundStyle(
+                                LinearGradient(
+                                    colors: [.cosmicGold, .cosmicPurple],
+                                    startPoint: .leading,
+                                    endPoint: .trailing
+                                )
+                            )
+                    }
+
+                    Text(interpretation)
+                        .font(.cosmicBody(14))
+                        .foregroundStyle(Color.cosmicText.opacity(0.9))
+                        .multilineTextAlignment(.leading)
+                        .lineSpacing(5)
+                }
+                .padding(20)
+                .cosmicCard()
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16)
+                        .strokeBorder(
+                            LinearGradient(
+                                colors: [Color.cosmicGold.opacity(0.3), Color.cosmicPurple.opacity(0.15)],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            ),
+                            lineWidth: 1
+                        )
+                )
+            } else {
+                // Request button
+                VStack(spacing: 10) {
+                    Button {
+                        requestTarotAIInterpretation(reading)
+                    } label: {
+                        HStack(spacing: 10) {
+                            if isLoadingAI {
+                                ProgressView()
+                                    .tint(Color.white)
+                            } else {
+                                Image(systemName: "sparkles")
+                                    .font(.system(size: 16, weight: .medium))
+                            }
+
+                            Text(isLoadingAI ? "Analyse en cours..." : "Interpretation IA")
+                                .font(.cosmicHeadline(15))
+                        }
+                        .foregroundStyle(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 14)
+                        .background(
+                            RoundedRectangle(cornerRadius: 14)
+                                .fill(
+                                    LinearGradient(
+                                        colors: [.cosmicGold.opacity(0.8), .cosmicPurple.opacity(0.6)],
+                                        startPoint: .leading,
+                                        endPoint: .trailing
+                                    )
+                                )
+                        )
+                    }
+                    .buttonStyle(.plain)
+                    .disabled(isLoadingAI || !creditManager.hasCredits)
+
+                    // Credit indicator
+                    HStack(spacing: 6) {
+                        Image(systemName: "bolt.fill")
+                            .font(.system(size: 10))
+                            .foregroundStyle(Color.cosmicGold)
+
+                        if creditManager.hasCredits {
+                            Text("\(creditManager.credits) credit\(creditManager.credits > 1 ? "s" : "") restant\(creditManager.credits > 1 ? "s" : "") aujourd'hui")
+                                .font(.cosmicCaption(11))
+                                .foregroundStyle(Color.cosmicTextSecondary)
+                        } else {
+                            Text("Plus de credits pour aujourd'hui")
+                                .font(.cosmicCaption(11))
+                                .foregroundStyle(Color.cosmicRose.opacity(0.8))
+                        }
+                    }
+
+                    if let error = aiError {
+                        Text(error)
+                            .font(.cosmicCaption(11))
+                            .foregroundStyle(Color.cosmicRose)
+                            .multilineTextAlignment(.center)
+                    }
+                }
+            }
+        }
+    }
+
+    private func requestTarotAIInterpretation(_ reading: TarotReading) {
+        guard creditManager.hasCredits else { return }
+        isLoadingAI = true
+        aiError = nil
+
+        Task {
+            do {
+                let result = try await AIInterpretationService.shared.interpretTarot(
+                    reading: reading,
+                    deck: viewModel.deck
+                )
+                let _ = creditManager.consumeCredit()
+                withAnimation {
+                    aiInterpretation = result
+                }
+            } catch {
+                aiError = error.localizedDescription
+            }
+            isLoadingAI = false
         }
     }
 

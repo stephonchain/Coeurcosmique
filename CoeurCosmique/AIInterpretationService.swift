@@ -5,6 +5,7 @@ import Foundation
 private struct ProxyRequest: Encodable {
     let spread: String
     let question: String?
+    let deckType: String
     let cards: [CardPosition]
     /// Pre-built user prompt so the proxy can forward it directly to Claude
     let userMessage: String
@@ -73,14 +74,34 @@ actor AIInterpretationService {
     /// Bearer token sent to the proxy for auth
     private let proxyToken: String? = "75FC49FC-55F2-4915-9EBB-65E4B3133D9F"
 
-    // MARK: - Public
+    // MARK: - Public: Quantum Oracle
 
     func interpret(reading: QuantumOracleReading, deck: [QuantumOracleCard]) async throws -> String {
+        let payload = try buildQuantumPayload(reading: reading, deck: deck)
+        return try await sendRequest(payload: payload)
+    }
+
+    // MARK: - Public: Tarot
+
+    func interpretTarot(reading: TarotReading, deck: [TarotCard]) async throws -> String {
+        let payload = try buildTarotPayload(reading: reading, deck: deck)
+        return try await sendRequest(payload: payload)
+    }
+
+    // MARK: - Public: Oracle du Coeur Cosmique
+
+    func interpretOracle(reading: OracleReading, deck: [OracleCard]) async throws -> String {
+        let payload = try buildOraclePayload(reading: reading, deck: deck)
+        return try await sendRequest(payload: payload)
+    }
+
+    // MARK: - Network
+
+    private func sendRequest(payload: ProxyRequest) async throws -> String {
         guard let url = proxyURL else {
             throw AIInterpretationError.noEndpoint
         }
 
-        let payload = try buildPayload(reading: reading, deck: deck)
         let body = try JSONEncoder().encode(payload)
 
         var request = URLRequest(url: url)
@@ -115,13 +136,13 @@ actor AIInterpretationService {
         return result
     }
 
-    // MARK: - Build Payload
+    // MARK: - Build Quantum Payload
 
-    private func buildPayload(reading: QuantumOracleReading, deck: [QuantumOracleCard]) throws -> ProxyRequest {
+    private func buildQuantumPayload(reading: QuantumOracleReading, deck: [QuantumOracleCard]) throws -> ProxyRequest {
         let cards = reading.cards.enumerated().compactMap { index, drawn -> ProxyRequest.CardPosition? in
             guard let card = drawn.resolve(from: deck) else { return nil }
             let label = index < reading.spread.labels.count ? reading.spread.labels[index] : "Position \(index + 1)"
-            let spreadInterp = interpretationText(card: card, spread: reading.spread, position: index)
+            let spreadInterp = quantumInterpretationText(card: card, spread: reading.spread, position: index)
 
             return ProxyRequest.CardPosition(
                 position: label,
@@ -142,12 +163,90 @@ actor AIInterpretationService {
         return ProxyRequest(
             spread: reading.spread.title,
             question: reading.question,
+            deckType: "quantum",
             cards: cards,
             userMessage: userMessage
         )
     }
 
-    // MARK: - Build User Prompt (mirrors proxy-side buildUserPrompt)
+    // MARK: - Build Tarot Payload
+
+    private func buildTarotPayload(reading: TarotReading, deck: [TarotCard]) throws -> ProxyRequest {
+        let cards = reading.cards.enumerated().compactMap { index, drawn -> ProxyRequest.CardPosition? in
+            guard let card = drawn.resolve(from: deck) else { return nil }
+            let label = index < reading.spread.labels.count ? reading.spread.labels[index] : "Position \(index + 1)"
+
+            let orientation = drawn.isReversed ? "Inversée" : "Droite"
+            let meaning = drawn.isReversed ? card.reversedMeaning : card.uprightMeaning
+
+            return ProxyRequest.CardPosition(
+                position: label,
+                name: card.name,
+                family: card.arcana.displayName,
+                essence: card.keywords,
+                messageProfond: meaning,
+                spreadInterpretation: "\(orientation). \(card.interpretation.general)"
+            )
+        }
+
+        guard !cards.isEmpty else {
+            throw AIInterpretationError.noCardsResolved
+        }
+
+        let userMessage = buildTarotUserMessage(
+            spread: reading.spread.title,
+            question: reading.question,
+            cards: cards,
+            drawnCards: reading.cards,
+            deck: deck
+        )
+
+        return ProxyRequest(
+            spread: reading.spread.title,
+            question: reading.question,
+            deckType: "tarot",
+            cards: cards,
+            userMessage: userMessage
+        )
+    }
+
+    // MARK: - Build Oracle Payload
+
+    private func buildOraclePayload(reading: OracleReading, deck: [OracleCard]) throws -> ProxyRequest {
+        let cards = reading.cards.enumerated().compactMap { index, drawn -> ProxyRequest.CardPosition? in
+            guard let card = drawn.resolve(from: deck) else { return nil }
+            let label = index < reading.spread.labels.count ? reading.spread.labels[index] : "Position \(index + 1)"
+
+            return ProxyRequest.CardPosition(
+                position: label,
+                name: "\(card.number). \(card.name)",
+                family: "Oracle du Coeur Cosmique",
+                essence: card.keywords,
+                messageProfond: card.message,
+                spreadInterpretation: card.extendedMeaning
+            )
+        }
+
+        guard !cards.isEmpty else {
+            throw AIInterpretationError.noCardsResolved
+        }
+
+        let userMessage = buildOracleUserMessage(
+            spread: reading.spread.title,
+            question: reading.question,
+            cards: cards
+        )
+
+        return ProxyRequest(
+            spread: reading.spread.title,
+            question: reading.question,
+            deckType: "oracle",
+            cards: cards,
+            userMessage: userMessage
+        )
+    }
+
+    // MARK: - Build User Prompts
 
     private func buildUserMessage(spread: String, question: String?, cards: [ProxyRequest.CardPosition]) -> String {
         var lines: [String] = []
@@ -172,9 +271,78 @@ actor AIInterpretationService {
         return lines.joined(separator: "\n")
     }
 
+    private func buildTarotUserMessage(
+        spread: String,
+        question: String?,
+        cards: [ProxyRequest.CardPosition],
+        drawnCards: [DrawnCard],
+        deck: [TarotCard]
+    ) -> String {
+        var lines: [String] = []
+
+        lines.append("Tirage : \(spread)")
+        if let question, !question.isEmpty {
+            lines.append("Question : \(question)")
+        }
+        lines.append("")
+
+        for (index, card) in cards.enumerated() {
+            let drawn = index < drawnCards.count ? drawnCards[index] : nil
+            let tarotCard = drawn?.resolve(from: deck)
+            let orientation = drawn?.isReversed == true ? "Inversée" : "Droite"
+
+            lines.append("--- \(card.position) ---")
+            lines.append("Carte : \(card.name)")
+            lines.append("Arcane : \(card.family)")
+            lines.append("Orientation : \(orientation)")
+            lines.append("Mots-clés : \(card.essence.joined(separator: ", "))")
+            if let tarotCard {
+                lines.append("Sens droit : \(tarotCard.uprightMeaning)")
+                lines.append("Sens inversé : \(tarotCard.reversedMeaning)")
+                lines.append("Interprétation générale : \(tarotCard.interpretation.general)")
+                lines.append("Amour : \(tarotCard.interpretation.love)")
+                lines.append("Carrière : \(tarotCard.interpretation.career)")
+                lines.append("Spiritualité : \(tarotCard.interpretation.spiritual)")
+                if !tarotCard.element.isEmpty {
+                    lines.append("Élément : \(tarotCard.element)")
+                }
+            }
+            lines.append("")
+        }
+
+        lines.append("Fournis une synthèse unifiée de ce tirage en tenant compte de l'orientation de chaque carte et de sa position.")
+        return lines.joined(separator: "\n")
+    }
+
+    private func buildOracleUserMessage(
+        spread: String,
+        question: String?,
+        cards: [ProxyRequest.CardPosition]
+    ) -> String {
+        var lines: [String] = []
+
+        lines.append("Tirage : \(spread)")
+        if let question, !question.isEmpty {
+            lines.append("Question : \(question)")
+        }
+        lines.append("")
+
+        for card in cards {
+            lines.append("--- \(card.position) ---")
+            lines.append("Carte : \(card.name)")
+            lines.append("Mots-clés : \(card.essence.joined(separator: ", "))")
+            lines.append("Message : \(card.messageProfond)")
+            lines.append("Signification étendue : \(card.spreadInterpretation)")
+            lines.append("")
+        }
+
+        lines.append("Fournis une synthèse unifiée de ce tirage en reliant le message de chaque carte à sa position.")
+        return lines.joined(separator: "\n")
+    }
+
     // MARK: - Helpers
 
-    private func interpretationText(card: QuantumOracleCard, spread: QuantumSpreadType, position: Int) -> String {
+    private func quantumInterpretationText(card: QuantumOracleCard, spread: QuantumSpreadType, position: Int) -> String {
         switch spread {
         case .lienDesAmes:
             switch position {
