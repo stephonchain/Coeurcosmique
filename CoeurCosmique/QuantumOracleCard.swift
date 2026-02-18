@@ -58,7 +58,7 @@ enum QuantumFamily: String, CaseIterable, Codable {
 // MARK: - Quantum Interpretation per card
 
 struct QuantumInterpretation: Equatable, Codable {
-    // Tirage 1 - L'Intrication des Âmes (Relationnel)
+    // Tirage 1 - Le Lien des Âmes (Relationnel)
     let alphaYou: String
     let betaOther: String
     let linkResult: String
@@ -137,7 +137,7 @@ struct DrawnQuantumOracleCard: Equatable, Identifiable, Codable, Hashable {
 // MARK: - Quantum Spread Types
 
 enum QuantumSpreadType: String, CaseIterable, Codable, Identifiable {
-    case intricationDesAmes
+    case lienDesAmes
     case chatDeSchrodinger
     case sautQuantique
 
@@ -145,7 +145,7 @@ enum QuantumSpreadType: String, CaseIterable, Codable, Identifiable {
 
     var cardCount: Int {
         switch self {
-        case .intricationDesAmes: return 3
+        case .lienDesAmes: return 3
         case .chatDeSchrodinger: return 4
         case .sautQuantique: return 5
         }
@@ -153,7 +153,7 @@ enum QuantumSpreadType: String, CaseIterable, Codable, Identifiable {
 
     var title: String {
         switch self {
-        case .intricationDesAmes: return "L'Intrication des Âmes"
+        case .lienDesAmes: return "Le Lien des Âmes"
         case .chatDeSchrodinger: return "Le Chat de Schrödinger"
         case .sautQuantique: return "Le Saut Quantique"
         }
@@ -161,7 +161,7 @@ enum QuantumSpreadType: String, CaseIterable, Codable, Identifiable {
 
     var subtitle: String {
         switch self {
-        case .intricationDesAmes: return "Le Scanner Relationnel"
+        case .lienDesAmes: return "Le Scanner Relationnel"
         case .chatDeSchrodinger: return "L'Outil Décisionnel"
         case .sautQuantique: return "La Flèche d'Évolution"
         }
@@ -169,7 +169,7 @@ enum QuantumSpreadType: String, CaseIterable, Codable, Identifiable {
 
     var labels: [String] {
         switch self {
-        case .intricationDesAmes: return ["Particule Alpha (Vous)", "Particule Bêta (L'Autre)", "Cordon Quantique (Le Lien)"]
+        case .lienDesAmes: return ["Particule Alpha (Vous)", "Particule Bêta (L'Autre)", "Cordon Quantique (Le Lien)"]
         case .chatDeSchrodinger: return ["Superposition (Situation)", "Boîte Ouverte A (Action)", "Boîte Ouverte B (Non-Action)", "Effondrement de l'Onde (Synthèse)"]
         case .sautQuantique: return ["Gravité (Frein)", "Énergie Noire (Force)", "Horizon (Seuil)", "Trou de Ver (Aide)", "Nouvelle Galaxie (But)"]
         }
@@ -177,7 +177,7 @@ enum QuantumSpreadType: String, CaseIterable, Codable, Identifiable {
 
     var shortLabels: [String] {
         switch self {
-        case .intricationDesAmes: return ["Alpha", "Bêta", "Lien"]
+        case .lienDesAmes: return ["Alpha", "Bêta", "Lien"]
         case .chatDeSchrodinger: return ["Situation", "Action", "Non-Action", "Synthèse"]
         case .sautQuantique: return ["Gravité", "Énergie Noire", "Horizon", "Trou de Ver", "Nouvelle Galaxie"]
         }
@@ -185,7 +185,7 @@ enum QuantumSpreadType: String, CaseIterable, Codable, Identifiable {
 
     var icon: String {
         switch self {
-        case .intricationDesAmes: return "link"
+        case .lienDesAmes: return "link"
         case .chatDeSchrodinger: return "questionmark.square.dashed"
         case .sautQuantique: return "arrow.up.forward.circle.fill"
         }
@@ -193,7 +193,7 @@ enum QuantumSpreadType: String, CaseIterable, Codable, Identifiable {
 
     var description: String {
         switch self {
-        case .intricationDesAmes: return "Comprendre les énergies invisibles entre vous et une autre personne ou un projet"
+        case .lienDesAmes: return "Comprendre les énergies invisibles entre vous et une autre personne ou un projet"
         case .chatDeSchrodinger: return "Face à un dilemme, ouvrir les deux boîtes de possibles"
         case .sautQuantique: return "Dessiner la trajectoire de votre âme pour les grandes transitions"
         }
@@ -203,7 +203,7 @@ enum QuantumSpreadType: String, CaseIterable, Codable, Identifiable {
     func interpretationText(for card: QuantumOracleCard, at positionIndex: Int) -> String {
         let interp = card.interpretation
         switch self {
-        case .intricationDesAmes:
+        case .lienDesAmes:
             switch positionIndex {
             case 0: return interp.alphaYou
             case 1: return interp.betaOther

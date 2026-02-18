@@ -13,7 +13,7 @@ enum OracleType: String, CaseIterable, Identifiable {
         case .cosmicHeart:
             return "Oracle Cœur Cosmique"
         case .quantumEntanglement:
-            return "Oracle Quantique"
+            return "Oracle du Lien Quantique"
         }
     }
     
@@ -22,7 +22,7 @@ enum OracleType: String, CaseIterable, Identifiable {
         case .cosmicHeart:
             return "Messages du cœur cosmique"
         case .quantumEntanglement:
-            return "Intrication quantique de l'âme"
+            return "Lien quantique de l'âme"
         }
     }
     
@@ -65,11 +65,10 @@ enum OracleType: String, CaseIterable, Identifiable {
                 PreviewCardData(imageName: allCards[2].imageName, color: .cosmicRose, showImage: true)
             ]
         case .quantumEntanglement:
-            // Placeholders for Quantum Oracle (no images yet)
             return [
-                PreviewCardData(imageName: "quantum-oracle-01", color: .cosmicPurple, showImage: false),
-                PreviewCardData(imageName: "quantum-oracle-21", color: .cosmicPurple, showImage: false),
-                PreviewCardData(imageName: "quantum-oracle-42", color: .cosmicPurple, showImage: false)
+                PreviewCardData(imageName: "quantum-oracle-01", color: .cosmicPurple, showImage: true),
+                PreviewCardData(imageName: "quantum-oracle-21", color: .cosmicPurple, showImage: true),
+                PreviewCardData(imageName: "quantum-oracle-42", color: .cosmicPurple, showImage: true)
             ]
         }
     }

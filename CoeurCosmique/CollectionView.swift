@@ -11,7 +11,7 @@ enum CollectionDeck: String, CaseIterable {
         switch self {
         case .tarot: return "Tarot de Marseille"
         case .oracle: return "Oracle Cœur Cosmique"
-        case .quantumOracle: return "Oracle Quantique"
+        case .quantumOracle: return "Oracle du Lien Quantique"
         }
     }
 }

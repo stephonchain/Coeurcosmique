@@ -41,7 +41,7 @@ struct QuantumOracleCollectionContent: View {
                 )
             
             VStack(spacing: 8) {
-                Text("Oracle Quantique")
+                Text("Oracle du Lien Quantique")
                     .font(.cosmicTitle(24))
                     .foregroundStyle(Color.cosmicText)
                 

@@ -5,7 +5,7 @@ import SwiftUI
 struct QuantumOracleDrawView: View {
     @ObservedObject var viewModel: AppViewModel
     @EnvironmentObject var storeManager: StoreManager
-    @State private var selectedSpread: QuantumSpreadType = .intricationDesAmes
+    @State private var selectedSpread: QuantumSpreadType = .lienDesAmes
     @State private var question: String = ""
     @State private var isDrawing = false
     @State private var revealedCards: Set<Int> = []
@@ -66,12 +66,12 @@ struct QuantumOracleDrawView: View {
                                 )
                             )
                         
-                        Text("Oracle Quantique")
+                        Text("Oracle du Lien Quantique")
                             .font(.cosmicTitle(28))
                             .foregroundStyle(Color.cosmicText)
                     }
                     
-                    Text("Explore les lois de l'intrication cosmique")
+                    Text("Explore les lois du lien cosmique")
                         .font(.cosmicCaption())
                         .foregroundStyle(Color.cosmicTextSecondary)
                 }
@@ -192,7 +192,7 @@ struct QuantumOracleDrawView: View {
     
     private var quantumSpreadSelection: some View {
         VStack(spacing: 12) {
-            ForEach([QuantumSpreadType.intricationDesAmes, .chatDeSchrodinger, .sautQuantique]) { spread in
+            ForEach([QuantumSpreadType.lienDesAmes, .chatDeSchrodinger, .sautQuantique]) { spread in
                 Button {
                     withAnimation(.spring(response: 0.3)) {
                         selectedSpread = spread
@@ -292,7 +292,7 @@ struct QuantumOracleDrawView: View {
                 }
                 
                 Text(isDrawing
-                     ? "Intrication en cours..."
+                     ? "Connexion en cours..."
                      : hasReachedFreeLimit
                         ? "Activer Premium"
                         : "Observer l'onde quantique")
@@ -442,7 +442,7 @@ struct QuantumOracleDrawView: View {
         positionIndex: Int
     ) -> String {
         switch spread {
-        case .intricationDesAmes:
+        case .lienDesAmes:
             switch positionIndex {
             case 0: return card.interpretation.alphaYou
             case 1: return card.interpretation.betaOther

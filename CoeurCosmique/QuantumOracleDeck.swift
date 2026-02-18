@@ -6,7 +6,7 @@ enum QuantumOracleDeck {
         
         QuantumOracleCard(
             number: 1,
-            name: "L'Intrication Éternelle",
+            name: "Le Lien Éternel",
             family: .loisFondamentales,
             essence: ["Lien indissoluble", "Amour", "Connexion d'âme"],
             messageProfond: "La distance physique est une illusion. Vous êtes connecté instantanément à une autre âme ou à une situation, peu importe l'éloignement. Ce qui affecte l'un affecte l'autre immédiatement.",
