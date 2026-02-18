@@ -283,55 +283,59 @@ struct OnboardingPage {
     let imageName: String?
 
     static let allPages: [OnboardingPage] = [
+        // Page 1 – Welcome (recentré oracles)
         OnboardingPage(
             icon: "sparkles",
             title: "Bienvenue dans\nCoeur Cosmique",
-            subtitle: "Ton guide de Tarot personnel.\nDécouvre les messages que l'univers a pour toi.",
+            subtitle: "Tes oracles personnels guidés par l'intelligence artificielle.\nDécouvre les messages que l'univers a pour toi.",
             features: [],
             accentColor: .cosmicGold,
             accentColorLight: .cosmicGoldLight,
             videoFileName: "onboarding-welcome",
             imageName: "onboarding-welcome"
         ),
+        // Page 2 – Les Oracles (star feature)
         OnboardingPage(
-            icon: "suit.heart.fill",
-            title: "Tirages guidés",
-            subtitle: "Choisis parmi plusieurs types de tirages et pose tes questions au Tarot.",
+            icon: "moon.stars.fill",
+            title: "Deux Oracles\npuissants",
+            subtitle: "Explore deux oracles uniques pour recevoir tes guidances cosmiques au quotidien.",
             features: [
-                "Guidance quotidienne",
-                "Passé · Présent · Futur",
-                "Relations & Amour",
-                "Oui / Non instantané"
-            ],
-            accentColor: .cosmicRose,
-            accentColorLight: Color(red: 0.93, green: 0.73, blue: 0.73),
-            videoFileName: "onboarding-spreads",
-            imageName: "onboarding-spreads"
-        ),
-        OnboardingPage(
-            icon: "square.grid.2x2.fill",
-            title: "78 cartes à explorer",
-            subtitle: "Plonge dans la signification de chaque carte du Tarot de Marseille.",
-            features: [
-                "Arcanes Majeurs & Mineurs",
-                "Significations à l'endroit & renversé",
-                "Interprétations : Amour, Carrière, Spirituel",
-                "Mots-clés pour chaque carte"
+                "Oracle Cœur Cosmique · 42 cartes",
+                "Oracle Quantique · 44 cartes, 6 familles",
+                "Tirages : Lien des Âmes, Chat de Schrödinger…",
+                "Messages personnalisés à chaque tirage"
             ],
             accentColor: .cosmicPurple,
             accentColorLight: .cosmicPurpleLight,
+            videoFileName: "onboarding-spreads",
+            imageName: "onboarding-spreads"
+        ),
+        // Page 3 – Interprétation IA (nouvelle fonctionnalité)
+        OnboardingPage(
+            icon: "wand.and.stars",
+            title: "L'IA interprète\ntes tirages",
+            subtitle: "Une intelligence artificielle analyse tes cartes et te délivre une interprétation unique et personnalisée.",
+            features: [
+                "Interprétations unifiées par IA",
+                "Analyse adaptée à ta question",
+                "Vocabulaire quantique & spirituel",
+                "Guidance profonde et sur mesure"
+            ],
+            accentColor: .cosmicRose,
+            accentColorLight: Color(red: 0.93, green: 0.73, blue: 0.73),
             videoFileName: nil,
             imageName: "onboarding-collection"
         ),
+        // Page 4 – Tarot & Journal (secondaire)
         OnboardingPage(
             icon: "book.fill",
-            title: "Ton journal cosmique",
-            subtitle: "Garde une trace de chacune de tes lectures et observe ton évolution.",
+            title: "Tarot & Journal\ncosmique",
+            subtitle: "Explore aussi le Tarot classique et garde une trace de ton chemin spirituel.",
             features: [
-                "Historique de tous tes tirages",
-                "Retrouve tes questions passées",
-                "Suis ton chemin spirituel",
-                "Relis tes interprétations"
+                "78 cartes du Tarot à découvrir",
+                "Tirages quotidien, amour, oui/non",
+                "Journal de tous tes tirages",
+                "Suivi de mood & gratitude"
             ],
             accentColor: .cosmicGold,
             accentColorLight: .cosmicGoldLight,
