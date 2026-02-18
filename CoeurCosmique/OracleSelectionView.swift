@@ -57,7 +57,6 @@ enum OracleType: String, CaseIterable, Identifiable {
     func previewCards(viewModel: AppViewModel) -> [PreviewCardData] {
         switch self {
         case .cosmicHeart:
-            // Pick 3 random cards from the Oracle deck
             let allCards = viewModel.oracleDeck.shuffled()
             return [
                 PreviewCardData(imageName: allCards[0].imageName, color: .cosmicRose, showImage: true),
@@ -65,10 +64,11 @@ enum OracleType: String, CaseIterable, Identifiable {
                 PreviewCardData(imageName: allCards[2].imageName, color: .cosmicRose, showImage: true)
             ]
         case .quantumEntanglement:
+            let allCards = viewModel.quantumOracleDeck.shuffled()
             return [
-                PreviewCardData(imageName: "quantum-oracle-01", color: .cosmicPurple, showImage: true),
-                PreviewCardData(imageName: "quantum-oracle-21", color: .cosmicPurple, showImage: true),
-                PreviewCardData(imageName: "quantum-oracle-42", color: .cosmicPurple, showImage: true)
+                PreviewCardData(imageName: allCards[0].imageName, color: .cosmicPurple, showImage: true),
+                PreviewCardData(imageName: allCards[1].imageName, color: .cosmicPurple, showImage: true),
+                PreviewCardData(imageName: allCards[2].imageName, color: .cosmicPurple, showImage: true)
             ]
         }
     }
@@ -88,13 +88,18 @@ struct OracleSelectionView: View {
     @State private var currentIndex: Int = 0
     @State private var dragOffset: CGFloat = 0
     @State private var showPremiumAlert = false
+    @State private var cachedPreviewCards: [OracleType: [PreviewCardData]] = [:]
     @Binding var selectedOracle: OracleType?
-    
+
     private let oracles = OracleType.allCases
     private var selection: OracleType {
         oracles[currentIndex]
     }
-    
+
+    private func previewCards(for oracle: OracleType) -> [PreviewCardData] {
+        cachedPreviewCards[oracle] ?? oracle.previewCards(viewModel: viewModel)
+    }
+
     var body: some View {
         VStack(spacing: 0) {
             // Header
@@ -153,6 +158,12 @@ struct OracleSelectionView: View {
                 .padding(.horizontal, 20)
                 .padding(.bottom, 100)
         }
+        .onAppear {
+            guard cachedPreviewCards.isEmpty else { return }
+            for oracle in oracles {
+                cachedPreviewCards[oracle] = oracle.previewCards(viewModel: viewModel)
+            }
+        }
         .sheet(isPresented: $showPremiumAlert) {
             PaywallView(storeManager: storeManager)
         }
@@ -167,7 +178,7 @@ struct OracleSelectionView: View {
         
         return VStack(spacing: 20) {
             // Visual card preview (3 cards fanned out)
-            cardFanPreview(oracle, viewModel: viewModel)
+            cardFanPreview(oracle)
                 .frame(height: 280)
             
             // Oracle info
@@ -215,8 +226,8 @@ struct OracleSelectionView: View {
     
     // MARK: - Card Fan Preview
     
-    private func cardFanPreview(_ oracle: OracleType, viewModel: AppViewModel) -> some View {
-        let cards = oracle.previewCards(viewModel: viewModel)
+    private func cardFanPreview(_ oracle: OracleType) -> some View {
+        let cards = previewCards(for: oracle)
         return ZStack {
             // Back card (left)
             previewCard(cards[0], color: oracle.color)
