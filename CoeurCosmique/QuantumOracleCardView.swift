@@ -125,74 +125,21 @@ struct QuantumOracleCardFront: View {
 
 struct QuantumOracleCardBack: View {
     var size: QuantumOracleCardFront.CardSize = .medium
-    
+
     var body: some View {
-        ZStack {
-            // Background gradient
-            RoundedRectangle(cornerRadius: size == .large ? 16 : 12)
-                .fill(
-                    LinearGradient(
-                        colors: [
-                            Color(red: 0.1, green: 0.05, blue: 0.2),
-                            Color(red: 0.05, green: 0.1, blue: 0.25),
-                            Color(red: 0.1, green: 0.05, blue: 0.15)
-                        ],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
+        Image("card-back")
+            .resizable()
+            .aspectRatio(contentMode: .fill)
+            .frame(width: size.width, height: size.height)
+            .clipShape(RoundedRectangle(cornerRadius: size == .large ? 16 : 12))
+            .overlay(
+                RoundedRectangle(cornerRadius: size == .large ? 16 : 12)
+                    .strokeBorder(
+                        LinearGradient.cosmicGoldGradient,
+                        lineWidth: 1.5
                     )
-                )
-            
-            // Quantum pattern overlay
-            ZStack {
-                // Geometric patterns
-                Circle()
-                    .stroke(Color.cosmicPurple.opacity(0.3), lineWidth: 1)
-                    .frame(width: size.width * 0.4)
-                
-                Circle()
-                    .stroke(Color.cosmicRose.opacity(0.2), lineWidth: 1)
-                    .frame(width: size.width * 0.6)
-                
-                ForEach(0..<6) { i in
-                    Circle()
-                        .fill(LinearGradient(
-                            colors: [.cosmicPurple.opacity(0.1), .clear],
-                            startPoint: .center,
-                            endPoint: .bottom
-                        ))
-                        .frame(width: 8, height: 8)
-                        .offset(
-                            x: cos(Double(i) * .pi / 3) * (size.width * 0.25),
-                            y: sin(Double(i) * .pi / 3) * (size.width * 0.25)
-                        )
-                }
-                
-                // Center symbol
-                Text("∞")
-                    .font(.system(size: size == .large ? 36 : size == .medium ? 24 : 18))
-                    .foregroundStyle(
-                        LinearGradient(
-                            colors: [.cosmicRose, .cosmicPurple],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-                    .fontWeight(.light)
-            }
-            
-            // Border
-            RoundedRectangle(cornerRadius: size == .large ? 16 : 12)
-                .strokeBorder(
-                    LinearGradient(
-                        colors: [.cosmicPurple, .cosmicRose, .cosmicPurple],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    ),
-                    lineWidth: 1.5
-                )
-        }
-        .frame(width: size.width, height: size.height)
-        .shadow(color: Color.cosmicPurple.opacity(0.4), radius: 8)
+            )
+            .shadow(color: Color.cosmicPurple.opacity(0.3), radius: 8)
     }
 }
 
