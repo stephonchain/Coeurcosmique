@@ -1,40 +1,38 @@
 import Foundation
 
-// MARK: - Anthropic API Types
+// MARK: - Proxy Request / Response
 
-private struct AnthropicRequest: Encodable {
-    let model: String
-    let max_tokens: Int
-    let system: String
-    let messages: [Message]
+private struct ProxyRequest: Encodable {
+    let spread: String
+    let question: String?
+    let cards: [CardPosition]
 
-    struct Message: Encodable {
-        let role: String
-        let content: String
+    struct CardPosition: Encodable {
+        let position: String
+        let name: String
+        let family: String
+        let essence: [String]
+        let messageProfond: String
+        let spreadInterpretation: String
     }
 }
 
-private struct AnthropicResponse: Decodable {
-    let content: [ContentBlock]
-
-    struct ContentBlock: Decodable {
-        let type: String
-        let text: String?
-    }
+private struct ProxyResponse: Decodable {
+    let interpretation: String
 }
 
 // MARK: - Errors
 
 enum AIInterpretationError: LocalizedError {
-    case noAPIKey
+    case noEndpoint
     case networkError(Error)
     case invalidResponse
     case serverError(String)
 
     var errorDescription: String? {
         switch self {
-        case .noAPIKey:
-            return "Clé API non configurée."
+        case .noEndpoint:
+            return "Service d'interprétation non configuré."
         case .networkError(let error):
             return "Erreur réseau : \(error.localizedDescription)"
         case .invalidResponse:
@@ -51,39 +49,38 @@ actor AIInterpretationService {
 
     static let shared = AIInterpretationService()
 
-    private static let apiURL = URL(string: "https://api.anthropic.com/v1/messages")!
-    private static let model = "claude-haiku-4-5-20251001"
-    private static let anthropicVersion = "2023-06-01"
+    /// Proxy endpoint URL loaded from Info.plist key `AI_PROXY_URL`.
+    /// Example: https://your-project.vercel.app/api/interpret
+    private let proxyURL: URL? = {
+        guard let urlString = Bundle.main.object(forInfoDictionaryKey: "AI_PROXY_URL") as? String,
+              let url = URL(string: urlString) else {
+            return nil
+        }
+        return url
+    }()
 
-    /// API key loaded from Info.plist key `ANTHROPIC_API_KEY`
-    private let apiKey: String? = {
-        Bundle.main.object(forInfoDictionaryKey: "ANTHROPIC_API_KEY") as? String
+    /// Bearer token sent to the proxy for auth, from Info.plist key `AI_PROXY_TOKEN`.
+    private let proxyToken: String? = {
+        Bundle.main.object(forInfoDictionaryKey: "AI_PROXY_TOKEN") as? String
     }()
 
     // MARK: - Public
 
     func interpret(reading: QuantumOracleReading, deck: [QuantumOracleCard]) async throws -> String {
-        guard let key = apiKey, !key.isEmpty else {
-            throw AIInterpretationError.noAPIKey
+        guard let url = proxyURL else {
+            throw AIInterpretationError.noEndpoint
         }
 
-        let userPrompt = buildUserPrompt(reading: reading, deck: deck)
+        let payload = buildPayload(reading: reading, deck: deck)
+        let body = try JSONEncoder().encode(payload)
 
-        let body = AnthropicRequest(
-            model: Self.model,
-            max_tokens: 1024,
-            system: Self.systemPrompt,
-            messages: [
-                .init(role: "user", content: userPrompt)
-            ]
-        )
-
-        var request = URLRequest(url: Self.apiURL)
+        var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.setValue(key, forHTTPHeaderField: "x-api-key")
-        request.setValue(Self.anthropicVersion, forHTTPHeaderField: "anthropic-version")
-        request.httpBody = try JSONEncoder().encode(body)
+        if let token = proxyToken, !token.isEmpty {
+            request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        }
+        request.httpBody = body
         request.timeoutInterval = 30
 
         let (data, response): (Data, URLResponse)
@@ -102,65 +99,33 @@ actor AIInterpretationService {
             throw AIInterpretationError.serverError(message)
         }
 
-        let decoded = try JSONDecoder().decode(AnthropicResponse.self, from: data)
-        guard let text = decoded.content.first(where: { $0.type == "text" })?.text else {
-            throw AIInterpretationError.invalidResponse
-        }
-        return text
+        let decoded = try JSONDecoder().decode(ProxyResponse.self, from: data)
+        return decoded.interpretation
     }
 
-    // MARK: - System Prompt
+    // MARK: - Build Payload
 
-    private static let systemPrompt = """
-    Tu es l'Oracle du Lien Quantique, un guide spirituel et intuitif qui interprète les tirages \
-    de l'Oracle de l'Intrication Quantique dans l'application Cœur Cosmique.
-
-    Ton rôle est de fournir une synthèse unifiée d'un tirage en reliant :
-    1. Le sens profond de chaque carte tirée
-    2. La position de chaque carte dans le tirage (et ce que cette position représente)
-    3. La question ou intention du consultant (si elle est fournie)
-
-    Règles :
-    - Réponds en français, avec un ton bienveillant, poétique mais accessible.
-    - Tutoie le consultant.
-    - Fais le lien entre les cartes : montre comment elles dialoguent entre elles.
-    - Si une question est posée, ancre ton interprétation autour de cette question.
-    - Si aucune question n'est posée, offre une guidance générale.
-    - Utilise le vocabulaire quantique (intrication, superposition, fréquence, vibration, observateur) \
-    naturellement, sans forcer.
-    - Ne répète pas les informations mot pour mot, synthétise et enrichis.
-    - Termine par un conseil actionnable ou une invitation à la réflexion.
-    - Reste concis : 150 à 250 mots maximum.
-    - N'utilise pas d'émojis.
-    """
-
-    // MARK: - Build User Prompt
-
-    private func buildUserPrompt(reading: QuantumOracleReading, deck: [QuantumOracleCard]) -> String {
-        var lines: [String] = []
-
-        lines.append("Tirage : \(reading.spread.title)")
-        if let q = reading.question, !q.isEmpty {
-            lines.append("Question : \(q)")
-        }
-        lines.append("")
-
-        for (index, drawn) in reading.cards.enumerated() {
-            guard let card = drawn.resolve(from: deck) else { continue }
+    private func buildPayload(reading: QuantumOracleReading, deck: [QuantumOracleCard]) -> ProxyRequest {
+        let cards = reading.cards.enumerated().compactMap { index, drawn -> ProxyRequest.CardPosition? in
+            guard let card = drawn.resolve(from: deck) else { return nil }
             let label = index < reading.spread.labels.count ? reading.spread.labels[index] : "Position \(index + 1)"
             let spreadInterp = interpretationText(card: card, spread: reading.spread, position: index)
 
-            lines.append("--- \(label) ---")
-            lines.append("Carte : \(card.number). \(card.name)")
-            lines.append("Famille : \(card.family.title)")
-            lines.append("Essence : \(card.essence.joined(separator: ", "))")
-            lines.append("Message profond : \(card.messageProfond)")
-            lines.append("Interprétation positionnelle : \(spreadInterp)")
-            lines.append("")
+            return ProxyRequest.CardPosition(
+                position: label,
+                name: "\(card.number). \(card.name)",
+                family: card.family.title,
+                essence: card.essence,
+                messageProfond: card.messageProfond,
+                spreadInterpretation: spreadInterp
+            )
         }
 
-        lines.append("Fournis une synthèse unifiée de ce tirage.")
-        return lines.joined(separator: "\n")
+        return ProxyRequest(
+            spread: reading.spread.title,
+            question: reading.question,
+            cards: cards
+        )
     }
 
     // MARK: - Helpers
