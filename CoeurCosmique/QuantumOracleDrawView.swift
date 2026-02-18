@@ -5,6 +5,7 @@ import SwiftUI
 struct QuantumOracleDrawView: View {
     @ObservedObject var viewModel: AppViewModel
     @EnvironmentObject var storeManager: StoreManager
+    @EnvironmentObject var creditManager: CreditManager
     @State private var selectedSpread: QuantumSpreadType = .lienDesAmes
     @State private var question: String = ""
     @State private var isDrawing = false
@@ -13,6 +14,11 @@ struct QuantumOracleDrawView: View {
     @State private var showPaywall = false
     @State private var fullScreenQuantumCard: QuantumOracleCard? = nil
     @FocusState private var isQuestionFocused: Bool
+
+    // AI Interpretation
+    @State private var aiInterpretation: String?
+    @State private var isLoadingAI = false
+    @State private var aiError: String?
     
     private var hasReachedFreeLimit: Bool {
         // Quantum Oracle is Premium only
@@ -133,6 +139,11 @@ struct QuantumOracleDrawView: View {
                     quantumCardView(drawn, label: label, index: index, total: reading.cards.count, spread: reading.spread)
                 }
                 
+                // AI Interpretation section
+                if storeManager.isPremium {
+                    aiInterpretationSection(reading)
+                }
+
                 // New draw button
                 Button {
                     withAnimation {
@@ -140,6 +151,8 @@ struct QuantumOracleDrawView: View {
                         viewModel.currentQuantumReading = nil
                         revealedCards = []
                         question = ""
+                        aiInterpretation = nil
+                        aiError = nil
                     }
                 } label: {
                     HStack(spacing: 10) {
@@ -472,8 +485,135 @@ struct QuantumOracleDrawView: View {
         }
     }
     
+    // MARK: - AI Interpretation
+
+    private func aiInterpretationSection(_ reading: QuantumOracleReading) -> some View {
+        VStack(spacing: 16) {
+            if let interpretation = aiInterpretation {
+                // Display AI result
+                VStack(spacing: 12) {
+                    HStack(spacing: 8) {
+                        Image(systemName: "sparkles")
+                            .font(.system(size: 14))
+                            .foregroundStyle(Color.cosmicGold)
+
+                        Text("Synthese Quantique IA")
+                            .font(.cosmicHeadline(16))
+                            .foregroundStyle(
+                                LinearGradient(
+                                    colors: [.cosmicPurple, .cosmicGold],
+                                    startPoint: .leading,
+                                    endPoint: .trailing
+                                )
+                            )
+                    }
+
+                    Text(interpretation)
+                        .font(.cosmicBody(14))
+                        .foregroundStyle(Color.cosmicText.opacity(0.9))
+                        .multilineTextAlignment(.leading)
+                        .lineSpacing(5)
+                }
+                .padding(20)
+                .cosmicCard()
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16)
+                        .strokeBorder(
+                            LinearGradient(
+                                colors: [Color.cosmicGold.opacity(0.3), Color.cosmicPurple.opacity(0.15)],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            ),
+                            lineWidth: 1
+                        )
+                )
+            } else {
+                // Request button
+                VStack(spacing: 10) {
+                    Button {
+                        requestAIInterpretation(reading)
+                    } label: {
+                        HStack(spacing: 10) {
+                            if isLoadingAI {
+                                ProgressView()
+                                    .tint(Color.white)
+                            } else {
+                                Image(systemName: "sparkles")
+                                    .font(.system(size: 16, weight: .medium))
+                            }
+
+                            Text(isLoadingAI ? "Analyse en cours..." : "Interpretation IA")
+                                .font(.cosmicHeadline(15))
+                        }
+                        .foregroundStyle(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 14)
+                        .background(
+                            RoundedRectangle(cornerRadius: 14)
+                                .fill(
+                                    LinearGradient(
+                                        colors: [.cosmicPurple.opacity(0.8), .cosmicGold.opacity(0.6)],
+                                        startPoint: .leading,
+                                        endPoint: .trailing
+                                    )
+                                )
+                        )
+                    }
+                    .buttonStyle(.plain)
+                    .disabled(isLoadingAI || !creditManager.hasCredits)
+
+                    // Credit indicator
+                    HStack(spacing: 6) {
+                        Image(systemName: "bolt.fill")
+                            .font(.system(size: 10))
+                            .foregroundStyle(Color.cosmicGold)
+
+                        if creditManager.hasCredits {
+                            Text("\(creditManager.credits) credit\(creditManager.credits > 1 ? "s" : "") restant\(creditManager.credits > 1 ? "s" : "") aujourd'hui")
+                                .font(.cosmicCaption(11))
+                                .foregroundStyle(Color.cosmicTextSecondary)
+                        } else {
+                            Text("Plus de credits pour aujourd'hui")
+                                .font(.cosmicCaption(11))
+                                .foregroundStyle(Color.cosmicRose.opacity(0.8))
+                        }
+                    }
+
+                    if let error = aiError {
+                        Text(error)
+                            .font(.cosmicCaption(11))
+                            .foregroundStyle(Color.cosmicRose)
+                            .multilineTextAlignment(.center)
+                    }
+                }
+            }
+        }
+    }
+
+    private func requestAIInterpretation(_ reading: QuantumOracleReading) {
+        guard creditManager.hasCredits else { return }
+        isLoadingAI = true
+        aiError = nil
+
+        Task {
+            do {
+                let result = try await AIInterpretationService.shared.interpret(
+                    reading: reading,
+                    deck: QuantumOracleDeck.allCards
+                )
+                let _ = creditManager.consumeCredit()
+                withAnimation {
+                    aiInterpretation = result
+                }
+            } catch {
+                aiError = error.localizedDescription
+            }
+            isLoadingAI = false
+        }
+    }
+
     // MARK: - Actions
-    
+
     private func performQuantumDraw() {
         isQuestionFocused = false
         isDrawing = true
