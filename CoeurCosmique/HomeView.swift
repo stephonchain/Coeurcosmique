@@ -6,8 +6,7 @@ struct HomeView: View {
     @State private var isCardFlipped = false
     @State private var showMotivation = false
     @State private var appeared = false
-    @State private var fullScreenTarotCard: TarotCard? = nil
-    @State private var fullScreenIsReversed = false
+    @State private var fullScreenCardContent: FullScreenCardView.CardContent? = nil
     @State private var showGratitudeSheet = false
 
     var body: some View {
@@ -53,9 +52,9 @@ struct HomeView: View {
             }
         }
         .overlay {
-            if let card = fullScreenTarotCard {
-                FullScreenCardView(content: .tarot(card, isReversed: fullScreenIsReversed)) {
-                    fullScreenTarotCard = nil
+            if let content = fullScreenCardContent {
+                FullScreenCardView(content: content) {
+                    fullScreenCardContent = nil
                 }
             }
         }
@@ -201,40 +200,30 @@ struct HomeView: View {
                 }
             }
 
-            if let drawn = viewModel.dailyCard,
-               let card = drawn.resolve(from: viewModel.deck) {
+            if let info = viewModel.dailyCard {
                 VStack(spacing: 20) {
-                    FlippableTarotCard(
-                        card: card,
-                        isReversed: drawn.isReversed,
-                        isFlipped: $isCardFlipped,
-                        size: .large,
-                        onFullScreen: {
-                            fullScreenTarotCard = card
-                            fullScreenIsReversed = drawn.isReversed
-                        }
-                    )
-                    .onAppear {
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
-                            withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
-                                isCardFlipped = true
+                    dailyFlippableCard(info)
+                        .onAppear {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+                                withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
+                                    isCardFlipped = true
+                                }
                             }
                         }
-                    }
 
                     if isCardFlipped {
                         VStack(spacing: 12) {
-                            Text(card.name)
+                            Text(info.name)
                                 .font(.cosmicHeadline(20))
                                 .foregroundStyle(Color.cosmicText)
 
-                            if drawn.isReversed {
+                            if case .tarot(_, let isReversed) = info, isReversed {
                                 Text("Inversée")
                                     .font(.cosmicCaption(12))
                                     .foregroundStyle(Color.cosmicRose)
                             }
 
-                            Text(drawn.interpretation(from: viewModel.deck))
+                            Text(info.message)
                                 .font(.cosmicBody(15))
                                 .foregroundStyle(Color.cosmicTextSecondary)
                                 .multilineTextAlignment(.center)
@@ -242,7 +231,7 @@ struct HomeView: View {
 
                             // Keywords
                             HStack(spacing: 8) {
-                                ForEach(card.keywords, id: \.self) { keyword in
+                                ForEach(info.keywords, id: \.self) { keyword in
                                     Text(keyword)
                                         .font(.cosmicCaption(11))
                                         .foregroundStyle(Color.cosmicPurple)
@@ -282,6 +271,36 @@ struct HomeView: View {
         }
         .padding(20)
         .cosmicCard()
+    }
+
+    // MARK: - Flippable Card per Deck Type
+
+    @ViewBuilder
+    private func dailyFlippableCard(_ info: DailyCardInfo) -> some View {
+        switch info {
+        case .tarot(let card, let isReversed):
+            FlippableTarotCard(
+                card: card,
+                isReversed: isReversed,
+                isFlipped: $isCardFlipped,
+                size: .large,
+                onFullScreen: { fullScreenCardContent = info.fullScreenContent }
+            )
+        case .oracle(let card):
+            FlippableOracleCard(
+                card: card,
+                isFlipped: $isCardFlipped,
+                size: .large,
+                onFullScreen: { fullScreenCardContent = info.fullScreenContent }
+            )
+        case .quantumOracle(let card):
+            FlippableQuantumOracleCard(
+                card: card,
+                isFlipped: $isCardFlipped,
+                size: .large,
+                onFullScreen: { fullScreenCardContent = info.fullScreenContent }
+            )
+        }
     }
     
     // MARK: - Quick Actions

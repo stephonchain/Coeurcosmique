@@ -14,7 +14,7 @@ final class AppViewModel: ObservableObject {
     // MARK: - Published State
 
     @Published var selectedTab: AppTab = .home
-    @Published var dailyCard: DrawnCard?
+    @Published var dailyCard: DailyCardInfo?
     @Published var currentReading: TarotReading?
     @Published var history: [ReadingHistoryEntry] = []
     @Published var oracleHistory: [OracleReadingHistoryEntry] = []
@@ -51,16 +51,36 @@ final class AppViewModel: ObservableObject {
     // MARK: - Daily Card
 
     func loadDailyCard() {
-        if let saved = dailyStore.readTodayCard(deck: deck) {
+        if let saved = dailyStore.readTodayCard(
+            tarotDeck: deck,
+            oracleDeck: oracleDeck,
+            quantumDeck: quantumOracleDeck
+        ) {
             dailyCard = saved
         }
     }
 
     func drawNewDailyCard() {
-        let reading = engine.draw(spread: .dailyGuidance)
-        guard let card = reading.cards.first else { return }
-        dailyCard = card
-        dailyStore.saveTodayCard(card, deck: deck)
+        let deckChoice = Int.random(in: 0..<3)
+        let info: DailyCardInfo
+        switch deckChoice {
+        case 0:
+            // Tarot
+            let reading = engine.draw(spread: .dailyGuidance)
+            guard let card = reading.cards.first,
+                  let resolved = card.resolve(from: deck) else { return }
+            info = .tarot(resolved, isReversed: card.isReversed)
+        case 1:
+            // Oracle
+            guard let card = oracleDeck.randomElement() else { return }
+            info = .oracle(card)
+        default:
+            // Quantum Oracle
+            guard let card = quantumOracleDeck.randomElement() else { return }
+            info = .quantumOracle(card)
+        }
+        dailyCard = info
+        dailyStore.saveTodayCard(info)
     }
 
     // MARK: - Readings
