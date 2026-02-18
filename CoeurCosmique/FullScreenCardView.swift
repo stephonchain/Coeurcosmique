@@ -90,7 +90,7 @@ struct FullScreenCardView: View {
         case .quantumOracle(let card):
             VStack(spacing: 6) {
                 HStack(spacing: 8) {
-                    Text(card.family.icon)
+                    Image(systemName: card.family.icon)
                         .font(.system(size: 18))
                     Text("\(card.number). \(card.name)")
                         .font(.cosmicTitle(22))
@@ -222,7 +222,7 @@ struct FullScreenCardView: View {
                     .aspectRatio(0.6, contentMode: .fit)
                     .overlay(
                         VStack(spacing: 12) {
-                            Text(card.family.icon)
+                            Image(systemName: card.family.icon)
                                 .font(.system(size: 50))
                                 .foregroundStyle(card.family.color.opacity(0.5))
                             Text(card.name)

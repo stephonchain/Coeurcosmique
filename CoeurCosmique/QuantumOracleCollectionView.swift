@@ -235,7 +235,7 @@ struct QuantumCardDetailView: View {
                     VStack(spacing: 16) {
                         // Family
                         HStack(spacing: 8) {
-                            Text(card.family.icon)
+                            Image(systemName: card.family.icon)
                                 .font(.system(size: 16))
                             Text(card.family.rawValue)
                                 .font(.cosmicCaption(12))

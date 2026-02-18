@@ -377,9 +377,9 @@ struct QuantumOracleDrawView: View {
         VStack(spacing: 12) {
             // Card name and number
             HStack(spacing: 8) {
-                Text(card.family.icon)
+                Image(systemName: card.family.icon)
                     .font(.system(size: 16))
-                
+
                 Text("\(card.number). \(card.name)")
                     .font(.cosmicHeadline(16))
                     .foregroundStyle(Color.cosmicText)

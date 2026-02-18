@@ -64,26 +64,6 @@ struct QuantumOracleCardFront: View {
                 .padding(size == .large ? 8 : 5)
                 .opacity(UIImage(named: card.imageName) == nil ? 1 : 0)
             
-            // Top family indicator
-            VStack {
-                HStack {
-                    Text(card.family.icon)
-                        .font(.system(size: size == .large ? 20 : size == .medium ? 14 : 10))
-                        .padding(size == .large ? 6 : 4)
-                        .background(
-                            Circle()
-                                .fill(card.family.color.opacity(0.15))
-                                .overlay(
-                                    Circle()
-                                        .strokeBorder(card.family.color.opacity(0.3), lineWidth: 1)
-                                )
-                        )
-                    Spacer()
-                }
-                .padding(size == .large ? 10 : 7)
-                Spacer()
-            }
-            
             // Bottom name overlay
             VStack {
                 Spacer()
@@ -130,7 +110,7 @@ struct QuantumOracleCardFront: View {
             )
             .overlay(
                 VStack(spacing: 6) {
-                    Text(card.family.icon)
+                    Image(systemName: card.family.icon)
                         .font(.system(size: size == .large ? 40 : size == .medium ? 28 : 18))
                         .foregroundStyle(card.family.color.opacity(0.5))
                     Text("\(card.number)")
