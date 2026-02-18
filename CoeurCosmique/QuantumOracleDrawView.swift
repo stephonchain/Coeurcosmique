@@ -386,7 +386,7 @@ struct QuantumOracleDrawView: View {
             }
             
             // Family indicator
-            Text(card.family.rawValue)
+            Text(card.family.title)
                 .font(.cosmicCaption(10))
                 .foregroundStyle(card.family.color)
                 .textCase(.uppercase)

@@ -18,6 +18,7 @@ final class AppViewModel: ObservableObject {
     @Published var currentReading: TarotReading?
     @Published var history: [ReadingHistoryEntry] = []
     @Published var oracleHistory: [OracleReadingHistoryEntry] = []
+    @Published var quantumHistory: [QuantumOracleReadingHistoryEntry] = []
     @Published var todayDrawCount: Int = 0
 
     // Oracle state
@@ -105,6 +106,10 @@ final class AppViewModel: ObservableObject {
         oracleHistory = historyStore.loadOracle()
     }
 
+    func loadQuantumHistory() {
+        quantumHistory = historyStore.loadQuantum()
+    }
+
     // MARK: - Draw Tracking
 
     func loadTodayDrawCount() {
@@ -190,9 +195,10 @@ final class AppViewModel: ObservableObject {
         }
         let reading = QuantumOracleReading(spread: spread, cards: drawnCards, question: question)
         currentQuantumReading = reading
-        
-        // Note: Quantum Oracle is premium-only, no limits
-        // History tracking can be added when needed
+
+        let entry = QuantumOracleReadingHistoryEntry(from: reading, deck: quantumOracleDeck)
+        historyStore.appendQuantum(entry)
+        loadQuantumHistory()
         incrementQuantumDrawCount()
     }
     

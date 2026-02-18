@@ -164,7 +164,7 @@ struct QuantumOracleCollectionContent: View {
                 
                 ForEach(QuantumFamily.allCases, id: \.self) { family in
                     FilterChip(
-                        title: family.rawValue.prefix(1).uppercased() + family.rawValue.dropFirst(),
+                        title: family.title,
                         isSelected: selectedFamily == family
                     ) {
                         withAnimation(.spring(response: 0.3)) {
@@ -237,7 +237,7 @@ struct QuantumCardDetailView: View {
                         HStack(spacing: 8) {
                             Image(systemName: card.family.icon)
                                 .font(.system(size: 16))
-                            Text(card.family.rawValue)
+                            Text(card.family.title)
                                 .font(.cosmicCaption(12))
                                 .foregroundStyle(card.family.color)
                                 .textCase(.uppercase)

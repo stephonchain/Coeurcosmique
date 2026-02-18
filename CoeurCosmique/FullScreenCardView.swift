@@ -97,7 +97,7 @@ struct FullScreenCardView: View {
                 }
                 .foregroundStyle(.white)
                 
-                Text(card.family.rawValue)
+                Text(card.family.title)
                     .font(.cosmicCaption(12))
                     .foregroundStyle(card.family.color)
                     .textCase(.uppercase)

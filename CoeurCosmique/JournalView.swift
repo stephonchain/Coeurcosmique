@@ -29,6 +29,11 @@ struct JournalView: View {
         }
     }
 
+    private var displayedQuantumHistory: [QuantumOracleReadingHistoryEntry] {
+        // Quantum is premium-only, no limit needed
+        return viewModel.quantumHistory
+    }
+
     private var hasLockedTarotEntries: Bool {
         !storeManager.isPremium && viewModel.history.count > AppViewModel.freeJournalLimit
     }
@@ -70,6 +75,7 @@ struct JournalView: View {
         .onAppear {
             viewModel.loadHistory()
             viewModel.loadOracleHistory()
+            viewModel.loadQuantumHistory()
         }
         .sheet(isPresented: $showPaywall) {
             PaywallView(storeManager: storeManager)
@@ -155,7 +161,7 @@ struct JournalView: View {
 
     private var oracleSection: some View {
         Group {
-            if viewModel.oracleHistory.isEmpty {
+            if viewModel.oracleHistory.isEmpty && viewModel.quantumHistory.isEmpty {
                 emptyState(
                     icon: "♡",
                     title: "Aucun tirage d'Oracle",
@@ -168,6 +174,10 @@ struct JournalView: View {
                 LazyVStack(spacing: 14) {
                     ForEach(displayedOracleHistory) { entry in
                         OracleJournalEntryRow(entry: entry, deck: viewModel.oracleDeck)
+                    }
+
+                    ForEach(displayedQuantumHistory) { entry in
+                        QuantumOracleJournalEntryRow(entry: entry, deck: viewModel.quantumOracleDeck)
                     }
                 }
 
@@ -474,6 +484,131 @@ struct OracleJournalEntryRow: View {
                                             .padding(.vertical, 3)
                                             .background(
                                                 Capsule().fill(Color.cosmicRose.opacity(0.12))
+                                            )
+                                    }
+                                }
+                            }
+                            .padding(12)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .background(
+                                RoundedRectangle(cornerRadius: 10)
+                                    .fill(Color.cosmicBackground.opacity(0.5))
+                            )
+                        }
+                    }
+                }
+                .transition(.opacity.combined(with: .move(edge: .top)))
+            }
+        }
+        .padding(16)
+        .cosmicCard(cornerRadius: 16)
+        .onTapGesture {
+            withAnimation(.spring(response: 0.3)) {
+                isExpanded.toggle()
+            }
+        }
+    }
+
+    private var formattedDate: String {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "fr_FR")
+        formatter.dateStyle = .long
+        formatter.timeStyle = .short
+        return formatter.string(from: entry.createdAt)
+    }
+}
+
+// MARK: - Quantum Oracle Journal Entry Row
+
+struct QuantumOracleJournalEntryRow: View {
+    let entry: QuantumOracleReadingHistoryEntry
+    let deck: [QuantumOracleCard]
+    @State private var isExpanded = false
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            // Header
+            HStack {
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack(spacing: 6) {
+                        Image(systemName: "atom")
+                            .font(.system(size: 12))
+                            .foregroundStyle(Color.cosmicPurpleLight)
+                        Text(entry.spread.title)
+                            .font(.cosmicHeadline(15))
+                            .foregroundStyle(Color.cosmicText)
+                    }
+
+                    Text(formattedDate)
+                        .font(.cosmicCaption(11))
+                        .foregroundStyle(Color.cosmicTextSecondary)
+                }
+
+                Spacer()
+
+                Image(systemName: entry.spread.icon)
+                    .font(.system(size: 16))
+                    .foregroundStyle(Color.cosmicPurpleLight)
+            }
+
+            if !entry.question.isEmpty {
+                Text("« \(entry.question) »")
+                    .font(.cosmicBody(13))
+                    .foregroundStyle(Color.cosmicTextSecondary)
+                    .italic()
+            }
+
+            // Cards summary
+            FlowLayout(spacing: 8) {
+                ForEach(entry.cardNames, id: \.self) { name in
+                    Text(name)
+                        .font(.cosmicCaption(11))
+                        .foregroundStyle(Color.cosmicText)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 5)
+                        .background(
+                            Capsule().fill(Color.cosmicPurpleLight.opacity(0.12))
+                        )
+                }
+            }
+
+            // Expanded details
+            if isExpanded {
+                VStack(alignment: .leading, spacing: 10) {
+                    ForEach(Array(entry.cardNames.enumerated()), id: \.offset) { index, name in
+                        if let card = deck.first(where: { $0.name == name }) {
+                            let label = index < entry.spread.labels.count ? entry.spread.labels[index] : ""
+
+                            VStack(alignment: .leading, spacing: 6) {
+                                HStack(spacing: 6) {
+                                    Text(label)
+                                        .font(.cosmicCaption(10))
+                                        .foregroundStyle(Color.cosmicPurpleLight)
+                                        .textCase(.uppercase)
+                                        .kerning(1)
+
+                                    Spacer()
+                                }
+
+                                Text(card.name)
+                                    .font(.cosmicBody(14))
+                                    .foregroundStyle(Color.cosmicText)
+
+                                Text(entry.spread.interpretationText(for: card, at: index))
+                                    .font(.cosmicBody(13))
+                                    .foregroundStyle(Color.cosmicTextSecondary)
+                                    .italic()
+                                    .lineSpacing(2)
+
+                                FlowLayout(spacing: 6) {
+                                    ForEach(card.essence, id: \.self) { keyword in
+                                        Text(keyword)
+                                            .font(.cosmicCaption(10))
+                                            .foregroundStyle(Color.cosmicPurpleLight)
+                                            .padding(.horizontal, 8)
+                                            .padding(.vertical, 3)
+                                            .background(
+                                                Capsule().fill(Color.cosmicPurpleLight.opacity(0.12))
                                             )
                                     }
                                 }
