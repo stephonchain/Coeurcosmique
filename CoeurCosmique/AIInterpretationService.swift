@@ -49,20 +49,11 @@ actor AIInterpretationService {
 
     static let shared = AIInterpretationService()
 
-    /// Proxy endpoint URL loaded from Info.plist key `AI_PROXY_URL`.
-    /// Example: https://your-project.vercel.app/api/interpret
-    private let proxyURL: URL? = {
-        guard let urlString = Bundle.main.object(forInfoDictionaryKey: "AI_PROXY_URL") as? String,
-              let url = URL(string: urlString) else {
-            return nil
-        }
-        return url
-    }()
+    /// Proxy endpoint URL
+    private let proxyURL: URL? = URL(string: "https://coeurcosmique-proxy.vercel.app/api/interpret")
 
-    /// Bearer token sent to the proxy for auth, from Info.plist key `AI_PROXY_TOKEN`.
-    private let proxyToken: String? = {
-        Bundle.main.object(forInfoDictionaryKey: "AI_PROXY_TOKEN") as? String
-    }()
+    /// Bearer token sent to the proxy for auth
+    private let proxyToken: String? = "75FC49FC-55F2-4915-9EBB-65E4B3133D9F"
 
     // MARK: - Public
 
