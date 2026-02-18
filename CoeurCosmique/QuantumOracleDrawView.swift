@@ -199,8 +199,11 @@ struct QuantumOracleDrawView: View {
                     }
                 } label: {
                     HStack(spacing: 14) {
-                        Text(spread.icon)
+                        Image(systemName: spread.icon)
                             .font(.system(size: 20))
+                            .foregroundStyle(
+                                selectedSpread == spread ? Color.cosmicRose : Color.cosmicTextSecondary
+                            )
                             .frame(width: 32)
                         
                         VStack(alignment: .leading, spacing: 2) {
