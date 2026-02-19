@@ -6,12 +6,14 @@ enum CollectionDeck: String, CaseIterable {
     case tarot
     case oracle
     case quantumOracle
+    case runes
 
     var label: String {
         switch self {
-        case .tarot: return "Tarot de Marseille"
-        case .oracle: return "Oracle Cœur Cosmique"
-        case .quantumOracle: return "Oracle du Lien Quantique"
+        case .tarot: return "Tarot"
+        case .oracle: return "Oracle"
+        case .quantumOracle: return "Quantique"
+        case .runes: return "Runes"
         }
     }
 }
@@ -36,14 +38,18 @@ struct CollectionView: View {
             }
 
             // Deck content
-            if selectedDeck == .tarot {
+            switch selectedDeck {
+            case .tarot:
                 TarotCollectionContent(viewModel: viewModel)
                     .transition(.opacity)
-            } else if selectedDeck == .oracle {
+            case .oracle:
                 OracleCollectionView(viewModel: viewModel)
                     .transition(.opacity)
-            } else {
+            case .quantumOracle:
                 QuantumOracleCollectionContent(viewModel: viewModel)
+                    .transition(.opacity)
+            case .runes:
+                RuneCollectionContent(viewModel: viewModel)
                     .transition(.opacity)
             }
         }

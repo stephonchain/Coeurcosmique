@@ -5,54 +5,65 @@ import SwiftUI
 enum OracleType: String, CaseIterable, Identifiable {
     case cosmicHeart
     case quantumEntanglement
-    
+    case runesCosmiques
+
     var id: String { rawValue }
-    
+
     var title: String {
         switch self {
         case .cosmicHeart:
             return "Oracle Cœur Cosmique"
         case .quantumEntanglement:
             return "Oracle du Lien Quantique"
+        case .runesCosmiques:
+            return "Runes Cosmiques"
         }
     }
-    
+
     var subtitle: String {
         switch self {
         case .cosmicHeart:
             return "Messages du cœur cosmique"
         case .quantumEntanglement:
             return "Lien quantique de l'âme"
+        case .runesCosmiques:
+            return "Déchiffre le Code de l'Univers"
         }
     }
-    
+
     var icon: String {
         switch self {
         case .cosmicHeart:
             return "♡"
         case .quantumEntanglement:
             return "∞"
+        case .runesCosmiques:
+            return "ᚱ"
         }
     }
-    
+
     var color: Color {
         switch self {
         case .cosmicHeart:
             return .cosmicRose
         case .quantumEntanglement:
             return .cosmicPurple
+        case .runesCosmiques:
+            return .cosmicGold
         }
     }
-    
+
     var isPremium: Bool {
         switch self {
         case .cosmicHeart:
             return false
         case .quantumEntanglement:
             return true
+        case .runesCosmiques:
+            return true
         }
     }
-    
+
     // Sample cards to display in preview
     func previewCards(viewModel: AppViewModel) -> [PreviewCardData] {
         switch self {
@@ -69,6 +80,13 @@ enum OracleType: String, CaseIterable, Identifiable {
                 PreviewCardData(imageName: allCards[0].imageName, color: .cosmicPurple, showImage: true),
                 PreviewCardData(imageName: allCards[1].imageName, color: .cosmicPurple, showImage: true),
                 PreviewCardData(imageName: allCards[2].imageName, color: .cosmicPurple, showImage: true)
+            ]
+        case .runesCosmiques:
+            let allCards = RuneDeck.allCards.shuffled()
+            return [
+                PreviewCardData(imageName: allCards[0].imageName, color: .cosmicGold, showImage: true),
+                PreviewCardData(imageName: allCards[1].imageName, color: .cosmicGold, showImage: true),
+                PreviewCardData(imageName: allCards[2].imageName, color: .cosmicGold, showImage: true)
             ]
         }
     }
@@ -213,6 +231,11 @@ struct OracleSelectionView: View {
                     featureItem(icon: "infinity", text: "Lois quantiques", color: oracle.color)
                     featureItem(icon: "waveform.path", text: "3 tirages spéciaux", color: oracle.color)
                     featureItem(icon: "sparkle.magnifyingglass", text: "42 cartes quantiques", color: oracle.color)
+
+                case .runesCosmiques:
+                    featureItem(icon: "hexagon.fill", text: "Ancien Futhark cosmique", color: oracle.color)
+                    featureItem(icon: "shield.fill", text: "4 tirages runiques", color: oracle.color)
+                    featureItem(icon: "sparkles", text: "24 runes + IA", color: oracle.color)
                 }
             }
             .padding(.horizontal, 40)

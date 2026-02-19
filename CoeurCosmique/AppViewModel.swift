@@ -29,6 +29,10 @@ final class AppViewModel: ObservableObject {
     @Published var currentQuantumReading: QuantumOracleReading?
     @Published var todayQuantumDrawCount: Int = 0
 
+    // Rune state
+    @Published var currentRuneReading: RuneReading?
+    @Published var todayRuneDrawCount: Int = 0
+
     // MARK: - Dependencies
 
     let deck: [TarotCard] = TarotDeck.allCards
@@ -44,6 +48,8 @@ final class AppViewModel: ObservableObject {
     private static let oracleDrawDateKey = "oracleLastDrawDate"
     private static let quantumDrawCountKey = "quantumDailyDrawCount"
     private static let quantumDrawDateKey = "quantumLastDrawDate"
+    private static let runeDrawCountKey = "runeDailyDrawCount"
+    private static let runeDrawDateKey = "runeLastDrawDate"
 
     static let freeDailyDrawLimit = 1
     static let freeJournalLimit = 3
@@ -224,5 +230,44 @@ final class AppViewModel: ObservableObject {
             todayQuantumDrawCount += 1
         }
         UserDefaults.standard.set(todayQuantumDrawCount, forKey: Self.quantumDrawCountKey)
+    }
+
+    // MARK: - Rune Readings
+
+    func performRuneReading(spread: RuneSpreadType, question: String? = nil) {
+        var available = RuneDeck.allCards.shuffled()
+        var drawnCards: [DrawnRuneCard] = []
+        for _ in 0..<spread.cardCount {
+            if let card = available.popLast() {
+                drawnCards.append(DrawnRuneCard(card: card))
+            }
+        }
+        let reading = RuneReading(spread: spread, cards: drawnCards, question: question)
+        currentRuneReading = reading
+        incrementRuneDrawCount()
+    }
+
+    // MARK: - Rune Draw Tracking
+
+    func loadTodayRuneDrawCount() {
+        let today = todayString
+        let lastDate = UserDefaults.standard.string(forKey: Self.runeDrawDateKey) ?? ""
+        if lastDate == today {
+            todayRuneDrawCount = UserDefaults.standard.integer(forKey: Self.runeDrawCountKey)
+        } else {
+            todayRuneDrawCount = 0
+        }
+    }
+
+    private func incrementRuneDrawCount() {
+        let today = todayString
+        let lastDate = UserDefaults.standard.string(forKey: Self.runeDrawDateKey) ?? ""
+        if lastDate != today {
+            todayRuneDrawCount = 1
+            UserDefaults.standard.set(today, forKey: Self.runeDrawDateKey)
+        } else {
+            todayRuneDrawCount += 1
+        }
+        UserDefaults.standard.set(todayRuneDrawCount, forKey: Self.runeDrawCountKey)
     }
 }

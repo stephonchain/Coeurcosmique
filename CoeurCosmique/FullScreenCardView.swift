@@ -7,6 +7,7 @@ struct FullScreenCardView: View {
         case tarot(TarotCard, isReversed: Bool)
         case oracle(OracleCard)
         case quantumOracle(QuantumOracleCard)
+        case rune(RuneCard)
     }
 
     let content: CardContent
@@ -64,6 +65,8 @@ struct FullScreenCardView: View {
             oracleImage(card: card)
         case .quantumOracle(let card):
             quantumOracleImage(card: card)
+        case .rune(let card):
+            runeImage(card: card)
         }
     }
 
@@ -96,10 +99,26 @@ struct FullScreenCardView: View {
                         .font(.cosmicTitle(22))
                 }
                 .foregroundStyle(.white)
-                
+
                 Text(card.family.title)
                     .font(.cosmicCaption(12))
                     .foregroundStyle(card.family.color)
+                    .textCase(.uppercase)
+                    .kerning(1.5)
+            }
+        case .rune(let card):
+            VStack(spacing: 6) {
+                HStack(spacing: 8) {
+                    Image(systemName: card.aett.icon)
+                        .font(.system(size: 18))
+                    Text("\(card.number). \(card.name) (\(card.letter))")
+                        .font(.cosmicTitle(22))
+                }
+                .foregroundStyle(.white)
+
+                Text(card.aett.title)
+                    .font(.cosmicCaption(12))
+                    .foregroundStyle(card.aett.color)
                     .textCase(.uppercase)
                     .kerning(1.5)
             }
@@ -245,6 +264,55 @@ struct FullScreenCardView: View {
                 )
         )
         .shadow(color: card.family.color.opacity(0.4), radius: 30)
+    }
+
+    // MARK: - Rune Image
+
+    private func runeImage(card: RuneCard) -> some View {
+        Group {
+            if UIImage(named: card.imageName) != nil {
+                Image(card.imageName)
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+            } else {
+                Rectangle()
+                    .fill(
+                        LinearGradient(
+                            colors: [
+                                card.aett.color.opacity(0.25),
+                                Color.cosmicPurple.opacity(0.2),
+                                Color.cosmicCard
+                            ],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .aspectRatio(0.6, contentMode: .fit)
+                    .overlay(
+                        VStack(spacing: 12) {
+                            Text(card.letter)
+                                .font(.system(size: 60, weight: .bold, design: .serif))
+                                .foregroundStyle(card.aett.color.opacity(0.6))
+                            Text(card.name)
+                                .font(.cosmicHeadline(18))
+                                .foregroundStyle(.white.opacity(0.7))
+                        }
+                    )
+            }
+        }
+        .clipShape(RoundedRectangle(cornerRadius: 20))
+        .overlay(
+            RoundedRectangle(cornerRadius: 20)
+                .strokeBorder(
+                    LinearGradient(
+                        colors: [card.aett.color, .cosmicGold, card.aett.color],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 2
+                )
+        )
+        .shadow(color: card.aett.color.opacity(0.4), radius: 30)
     }
 
     // MARK: - Dismiss

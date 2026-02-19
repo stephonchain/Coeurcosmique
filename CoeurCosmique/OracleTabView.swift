@@ -58,7 +58,12 @@ struct OracleTabView: View {
                 if storeManager.isPremium {
                     QuantumOracleDrawView(viewModel: viewModel)
                 } else {
-                    // Double check premium status
+                    PaywallView(storeManager: storeManager)
+                }
+            case .runesCosmiques:
+                if storeManager.isPremium {
+                    RuneDrawView(viewModel: viewModel)
+                } else {
                     PaywallView(storeManager: storeManager)
                 }
             }

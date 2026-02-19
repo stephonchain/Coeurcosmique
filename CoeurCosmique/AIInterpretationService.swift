@@ -88,6 +88,13 @@ actor AIInterpretationService {
         return try await sendRequest(payload: payload)
     }
 
+    // MARK: - Public: Runes Cosmiques
+
+    func interpretRune(reading: RuneReading, deck: [RuneCard]) async throws -> String {
+        let payload = try buildRunePayload(reading: reading, deck: deck)
+        return try await sendRequest(payload: payload)
+    }
+
     // MARK: - Public: Oracle du Coeur Cosmique
 
     func interpretOracle(reading: OracleReading, deck: [OracleCard]) async throws -> String {
@@ -337,6 +344,77 @@ actor AIInterpretationService {
         }
 
         lines.append("Fournis une synthèse unifiée de ce tirage en reliant le message de chaque carte à sa position.")
+        return lines.joined(separator: "\n")
+    }
+
+    // MARK: - Build Rune Payload
+
+    private func buildRunePayload(reading: RuneReading, deck: [RuneCard]) throws -> ProxyRequest {
+        let cards = reading.cards.enumerated().compactMap { index, drawn -> ProxyRequest.CardPosition? in
+            guard let card = drawn.resolve(from: deck) else { return nil }
+            let label = index < reading.spread.labels.count ? reading.spread.labels[index] : "Position \(index + 1)"
+
+            return ProxyRequest.CardPosition(
+                position: label,
+                name: "\(card.number). \(card.name) (\(card.letter))",
+                family: card.aett.title,
+                essence: [card.conceptTraditionnel],
+                messageProfond: card.message,
+                spreadInterpretation: "\(card.visionCosmique) — \(card.visionCosmiqueDescription)"
+            )
+        }
+
+        guard !cards.isEmpty else {
+            throw AIInterpretationError.noCardsResolved
+        }
+
+        let userMessage = buildRuneUserMessage(
+            spread: reading.spread.title,
+            question: reading.question,
+            cards: cards,
+            drawnCards: reading.cards,
+            deck: deck
+        )
+
+        return ProxyRequest(
+            spread: reading.spread.title,
+            question: reading.question,
+            deckType: "rune",
+            cards: cards,
+            userMessage: userMessage
+        )
+    }
+
+    private func buildRuneUserMessage(
+        spread: String,
+        question: String?,
+        cards: [ProxyRequest.CardPosition],
+        drawnCards: [DrawnRuneCard],
+        deck: [RuneCard]
+    ) -> String {
+        var lines: [String] = []
+
+        lines.append("Tirage Runique : \(spread)")
+        if let question, !question.isEmpty {
+            lines.append("Question : \(question)")
+        }
+        lines.append("")
+
+        for (index, card) in cards.enumerated() {
+            let runeCard = index < drawnCards.count ? drawnCards[index].resolve(from: deck) : nil
+
+            lines.append("--- \(card.position) ---")
+            lines.append("Rune : \(card.name)")
+            lines.append("Aett : \(card.family)")
+            if let runeCard {
+                lines.append("Concept traditionnel : \(runeCard.conceptTraditionnel)")
+                lines.append("Vision cosmique : \(runeCard.visionCosmique) — \(runeCard.visionCosmiqueDescription)")
+                lines.append("Message : \(runeCard.message)")
+            }
+            lines.append("")
+        }
+
+        lines.append("Fournis une synthèse unifiée de ce tirage runique en reliant la sagesse ancestrale de chaque rune, sa vision cosmique et sa position dans le tirage.")
         return lines.joined(separator: "\n")
     }
 
