@@ -130,12 +130,45 @@ struct RuneDrawView: View {
                 }
                 .padding(.top, 16)
 
-                // Cards
+                // Visual spread layout
+                SpreadLayoutView(
+                    positions: reading.spread.layoutPositions,
+                    labels: reading.spread.labels,
+                    revealedCards: revealedCards,
+                    accentColor: .cosmicGold,
+                    cardBack: {
+                        MiniCardBack(accentColor: .cosmicGold)
+                    },
+                    cardFront: { index in
+                        if index < reading.cards.count,
+                           let card = reading.cards[index].resolve(from: RuneDeck.allCards) {
+                            MiniCardFront(
+                                imageName: card.imageName,
+                                title: card.name,
+                                subtitle: card.letter,
+                                accentColor: card.aett.color
+                            )
+                        } else {
+                            MiniCardBack(accentColor: .cosmicGold)
+                        }
+                    },
+                    onTapCard: { index in
+                        withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
+                            _ = revealedCards.insert(index)
+                        }
+                    }
+                )
+                .padding(.vertical, 8)
+
+                // Card details
                 ForEach(Array(reading.cards.enumerated()), id: \.element.id) { index, drawn in
                     let label = index < reading.spread.labels.count
                         ? reading.spread.labels[index]
                         : ""
-                    runeCardView(drawn, label: label, index: index, total: reading.cards.count)
+                    if revealedCards.contains(index) {
+                        runeCardView(drawn, label: label, index: index, total: reading.cards.count)
+                            .transition(.opacity.combined(with: .move(edge: .bottom)))
+                    }
                 }
 
                 // AI Interpretation section

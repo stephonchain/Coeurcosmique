@@ -106,15 +106,52 @@ struct DrawView: View {
                 }
                 .padding(.top, 16)
 
-                // Cards
+                // Visual spread layout
+                SpreadLayoutView(
+                    positions: reading.spread.layoutPositions,
+                    labels: reading.spread.labels,
+                    revealedCards: revealedCards,
+                    accentColor: .cosmicGold,
+                    cardBack: {
+                        MiniCardBack(accentColor: .cosmicGold)
+                    },
+                    cardFront: { index in
+                        if index < reading.cards.count,
+                           let card = reading.cards[index].resolve(from: viewModel.deck) {
+                            MiniCardFront(
+                                imageName: card.imageName,
+                                title: card.name,
+                                subtitle: card.arcana.symbol,
+                                accentColor: .cosmicGold
+                            )
+                            .rotationEffect(reading.cards[index].isReversed ? .degrees(180) : .zero)
+                        } else {
+                            MiniCardBack(accentColor: .cosmicGold)
+                        }
+                    },
+                    onTapCard: { index in
+                        withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
+                            _ = revealedCards.insert(index)
+                        }
+                    }
+                )
+                .padding(.vertical, 8)
+
+                // Card details
                 if reading.cards.count == 1 {
-                    singleCardView(reading.cards[0], label: reading.spread.labels[0], index: 0)
+                    if revealedCards.contains(0) {
+                        singleCardView(reading.cards[0], label: reading.spread.labels[0], index: 0)
+                            .transition(.opacity.combined(with: .move(edge: .bottom)))
+                    }
                 } else {
                     ForEach(Array(reading.cards.enumerated()), id: \.element.id) { index, drawn in
                         let label = index < reading.spread.labels.count
                             ? reading.spread.labels[index]
                             : ""
-                        cardReadingView(drawn, label: label, index: index)
+                        if revealedCards.contains(index) {
+                            cardReadingView(drawn, label: label, index: index)
+                                .transition(.opacity.combined(with: .move(edge: .bottom)))
+                        }
                     }
                 }
 

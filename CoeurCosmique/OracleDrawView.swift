@@ -181,15 +181,51 @@ struct OracleDrawView: View {
                 }
                 .padding(.top, 16)
 
-                // Cards
+                // Visual spread layout
+                SpreadLayoutView(
+                    positions: reading.spread.layoutPositions,
+                    labels: reading.spread.labels,
+                    revealedCards: revealedCards,
+                    accentColor: .cosmicRose,
+                    cardBack: {
+                        MiniCardBack(accentColor: .cosmicRose)
+                    },
+                    cardFront: { index in
+                        if index < reading.cards.count,
+                           let card = reading.cards[index].resolve(from: viewModel.oracleDeck) {
+                            MiniCardFront(
+                                imageName: card.imageName,
+                                title: card.name,
+                                subtitle: "\(card.number)",
+                                accentColor: .cosmicRose
+                            )
+                        } else {
+                            MiniCardBack(accentColor: .cosmicRose)
+                        }
+                    },
+                    onTapCard: { index in
+                        withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
+                            _ = revealedCards.insert(index)
+                        }
+                    }
+                )
+                .padding(.vertical, 8)
+
+                // Card details
                 if reading.cards.count == 1 {
-                    singleOracleCardView(reading.cards[0], label: reading.spread.labels[0], index: 0)
+                    if revealedCards.contains(0) {
+                        singleOracleCardView(reading.cards[0], label: reading.spread.labels[0], index: 0)
+                            .transition(.opacity.combined(with: .move(edge: .bottom)))
+                    }
                 } else {
                     ForEach(Array(reading.cards.enumerated()), id: \.element.id) { index, drawn in
                         let label = index < reading.spread.labels.count
                             ? reading.spread.labels[index]
                             : ""
-                        multiOracleCardView(drawn, label: label, index: index, total: reading.cards.count)
+                        if revealedCards.contains(index) {
+                            multiOracleCardView(drawn, label: label, index: index, total: reading.cards.count)
+                                .transition(.opacity.combined(with: .move(edge: .bottom)))
+                        }
                     }
                 }
 

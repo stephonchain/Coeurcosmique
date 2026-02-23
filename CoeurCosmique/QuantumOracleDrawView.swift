@@ -131,14 +131,47 @@ struct QuantumOracleDrawView: View {
                 }
                 .padding(.top, 16)
                 
-                // Cards
+                // Visual spread layout
+                SpreadLayoutView(
+                    positions: reading.spread.layoutPositions,
+                    labels: reading.spread.labels,
+                    revealedCards: revealedCards,
+                    accentColor: .cosmicPurple,
+                    cardBack: {
+                        MiniCardBack(accentColor: .cosmicPurple)
+                    },
+                    cardFront: { index in
+                        if index < reading.cards.count,
+                           let card = reading.cards[index].resolve(from: QuantumOracleDeck.allCards) {
+                            MiniCardFront(
+                                imageName: card.imageName,
+                                title: card.name,
+                                subtitle: "∞",
+                                accentColor: card.family.color
+                            )
+                        } else {
+                            MiniCardBack(accentColor: .cosmicPurple)
+                        }
+                    },
+                    onTapCard: { index in
+                        withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
+                            _ = revealedCards.insert(index)
+                        }
+                    }
+                )
+                .padding(.vertical, 8)
+
+                // Card details
                 ForEach(Array(reading.cards.enumerated()), id: \.element.id) { index, drawn in
                     let label = index < reading.spread.labels.count
                         ? reading.spread.labels[index]
                         : ""
-                    quantumCardView(drawn, label: label, index: index, total: reading.cards.count, spread: reading.spread)
+                    if revealedCards.contains(index) {
+                        quantumCardView(drawn, label: label, index: index, total: reading.cards.count, spread: reading.spread)
+                            .transition(.opacity.combined(with: .move(edge: .bottom)))
+                    }
                 }
-                
+
                 // AI Interpretation section
                 if storeManager.isPremium {
                     aiInterpretationSection(reading)
