@@ -71,6 +71,7 @@
 		AA00000001000049 /* CardCollectionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000002000049 /* CardCollectionManager.swift */; };
 		AA00000001000050 /* BoosterManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000002000050 /* BoosterManager.swift */; };
 		AA00000001000051 /* BoosterOpeningView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000002000051 /* BoosterOpeningView.swift */; };
+		AA00000001000061 /* BoutiqueView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000002000060 /* BoutiqueView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -139,6 +140,7 @@
 		AA00000002000049 /* CardCollectionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardCollectionManager.swift; sourceTree = "<group>"; };
 		AA00000002000050 /* BoosterManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoosterManager.swift; sourceTree = "<group>"; };
 		AA00000002000051 /* BoosterOpeningView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoosterOpeningView.swift; sourceTree = "<group>"; };
+		AA00000002000060 /* BoutiqueView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoutiqueView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -167,6 +169,7 @@
 				AA00000002000038 /* AIInterpretationService.swift */,
 				AA00000002000050 /* BoosterManager.swift */,
 				AA00000002000051 /* BoosterOpeningView.swift */,
+				AA00000002000060 /* BoutiqueView.swift */,
 				AA00000002000049 /* CardCollectionManager.swift */,
 				AA00000002000048 /* CardRarity.swift */,
 				9703C1102F44AC0F005D49C6 /* AffirmationEngine.swift */,
@@ -387,6 +390,7 @@
 				AA00000001000049 /* CardCollectionManager.swift in Sources */,
 				AA00000001000050 /* BoosterManager.swift in Sources */,
 				AA00000001000051 /* BoosterOpeningView.swift in Sources */,
+				AA00000001000061 /* BoutiqueView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

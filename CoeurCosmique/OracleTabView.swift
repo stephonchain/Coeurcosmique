@@ -52,6 +52,8 @@ struct OracleTabView: View {
             
             // Oracle content
             switch oracle {
+            case .tarot:
+                DrawView(viewModel: viewModel)
             case .cosmicHeart:
                 OracleDrawView(viewModel: viewModel)
             case .quantumEntanglement:

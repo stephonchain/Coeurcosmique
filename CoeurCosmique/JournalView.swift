@@ -140,7 +140,7 @@ struct JournalView: View {
                     subtitle: "Tes futures lectures de Tarot\napparaîtront ici.",
                     buttonLabel: "Faire un tirage",
                     buttonIcon: "sparkles",
-                    action: { viewModel.selectedTab = .draw }
+                    action: { viewModel.selectedTab = .oracle }
                 )
             } else {
                 LazyVStack(spacing: 14) {

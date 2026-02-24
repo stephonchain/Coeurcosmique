@@ -12,14 +12,12 @@ struct ContentView: View {
                 switch viewModel.selectedTab {
                 case .home:
                     HomeView(viewModel: viewModel)
-                case .draw:
-                    DrawView(viewModel: viewModel)
                 case .oracle:
                     OracleTabView(viewModel: viewModel)
                 case .collection:
                     CollectionView(viewModel: viewModel)
-                case .insights:
-                    InsightsTabView(viewModel: viewModel)
+                case .boutique:
+                    BoutiqueView(viewModel: viewModel)
                 case .journal:
                     JournalView(viewModel: viewModel)
                 }
@@ -92,10 +90,9 @@ struct ContentView: View {
     private func tabIcon(for tab: AppTab) -> String {
         switch tab {
         case .home: return viewModel.selectedTab == tab ? "sun.max.fill" : "sun.max"
-        case .draw: return viewModel.selectedTab == tab ? "sparkles" : "sparkles"
-        case .oracle: return viewModel.selectedTab == tab ? "heart.circle.fill" : "heart.circle"
+        case .oracle: return viewModel.selectedTab == tab ? "sparkles" : "sparkles"
         case .collection: return viewModel.selectedTab == tab ? "square.grid.2x2.fill" : "square.grid.2x2"
-        case .insights: return viewModel.selectedTab == tab ? "chart.bar.fill" : "chart.bar"
+        case .boutique: return viewModel.selectedTab == tab ? "bag.fill" : "bag"
         case .journal: return viewModel.selectedTab == tab ? "book.fill" : "book"
         }
     }
@@ -103,10 +100,9 @@ struct ContentView: View {
     private func tabLabel(for tab: AppTab) -> String {
         switch tab {
         case .home: return "Accueil"
-        case .draw: return "Tirage"
         case .oracle: return "Oracle"
         case .collection: return "Collection"
-        case .insights: return "Insights"
+        case .boutique: return "Boutique"
         case .journal: return "Journal"
         }
     }

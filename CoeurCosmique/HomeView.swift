@@ -12,6 +12,7 @@ struct HomeView: View {
     @State private var fullScreenCardContent: FullScreenCardView.CardContent? = nil
     @State private var showGratitudeSheet = false
     @State private var showBoosterOpening = false
+    @State private var hasAutoOpened = false
 
     var body: some View {
         ScrollView(showsIndicators: false) {
@@ -21,15 +22,20 @@ struct HomeView: View {
                     .opacity(appeared ? 1 : 0)
                     .offset(y: appeared ? 0 : 20)
 
-                // BOOSTER - Hero Section
-                boosterSection
+                // BOOSTER - Hero Section (bigger)
+                boosterHeroSection
                     .opacity(appeared ? 1 : 0)
                     .offset(y: appeared ? 0 : 25)
 
-                // Collection Progress
-                collectionProgressSection
-                    .opacity(appeared ? 1 : 0)
-                    .offset(y: appeared ? 0 : 30)
+                // Collection Progress (tappable)
+                Button {
+                    viewModel.selectedTab = .collection
+                } label: {
+                    collectionProgressSection
+                }
+                .buttonStyle(.plain)
+                .opacity(appeared ? 1 : 0)
+                .offset(y: appeared ? 0 : 30)
 
                 // Streak
                 if boosterManager.streak > 1 {
@@ -65,6 +71,14 @@ struct HomeView: View {
             }
             withAnimation(.easeOut(duration: 0.8).delay(0.3)) {
                 showMotivation = true
+            }
+
+            // Auto-open booster if available
+            if !hasAutoOpened && (boosterManager.canOpenBooster || boosterManager.hasPremiumBoosterAvailable(isPremium: storeManager.isPremium)) {
+                hasAutoOpened = true
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                    showBoosterOpening = true
+                }
             }
         }
         .overlay {
@@ -105,106 +119,175 @@ struct HomeView: View {
         .padding(.top, 8)
     }
 
-    // MARK: - Booster Section (HERO)
+    // MARK: - Booster Hero Section (BIGGER)
 
-    private var boosterSection: some View {
+    private var boosterHeroSection: some View {
+        VStack(spacing: 0) {
+            if boosterManager.canOpenBooster || boosterManager.hasPremiumBoosterAvailable(isPremium: storeManager.isPremium) {
+                // Available: big CTA
+                boosterAvailableTile
+            } else {
+                // Not available: energy insufficient + countdown + shop link
+                boosterUnavailableTile
+            }
+        }
+    }
+
+    private var boosterAvailableTile: some View {
         Button {
             showBoosterOpening = true
         } label: {
-            VStack(spacing: 16) {
-                HStack {
-                    VStack(alignment: .leading, spacing: 6) {
-                        HStack(spacing: 8) {
-                            Image(systemName: "gift.fill")
-                                .font(.system(size: 18))
-                                .foregroundStyle(Color.cosmicGold)
+            VStack(spacing: 20) {
+                // Large booster visual
+                ZStack {
+                    RoundedRectangle(cornerRadius: 18)
+                        .fill(
+                            LinearGradient(
+                                colors: [.cosmicPurple, .cosmicRose, .cosmicGold.opacity(0.6)],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                        .frame(height: 160)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 18)
+                                .strokeBorder(Color.cosmicGold.opacity(0.5), lineWidth: 2)
+                        )
 
+                    HStack(spacing: 20) {
+                        // Booster pack icon
+                        ZStack {
+                            RoundedRectangle(cornerRadius: 14)
+                                .fill(
+                                    LinearGradient(
+                                        colors: [.cosmicPurple.opacity(0.8), .cosmicRose.opacity(0.6)],
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    )
+                                )
+                                .frame(width: 80, height: 110)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 14)
+                                        .strokeBorder(Color.cosmicGold.opacity(0.6), lineWidth: 1.5)
+                                )
+
+                            VStack(spacing: 6) {
+                                Image(systemName: "sparkles")
+                                    .font(.system(size: 24))
+                                    .foregroundStyle(.white)
+                                Text("x5")
+                                    .font(.system(size: 14, weight: .bold))
+                                    .foregroundStyle(.white.opacity(0.8))
+                            }
+                        }
+                        .shadow(color: .cosmicGold.opacity(0.5), radius: 12)
+
+                        VStack(alignment: .leading, spacing: 8) {
                             Text("Booster Cosmique")
-                                .font(.cosmicHeadline(18))
-                                .foregroundStyle(Color.cosmicText)
-                        }
-
-                        if boosterManager.canOpenBooster {
-                            Text("Un booster est disponible !")
-                                .font(.cosmicCaption(13))
-                                .foregroundStyle(.green)
-                        } else if boosterManager.hasPremiumBoosterAvailable(isPremium: storeManager.isPremium) {
-                            Text("Booster Premium disponible !")
-                                .font(.cosmicCaption(13))
-                                .foregroundStyle(Color.cosmicGold)
-                        } else {
-                            Text("Prochain dans \(boosterManager.formattedTimeRemaining)")
-                                .font(.system(size: 13, design: .monospaced))
-                                .foregroundStyle(Color.cosmicTextSecondary)
-                        }
-                    }
-
-                    Spacer()
-
-                    // Visual booster icon
-                    ZStack {
-                        RoundedRectangle(cornerRadius: 12)
-                            .fill(
-                                LinearGradient(
-                                    colors: [.cosmicPurple, .cosmicRose],
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                )
-                            )
-                            .frame(width: 60, height: 80)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 12)
-                                    .strokeBorder(Color.cosmicGold.opacity(0.5), lineWidth: 1.5)
-                            )
-
-                        VStack(spacing: 4) {
-                            Image(systemName: "sparkles")
-                                .font(.system(size: 18))
+                                .font(.cosmicTitle(22))
                                 .foregroundStyle(.white)
-                            Text("x5")
-                                .font(.system(size: 11, weight: .bold))
-                                .foregroundStyle(.white.opacity(0.8))
+
+                            if boosterManager.hasPremiumBoosterAvailable(isPremium: storeManager.isPremium) && !boosterManager.canOpenBooster {
+                                Text("Booster Premium disponible !")
+                                    .font(.cosmicCaption(13))
+                                    .foregroundStyle(Color.cosmicGold)
+                            } else {
+                                Text("Un booster t'attend !")
+                                    .font(.cosmicCaption(13))
+                                    .foregroundStyle(.green)
+                            }
+
+                            HStack(spacing: 8) {
+                                Image(systemName: "hand.tap.fill")
+                                    .font(.system(size: 14))
+                                Text("Ouvrir maintenant")
+                                    .font(.cosmicHeadline(14))
+                            }
+                            .foregroundStyle(.white)
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 8)
+                            .background(
+                                Capsule()
+                                    .fill(Color.white.opacity(0.2))
+                            )
                         }
                     }
-                    .shadow(color: boosterManager.canOpenBooster ? .cosmicGold.opacity(0.4) : .clear, radius: 8)
-                }
-
-                // Open button
-                if boosterManager.canOpenBooster || boosterManager.hasPremiumBoosterAvailable(isPremium: storeManager.isPremium) {
-                    HStack(spacing: 8) {
-                        Image(systemName: "hand.tap.fill")
-                            .font(.system(size: 14))
-                        Text("Ouvrir maintenant")
-                            .font(.cosmicHeadline(14))
-                    }
-                    .foregroundStyle(.white)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 12)
-                    .background(
-                        RoundedRectangle(cornerRadius: 12)
-                            .fill(
-                                LinearGradient(
-                                    colors: [.cosmicPurple, .cosmicRose],
-                                    startPoint: .leading,
-                                    endPoint: .trailing
-                                )
-                            )
-                    )
+                    .padding(.horizontal, 20)
                 }
             }
-            .padding(16)
-            .cosmicCard(cornerRadius: 16)
+            .cosmicCard(cornerRadius: 18)
             .overlay(
-                RoundedRectangle(cornerRadius: 16)
-                    .strokeBorder(
-                        boosterManager.canOpenBooster
-                            ? Color.cosmicGold.opacity(0.5)
-                            : Color.clear,
-                        lineWidth: 1.5
-                    )
+                RoundedRectangle(cornerRadius: 18)
+                    .strokeBorder(Color.cosmicGold.opacity(0.5), lineWidth: 1.5)
             )
         }
         .buttonStyle(.plain)
+    }
+
+    private var boosterUnavailableTile: some View {
+        VStack(spacing: 16) {
+            HStack(spacing: 14) {
+                // Dimmed booster icon
+                ZStack {
+                    RoundedRectangle(cornerRadius: 14)
+                        .fill(Color.cosmicCard)
+                        .frame(width: 70, height: 95)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 14)
+                                .strokeBorder(Color.cosmicTextSecondary.opacity(0.3), lineWidth: 1.5)
+                        )
+
+                    VStack(spacing: 4) {
+                        Image(systemName: "sparkles")
+                            .font(.system(size: 20))
+                            .foregroundStyle(Color.cosmicTextSecondary.opacity(0.5))
+                        Text("x5")
+                            .font(.system(size: 12, weight: .bold))
+                            .foregroundStyle(Color.cosmicTextSecondary.opacity(0.4))
+                    }
+                }
+
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Energie Cosmique Insuffisante")
+                        .font(.cosmicHeadline(15))
+                        .foregroundStyle(Color.cosmicRose)
+
+                    // Countdown
+                    HStack(spacing: 6) {
+                        Image(systemName: "clock")
+                            .font(.system(size: 12))
+                            .foregroundStyle(Color.cosmicTextSecondary)
+                        Text("Prochain dans \(boosterManager.formattedTimeRemaining)")
+                            .font(.system(size: 13, design: .monospaced))
+                            .foregroundStyle(Color.cosmicTextSecondary)
+                    }
+                }
+
+                Spacer()
+            }
+
+            // Shop link
+            Button {
+                viewModel.selectedTab = .boutique
+            } label: {
+                HStack(spacing: 8) {
+                    Image(systemName: "bag.fill")
+                        .font(.system(size: 14))
+                    Text("Obtenir des Spheres Cosmiques")
+                        .font(.cosmicHeadline(13))
+                }
+                .foregroundStyle(Color.cosmicGold)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 12)
+                .background(
+                    RoundedRectangle(cornerRadius: 12)
+                        .strokeBorder(Color.cosmicGold.opacity(0.4), lineWidth: 1.5)
+                )
+            }
+            .buttonStyle(.plain)
+        }
+        .padding(16)
+        .cosmicCard(cornerRadius: 16)
     }
 
     // MARK: - Collection Progress
@@ -218,9 +301,15 @@ struct HomeView: View {
 
                 Spacer()
 
-                Text("\(collectionManager.totalOwned())/\(CardCollectionManager.totalCollectible)")
-                    .font(.cosmicCaption(13))
-                    .foregroundStyle(Color.cosmicGold)
+                HStack(spacing: 4) {
+                    Text("\(collectionManager.totalOwned())/\(CardCollectionManager.totalCollectible)")
+                        .font(.cosmicCaption(13))
+                        .foregroundStyle(Color.cosmicGold)
+
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 10, weight: .semibold))
+                        .foregroundStyle(Color.cosmicTextSecondary)
+                }
             }
 
             ProgressView(value: Double(collectionManager.totalOwned()), total: Double(CardCollectionManager.totalCollectible))
@@ -272,7 +361,7 @@ struct HomeView: View {
                     .font(.cosmicHeadline(14))
                     .foregroundStyle(Color.cosmicText)
 
-                Text("+\(min(boosterManager.streak, 10))% de chance de carte dorée")
+                Text("+\(min(boosterManager.streak, 10))% de chance de carte doree")
                     .font(.cosmicCaption(11))
                     .foregroundStyle(Color.cosmicGold)
             }
@@ -360,7 +449,7 @@ struct HomeView: View {
                                 .foregroundStyle(Color.cosmicText)
 
                             if case .tarot(_, let isReversed) = info, isReversed {
-                                Text("Inversée")
+                                Text("Inversee")
                                     .font(.cosmicCaption(11))
                                     .foregroundStyle(Color.cosmicRose)
                             }
@@ -397,7 +486,7 @@ struct HomeView: View {
                 } label: {
                     VStack(spacing: 16) {
                         TarotCardBack(size: .large)
-                        Text("Touche pour révéler ta carte")
+                        Text("Touche pour reveler ta carte")
                             .font(.cosmicCaption())
                             .foregroundStyle(Color.cosmicGold)
                     }
@@ -452,19 +541,19 @@ struct HomeView: View {
                 QuickActionButton(
                     icon: "sparkles",
                     title: "Tirage",
-                    subtitle: "Tarot complet",
+                    subtitle: "Tarot & Oracles",
                     color: .cosmicPurple
                 ) {
-                    viewModel.selectedTab = .draw
+                    viewModel.selectedTab = .oracle
                 }
 
                 QuickActionButton(
-                    icon: "square.grid.2x2",
-                    title: "Collection",
-                    subtitle: "\(collectionManager.totalOwned())/\(CardCollectionManager.totalCollectible)",
+                    icon: "bag",
+                    title: "Boutique",
+                    subtitle: "Spheres & Plus",
                     color: .cosmicGold
                 ) {
-                    viewModel.selectedTab = .collection
+                    viewModel.selectedTab = .boutique
                 }
             }
         }

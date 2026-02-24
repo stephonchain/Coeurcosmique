@@ -2,10 +2,9 @@ import SwiftUI
 
 enum AppTab: String, CaseIterable {
     case home
-    case draw
     case oracle
     case collection
-    case insights
+    case boutique
     case journal
 }
 

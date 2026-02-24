@@ -10,7 +10,17 @@ final class StoreManager: ObservableObject {
     static let monthlyID = "com.coeurcosmique.premium.monthly"
     static let yearlyID = "com.coeurcosmique.premium.yearly"
 
-    private static let productIDs: Set<String> = [weeklyID, monthlyID, yearlyID]
+    // Consumables
+    static let spheres50ID = "com.coeurcosmique.spheres.50"
+    static let unlockOracleID = "com.coeurcosmique.unlock.oracle"
+    static let unlockQuantumID = "com.coeurcosmique.unlock.quantum"
+    static let unlockRunesID = "com.coeurcosmique.unlock.runes"
+
+    private static let subscriptionIDs: Set<String> = [weeklyID, monthlyID, yearlyID]
+    private static let productIDs: Set<String> = [
+        weeklyID, monthlyID, yearlyID,
+        spheres50ID, unlockOracleID, unlockQuantumID, unlockRunesID
+    ]
 
     // MARK: - Published State
 
@@ -85,7 +95,7 @@ final class StoreManager: ObservableObject {
     func checkEntitlements() async {
         for await result in Transaction.currentEntitlements {
             if let transaction = try? checkVerified(result) {
-                if Self.productIDs.contains(transaction.productID) {
+                if Self.subscriptionIDs.contains(transaction.productID) {
                     isPremium = true
                     return
                 }

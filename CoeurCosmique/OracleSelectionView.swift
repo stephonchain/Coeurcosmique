@@ -3,6 +3,7 @@ import SwiftUI
 // MARK: - Oracle Type
 
 enum OracleType: String, CaseIterable, Identifiable {
+    case tarot
     case cosmicHeart
     case quantumEntanglement
     case runesCosmiques
@@ -11,6 +12,8 @@ enum OracleType: String, CaseIterable, Identifiable {
 
     var title: String {
         switch self {
+        case .tarot:
+            return "Tarot Cosmique"
         case .cosmicHeart:
             return "Oracle Cœur Cosmique"
         case .quantumEntanglement:
@@ -22,6 +25,8 @@ enum OracleType: String, CaseIterable, Identifiable {
 
     var subtitle: String {
         switch self {
+        case .tarot:
+            return "Les arcanes du destin"
         case .cosmicHeart:
             return "Messages du cœur cosmique"
         case .quantumEntanglement:
@@ -33,6 +38,8 @@ enum OracleType: String, CaseIterable, Identifiable {
 
     var icon: String {
         switch self {
+        case .tarot:
+            return "✦"
         case .cosmicHeart:
             return "♡"
         case .quantumEntanglement:
@@ -44,6 +51,8 @@ enum OracleType: String, CaseIterable, Identifiable {
 
     var color: Color {
         switch self {
+        case .tarot:
+            return .cosmicGold
         case .cosmicHeart:
             return .cosmicRose
         case .quantumEntanglement:
@@ -55,6 +64,8 @@ enum OracleType: String, CaseIterable, Identifiable {
 
     var isPremium: Bool {
         switch self {
+        case .tarot:
+            return false
         case .cosmicHeart:
             return false
         case .quantumEntanglement:
@@ -67,6 +78,13 @@ enum OracleType: String, CaseIterable, Identifiable {
     // Sample cards to display in preview
     func previewCards(viewModel: AppViewModel) -> [PreviewCardData] {
         switch self {
+        case .tarot:
+            let allCards = viewModel.deck.shuffled()
+            return [
+                PreviewCardData(imageName: allCards[0].imageName, color: .cosmicGold, showImage: !allCards[0].imageName.isEmpty),
+                PreviewCardData(imageName: allCards[1].imageName, color: .cosmicGold, showImage: !allCards[1].imageName.isEmpty),
+                PreviewCardData(imageName: allCards[2].imageName, color: .cosmicGold, showImage: !allCards[2].imageName.isEmpty)
+            ]
         case .cosmicHeart:
             let allCards = viewModel.oracleDeck.shuffled()
             return [
@@ -222,6 +240,11 @@ struct OracleSelectionView: View {
             // Features
             VStack(alignment: .leading, spacing: 10) {
                 switch oracle {
+                case .tarot:
+                    featureItem(icon: "sparkles", text: "78 arcanes du Tarot", color: oracle.color)
+                    featureItem(icon: "star.fill", text: "2 tirages classiques", color: oracle.color)
+                    featureItem(icon: "wand.and.stars", text: "Toujours disponible", color: oracle.color)
+
                 case .cosmicHeart:
                     featureItem(icon: "heart.fill", text: "Messages guidants", color: oracle.color)
                     featureItem(icon: "sparkles", text: "3 tirages uniques", color: oracle.color)

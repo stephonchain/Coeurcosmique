@@ -8,8 +8,8 @@ final class BoosterManager: ObservableObject {
     // MARK: - Constants
 
     static let boosterSize = 5
-    static let cooldownSeconds: TimeInterval = 24 * 60 * 60 // 24 hours
-    static let premiumCooldownSeconds: TimeInterval = 12 * 60 * 60 // 12 hours
+    static let cooldownSeconds: TimeInterval = 12 * 60 * 60 // 12 hours
+    static let premiumCooldownSeconds: TimeInterval = 24 * 60 * 60 // 24 hours (premium gets +1 per day)
 
     // MARK: - Published State
 
