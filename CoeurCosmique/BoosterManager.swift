@@ -145,6 +145,34 @@ final class BoosterManager: ObservableObject {
         return cards
     }
 
+    // MARK: - Sphere Booster (no cooldown impact)
+
+    func openSphereBooster(collectionManager: CardCollectionManager) -> [BoosterCard] {
+        var cards: [BoosterCard] = []
+
+        var pool: [(CollectibleDeck, Int)] = []
+        for n in 1...CollectibleDeck.oracle.totalCards {
+            pool.append((.oracle, n))
+        }
+        for n in 1...CollectibleDeck.quantum.totalCards {
+            pool.append((.quantum, n))
+        }
+        for n in 1...CollectibleDeck.rune.totalCards {
+            pool.append((.rune, n))
+        }
+
+        let shuffled = pool.shuffled()
+        for i in 0..<Self.boosterSize {
+            let (deck, number) = shuffled[i % shuffled.count]
+            let rarity = rollRarity()
+            let isNew = collectionManager.addCard(deck: deck, number: number, rarity: rarity)
+            cards.append(BoosterCard(deck: deck, number: number, rarity: rarity, isNew: isNew))
+        }
+
+        lastBoosterCards = cards
+        return cards
+    }
+
     // MARK: - Premium Extra Booster
 
     func hasPremiumBoosterAvailable(isPremium: Bool) -> Bool {

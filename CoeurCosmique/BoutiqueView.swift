@@ -48,6 +48,8 @@ struct BoutiqueView: View {
     @StateObject private var sphereManager = CosmicSphereManager()
     @State private var showPaywall = false
     @State private var showBoosterOpening = false
+    @State private var showSphereBooster = false
+    @State private var showSphereConfirm = false
     @State private var purchaseConfirmation: String?
     @State private var showUnlockConfirm: CollectibleDeck?
 
@@ -96,10 +98,29 @@ struct BoutiqueView: View {
             )
             .environmentObject(storeManager)
         }
+        .fullScreenCover(isPresented: $showSphereBooster) {
+            BoosterOpeningView(
+                collectionManager: collectionManager,
+                boosterManager: boosterManager,
+                onDismiss: { showSphereBooster = false },
+                isSphereBooster: true
+            )
+            .environmentObject(storeManager)
+        }
         .overlay {
             if let msg = purchaseConfirmation {
                 confirmationOverlay(msg)
             }
+        }
+        .alert("Ouvrir un Booster", isPresented: $showSphereConfirm) {
+            Button("Annuler", role: .cancel) { }
+            Button("Ouvrir (-10 Spheres)") {
+                if sphereManager.spendForBooster() {
+                    showSphereBooster = true
+                }
+            }
+        } message: {
+            Text("Depenser 10 Spheres Cosmiques pour ouvrir un Booster de 5 cartes ?")
         }
         .alert("Débloquer l'Oracle", isPresented: Binding(
             get: { showUnlockConfirm != nil },
@@ -549,8 +570,8 @@ struct BoutiqueView: View {
     }
 
     private func openSphereBooster() {
-        guard sphereManager.spendForBooster() else { return }
-        showBoosterOpening = true
+        guard sphereManager.canOpenBooster else { return }
+        showSphereConfirm = true
     }
 
     private func unlockFullDeck(_ deck: CollectibleDeck) {

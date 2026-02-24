@@ -7,6 +7,7 @@ struct BoosterOpeningView: View {
     @ObservedObject var collectionManager: CardCollectionManager
     @ObservedObject var boosterManager: BoosterManager
     let onDismiss: () -> Void
+    var isSphereBooster: Bool = false
 
     @State private var phase: BoosterPhase = .ready
     @State private var cards: [BoosterCard] = []
@@ -45,6 +46,12 @@ struct BoosterOpeningView: View {
             // Fullscreen card overlay
             if let card = fullScreenCard {
                 fullScreenCardOverlay(card)
+            }
+        }
+        .onAppear {
+            // Sphere boosters skip the ready phase and open immediately
+            if isSphereBooster && phase == .ready {
+                openBooster()
             }
         }
     }
@@ -724,10 +731,13 @@ struct BoosterOpeningView: View {
             phase = .opening
         }
 
-        let isPremiumBooster = !boosterManager.canOpenBooster && boosterManager.hasPremiumBoosterAvailable(isPremium: storeManager.isPremium)
+        let isSphere = isSphereBooster
+        let isPremiumBooster = !isSphere && !boosterManager.canOpenBooster && boosterManager.hasPremiumBoosterAvailable(isPremium: storeManager.isPremium)
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
-            if isPremiumBooster {
+            if isSphere {
+                cards = boosterManager.openSphereBooster(collectionManager: collectionManager)
+            } else if isPremiumBooster {
                 cards = boosterManager.openPremiumBooster(collectionManager: collectionManager)
             } else {
                 cards = boosterManager.openBooster(collectionManager: collectionManager)
