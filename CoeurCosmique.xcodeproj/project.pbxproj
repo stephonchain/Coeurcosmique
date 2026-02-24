@@ -72,6 +72,10 @@
 		AA00000001000050 /* BoosterManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000002000050 /* BoosterManager.swift */; };
 		AA00000001000051 /* BoosterOpeningView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000002000051 /* BoosterOpeningView.swift */; };
 		AA00000001000061 /* BoutiqueView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000002000060 /* BoutiqueView.swift */; };
+		AA00000001000070 /* MiniGameManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000002000070 /* MiniGameManager.swift */; };
+		AA00000001000071 /* MemoryGameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000002000071 /* MemoryGameView.swift */; };
+		AA00000001000072 /* MissingCardGameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000002000072 /* MissingCardGameView.swift */; };
+		AA00000001000073 /* MahjongGameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000002000073 /* MahjongGameView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -141,6 +145,10 @@
 		AA00000002000050 /* BoosterManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoosterManager.swift; sourceTree = "<group>"; };
 		AA00000002000051 /* BoosterOpeningView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoosterOpeningView.swift; sourceTree = "<group>"; };
 		AA00000002000060 /* BoutiqueView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoutiqueView.swift; sourceTree = "<group>"; };
+		AA00000002000070 /* MiniGameManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MiniGameManager.swift; sourceTree = "<group>"; };
+		AA00000002000071 /* MemoryGameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoryGameView.swift; sourceTree = "<group>"; };
+		AA00000002000072 /* MissingCardGameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MissingCardGameView.swift; sourceTree = "<group>"; };
+		AA00000002000073 /* MahjongGameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MahjongGameView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -170,6 +178,10 @@
 				AA00000002000050 /* BoosterManager.swift */,
 				AA00000002000051 /* BoosterOpeningView.swift */,
 				AA00000002000060 /* BoutiqueView.swift */,
+				AA00000002000073 /* MahjongGameView.swift */,
+				AA00000002000071 /* MemoryGameView.swift */,
+				AA00000002000070 /* MiniGameManager.swift */,
+				AA00000002000072 /* MissingCardGameView.swift */,
 				AA00000002000049 /* CardCollectionManager.swift */,
 				AA00000002000048 /* CardRarity.swift */,
 				9703C1102F44AC0F005D49C6 /* AffirmationEngine.swift */,
@@ -391,6 +403,10 @@
 				AA00000001000050 /* BoosterManager.swift in Sources */,
 				AA00000001000051 /* BoosterOpeningView.swift in Sources */,
 				AA00000001000061 /* BoutiqueView.swift in Sources */,
+				AA00000001000070 /* MiniGameManager.swift in Sources */,
+				AA00000001000071 /* MemoryGameView.swift in Sources */,
+				AA00000001000072 /* MissingCardGameView.swift in Sources */,
+				AA00000001000073 /* MahjongGameView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

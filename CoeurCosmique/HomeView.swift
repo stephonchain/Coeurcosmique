@@ -13,6 +13,7 @@ struct HomeView: View {
     @State private var showGratitudeSheet = false
     @State private var showBoosterOpening = false
     @State private var hasAutoOpened = false
+    @State private var activeGame: MiniGameType? = nil
 
     var body: some View {
         ScrollView(showsIndicators: false) {
@@ -36,6 +37,11 @@ struct HomeView: View {
                 .buttonStyle(.plain)
                 .opacity(appeared ? 1 : 0)
                 .offset(y: appeared ? 0 : 30)
+
+                // Mini-Games tiles
+                miniGamesSection
+                    .opacity(appeared ? 1 : 0)
+                    .offset(y: appeared ? 0 : 32)
 
                 // Streak
                 if boosterManager.streak > 1 {
@@ -95,6 +101,16 @@ struct HomeView: View {
                 onDismiss: { showBoosterOpening = false }
             )
             .environmentObject(storeManager)
+        }
+        .fullScreenCover(item: $activeGame) { game in
+            switch game {
+            case .memory:
+                MemoryGameView(onDismiss: { activeGame = nil })
+            case .missingCard:
+                MissingCardGameView(onDismiss: { activeGame = nil })
+            case .mahjong:
+                MahjongGameView(onDismiss: { activeGame = nil })
+            }
         }
         .sheet(isPresented: $showGratitudeSheet) {
             GratitudeQuickView(isPresented: $showGratitudeSheet)
@@ -523,6 +539,79 @@ struct HomeView: View {
                 size: .large,
                 onFullScreen: { fullScreenCardContent = info.fullScreenContent }
             )
+        }
+    }
+
+    // MARK: - Mini-Games
+
+    private var miniGamesSection: some View {
+        VStack(spacing: 12) {
+            HStack {
+                Text("Mini-Jeux")
+                    .font(.cosmicHeadline(16))
+                    .foregroundStyle(Color.cosmicText)
+
+                Spacer()
+
+                HStack(spacing: 4) {
+                    Image(systemName: "diamond.fill")
+                        .font(.system(size: 10))
+                        .foregroundStyle(.cyan)
+                    Text("Gagne des Spheres")
+                        .font(.cosmicCaption(11))
+                        .foregroundStyle(.cyan)
+                }
+            }
+
+            // Game tiles in a horizontal scroll
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 12) {
+                    ForEach(MiniGameType.allCases) { game in
+                        Button {
+                            activeGame = game
+                        } label: {
+                            VStack(alignment: .leading, spacing: 10) {
+                                HStack {
+                                    Image(systemName: game.icon)
+                                        .font(.system(size: 22, weight: .medium))
+                                        .foregroundStyle(game.color)
+
+                                    Spacer()
+
+                                    HStack(spacing: 3) {
+                                        Image(systemName: "diamond.fill")
+                                            .font(.system(size: 8))
+                                            .foregroundStyle(.cyan)
+                                        Text("+\(game.reward)")
+                                            .font(.system(size: 11, weight: .bold))
+                                            .foregroundStyle(.cyan)
+                                    }
+                                    .padding(.horizontal, 8)
+                                    .padding(.vertical, 3)
+                                    .background(Capsule().fill(Color.cyan.opacity(0.15)))
+                                }
+
+                                Text(game.title)
+                                    .font(.cosmicHeadline(14))
+                                    .foregroundStyle(Color.cosmicText)
+
+                                Text(game.subtitle)
+                                    .font(.cosmicCaption(11))
+                                    .foregroundStyle(Color.cosmicTextSecondary)
+                                    .lineLimit(1)
+                            }
+                            .frame(width: 150)
+                            .padding(14)
+                            .cosmicCard(cornerRadius: 14)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 14)
+                                    .strokeBorder(game.color.opacity(0.3), lineWidth: 1)
+                            )
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+            }
         }
     }
 
