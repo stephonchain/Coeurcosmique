@@ -60,6 +60,13 @@
 		AA00000001000038 /* AIInterpretationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000002000038 /* AIInterpretationService.swift */; };
 		AA00000001000039 /* CreditManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000002000039 /* CreditManager.swift */; };
 		AA00000001000040 /* QuantumOracleAboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000002000040 /* QuantumOracleAboutView.swift */; };
+		AA00000001000041 /* ActivityViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000002000041 /* ActivityViewController.swift */; };
+		AA00000001000042 /* RuneCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000002000042 /* RuneCard.swift */; };
+		AA00000001000043 /* RuneCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000002000043 /* RuneCardView.swift */; };
+		AA00000001000044 /* RuneCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000002000044 /* RuneCollectionView.swift */; };
+		AA00000001000045 /* RuneDeck.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000002000045 /* RuneDeck.swift */; };
+		AA00000001000046 /* RuneDrawView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000002000046 /* RuneDrawView.swift */; };
+		AA00000001000047 /* SpreadLayoutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000002000047 /* SpreadLayoutView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -117,6 +124,13 @@
 		AA00000002000038 /* AIInterpretationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIInterpretationService.swift; sourceTree = "<group>"; };
 		AA00000002000039 /* CreditManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreditManager.swift; sourceTree = "<group>"; };
 		AA00000002000040 /* QuantumOracleAboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuantumOracleAboutView.swift; sourceTree = "<group>"; };
+		AA00000002000041 /* ActivityViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityViewController.swift; sourceTree = "<group>"; };
+		AA00000002000042 /* RuneCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuneCard.swift; sourceTree = "<group>"; };
+		AA00000002000043 /* RuneCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuneCardView.swift; sourceTree = "<group>"; };
+		AA00000002000044 /* RuneCollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuneCollectionView.swift; sourceTree = "<group>"; };
+		AA00000002000045 /* RuneDeck.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuneDeck.swift; sourceTree = "<group>"; };
+		AA00000002000046 /* RuneDrawView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuneDrawView.swift; sourceTree = "<group>"; };
+		AA00000002000047 /* SpreadLayoutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpreadLayoutView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -141,6 +155,7 @@
 		AA00000003000002 /* CoeurCosmique */ = {
 			isa = PBXGroup;
 			children = (
+				AA00000002000041 /* ActivityViewController.swift */,
 				AA00000002000038 /* AIInterpretationService.swift */,
 				9703C1102F44AC0F005D49C6 /* AffirmationEngine.swift */,
 				AA00000002000003 /* AppViewModel.swift */,
@@ -185,6 +200,12 @@
 				9703C1182F44AC0F005D49C6 /* QuantumOracleDeck.swift */,
 				9703C1192F44AC0F005D49C6 /* QuantumOracleDrawView.swift */,
 				AA00000002000010 /* ReadingHistoryStore.swift */,
+				AA00000002000042 /* RuneCard.swift */,
+				AA00000002000043 /* RuneCardView.swift */,
+				AA00000002000044 /* RuneCollectionView.swift */,
+				AA00000002000045 /* RuneDeck.swift */,
+				AA00000002000046 /* RuneDrawView.swift */,
+				AA00000002000047 /* SpreadLayoutView.swift */,
 				9703C11A2F44AC0F005D49C6 /* StatisticsView.swift */,
 				AA00000002000024 /* StoreManager.swift */,
 				AA00000002000005 /* TarotCard.swift */,
@@ -343,6 +364,13 @@
 				AA00000001000038 /* AIInterpretationService.swift in Sources */,
 				AA00000001000039 /* CreditManager.swift in Sources */,
 				AA00000001000040 /* QuantumOracleAboutView.swift in Sources */,
+				AA00000001000041 /* ActivityViewController.swift in Sources */,
+				AA00000001000042 /* RuneCard.swift in Sources */,
+				AA00000001000043 /* RuneCardView.swift in Sources */,
+				AA00000001000044 /* RuneCollectionView.swift in Sources */,
+				AA00000001000045 /* RuneDeck.swift in Sources */,
+				AA00000001000046 /* RuneDrawView.swift in Sources */,
+				AA00000001000047 /* SpreadLayoutView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
