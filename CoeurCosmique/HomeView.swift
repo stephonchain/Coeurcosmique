@@ -110,6 +110,9 @@ struct HomeView: View {
                 MissingCardGameView(onDismiss: { activeGame = nil })
             case .mahjong:
                 MahjongGameView(onDismiss: { activeGame = nil })
+            case .flashCosmique:
+                FlashCosmiqueView(onDismiss: { activeGame = nil })
+                    .environmentObject(collectionManager)
             }
         }
         .sheet(isPresented: $showGratitudeSheet) {

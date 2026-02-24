@@ -66,12 +66,14 @@ enum MiniGameType: String, CaseIterable, Identifiable {
     case memory
     case missingCard
     case mahjong
+    case flashCosmique
 
     var title: String {
         switch self {
         case .memory: return "Memory"
         case .missingCard: return "Carte Absente"
         case .mahjong: return "Mahjong Cosmique"
+        case .flashCosmique: return "Flash Cosmique"
         }
     }
 
@@ -80,6 +82,7 @@ enum MiniGameType: String, CaseIterable, Identifiable {
         case .memory: return "Retrouve les paires"
         case .missingCard: return "Quelle carte manque ?"
         case .mahjong: return "Associe les tuiles"
+        case .flashCosmique: return "Apprends les cartes"
         }
     }
 
@@ -88,6 +91,7 @@ enum MiniGameType: String, CaseIterable, Identifiable {
         case .memory: return "square.grid.2x2"
         case .missingCard: return "eye.slash"
         case .mahjong: return "rectangle.grid.3x2"
+        case .flashCosmique: return "brain.head.profile"
         }
     }
 
@@ -96,6 +100,7 @@ enum MiniGameType: String, CaseIterable, Identifiable {
         case .memory: return .cyan
         case .missingCard: return .cosmicRose
         case .mahjong: return .cosmicPurple
+        case .flashCosmique: return .cosmicGold
         }
     }
 
@@ -106,6 +111,7 @@ enum MiniGameType: String, CaseIterable, Identifiable {
         case .memory: return "1 / 3 victoires"
         case .missingCard: return "+1 Sphere"
         case .mahjong: return "+1 Sphere"
+        case .flashCosmique: return "Cartes GOLD"
         }
     }
 }
