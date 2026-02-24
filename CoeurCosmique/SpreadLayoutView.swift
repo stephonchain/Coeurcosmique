@@ -251,13 +251,13 @@ extension QuantumSpreadType: SpreadLayoutProvider {
                 SpreadPosition(x: 0, y: 1)
             ]
         case .sautQuantique:
-            // Arrow: Gravity, Dark Energy, Horizon, Wormhole, New Galaxy
+            // X pattern: Gravity (top-left), Dark Energy (top-right), Horizon (center), Wormhole (bottom-left), New Galaxy (bottom-right)
             return [
-                SpreadPosition(x: -2, y: 0),
-                SpreadPosition(x: -1, y: 0),
+                SpreadPosition(x: -1, y: -1),
+                SpreadPosition(x: 1, y: -1),
                 SpreadPosition(x: 0, y: 0),
-                SpreadPosition(x: 1, y: 0),
-                SpreadPosition(x: 2, y: 0)
+                SpreadPosition(x: -1, y: 1),
+                SpreadPosition(x: 1, y: 1)
             ]
         }
     }
