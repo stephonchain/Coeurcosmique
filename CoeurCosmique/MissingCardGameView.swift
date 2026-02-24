@@ -12,6 +12,7 @@ struct MissingCardGameView: View {
     @State private var allCards: [GameCard] = []
     @State private var missingCard: GameCard? = nil
     @State private var displayedCards: [GameCard] = []
+    @State private var answerChoices: [GameCard] = []   // decoys + missing card
     @State private var selectedAnswer: GameCard? = nil
     @State private var showWin = false
     @State private var showError = false
@@ -87,6 +88,8 @@ struct MissingCardGameView: View {
             if showWin {
                 GameWinOverlay(
                     gameType: .missingCard,
+                    spheresEarned: 1,
+                    subtitle: nil,
                     onDismiss: onDismiss,
                     onPlayAgain: {
                         showWin = false
@@ -271,15 +274,15 @@ struct MissingCardGameView: View {
 
             Spacer()
 
-            // Choice buttons from ALL original cards (pick the missing one)
+            // Choice buttons: decoys (not on board) + the missing card
             Text("Choisis la carte manquante :")
                 .font(.cosmicCaption(12))
                 .foregroundStyle(Color.cosmicTextSecondary)
 
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 10) {
-                    ForEach(allCards) { card in
-                        let isMissing = !displayedCards.contains(where: { $0.matchID == card.matchID })
+                    ForEach(answerChoices) { card in
+                        let isCorrect = card.matchID == missingCard?.matchID
                         Button {
                             selectAnswer(card)
                         } label: {
@@ -298,7 +301,7 @@ struct MissingCardGameView: View {
                             .overlay(
                                 RoundedRectangle(cornerRadius: 8)
                                     .strokeBorder(
-                                        isMissing && showError ? Color.green : Color.clear,
+                                        isCorrect && showError ? Color.green : Color.clear,
                                         lineWidth: 2
                                     )
                             )
@@ -412,6 +415,15 @@ struct MissingCardGameView: View {
         let idx = Int.random(in: 0..<allCards.count)
         missingCard = allCards[idx]
         displayedCards = allCards.filter { $0.id != allCards[idx].id }.shuffled()
+
+        // Build answer choices: decoys (cards NOT in allCards) + the missing card
+        let usedMatchIDs = Set(allCards.map(\.matchID))
+        let decoyCount = allCards.count - 1  // same number of choices as displayed cards
+        let decoyPool = GameCard.buildPool(count: 108) // large pool
+            .filter { !usedMatchIDs.contains($0.matchID) }
+        let decoys = Array(decoyPool.prefix(decoyCount))
+        answerChoices = (decoys + [allCards[idx]]).shuffled()
+
         phase = .guess
     }
 
@@ -422,7 +434,7 @@ struct MissingCardGameView: View {
             // Correct!
             score += 1
             if round >= difficulty.roundsToWin {
-                // Game won
+                // All 3 rounds done with perfect score → reward
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                     gameManager.rewardWin(game: .missingCard, sphereManager: sphereManager)
                     showWin = true
@@ -433,16 +445,17 @@ struct MissingCardGameView: View {
                 }
             }
         } else {
-            // Wrong
+            // Wrong — show error, continue to next round (no sphere for this round)
             showError = true
             DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
                 if round >= difficulty.roundsToWin {
-                    // Game over but still won if score > 0... let's be generous
-                    if score > 0 {
+                    // End of game — only reward if perfect score
+                    if score == difficulty.roundsToWin {
                         gameManager.rewardWin(game: .missingCard, sphereManager: sphereManager)
+                        showWin = true
+                    } else {
+                        phase = .menu
                     }
-                    showWin = score > 0
-                    if !showWin { phase = .menu }
                 } else {
                     startRound()
                 }

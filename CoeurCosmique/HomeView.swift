@@ -582,8 +582,8 @@ struct HomeView: View {
                                         Image(systemName: "diamond.fill")
                                             .font(.system(size: 8))
                                             .foregroundStyle(.cyan)
-                                        Text("+\(game.reward)")
-                                            .font(.system(size: 11, weight: .bold))
+                                        Text(game.rewardLabel)
+                                            .font(.system(size: 9, weight: .bold))
                                             .foregroundStyle(.cyan)
                                     }
                                     .padding(.horizontal, 8)

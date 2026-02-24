@@ -13,8 +13,10 @@ struct MahjongGameView: View {
     @State private var matchedCount: Int = 0
     @State private var totalPairs: Int = 0
     @State private var moves: Int = 0
+    @State private var shufflesRemaining: Int = 3
     @State private var showWin = false
-    @State private var showHint = false
+    @State private var showGameOver = false
+    @State private var showDeadlockAlert = false
     @State private var difficulty: MahjongDifficulty = .medium
     @State private var started = false
     @State private var gridColumns: Int = 6
@@ -73,12 +75,45 @@ struct MahjongGameView: View {
             if showWin {
                 GameWinOverlay(
                     gameType: .mahjong,
+                    spheresEarned: 1,
+                    subtitle: nil,
                     onDismiss: onDismiss,
                     onPlayAgain: {
                         showWin = false
                         started = false
                     }
                 )
+            }
+
+            if showGameOver {
+                GameOverOverlay(
+                    message: "Plus aucune paire possible\net plus de melanges disponibles.",
+                    onDismiss: onDismiss,
+                    onRetry: {
+                        showGameOver = false
+                        started = false
+                    }
+                )
+            }
+        }
+        .alert("Aucune paire possible", isPresented: $showDeadlockAlert) {
+            if shufflesRemaining > 0 {
+                Button("Melanger (\(shufflesRemaining) restants)") {
+                    shuffleRemainingTiles()
+                }
+                Button("Abandonner", role: .cancel) {
+                    started = false
+                }
+            } else {
+                Button("OK") {
+                    showGameOver = true
+                }
+            }
+        } message: {
+            if shufflesRemaining > 0 {
+                Text("Il n'y a plus de paires disponibles. Tu peux melanger les tuiles restantes.")
+            } else {
+                Text("Il n'y a plus de paires et tu as utilise tes 3 melanges. Partie terminee !")
             }
         }
     }
@@ -144,7 +179,7 @@ struct MahjongGameView: View {
                 Image(systemName: "diamond.fill")
                     .font(.system(size: 12))
                     .foregroundStyle(.cyan)
-                Text("+\(MiniGameManager.mahjongReward) Spheres par victoire")
+                Text("+1 Sphere par victoire")
                     .font(.cosmicCaption(13))
                     .foregroundStyle(.cyan)
             }
@@ -195,7 +230,6 @@ struct MahjongGameView: View {
             LazyVGrid(columns: cols, spacing: 4) {
                 ForEach(Array(tiles.enumerated()), id: \.element.id) { index, tile in
                     if tile.isRemoved {
-                        // Empty space
                         Color.clear
                             .frame(width: tileWidth, height: tileHeight)
                     } else {
@@ -232,14 +266,12 @@ struct MahjongGameView: View {
                     )
             }
 
-            // Selection highlight
             if isSelected {
                 RoundedRectangle(cornerRadius: 6)
                     .strokeBorder(Color.cosmicGold, lineWidth: 2.5)
                     .frame(width: width, height: height)
             }
 
-            // Locked overlay
             if !isFree {
                 RoundedRectangle(cornerRadius: 6)
                     .fill(Color.black.opacity(0.4))
@@ -256,31 +288,35 @@ struct MahjongGameView: View {
     // MARK: - Stats Bar
 
     private var statsBar: some View {
-        HStack(spacing: 20) {
-            Label("\(moves) coups", systemImage: "hand.tap")
+        HStack(spacing: 12) {
+            Label("\(moves)", systemImage: "hand.tap")
                 .font(.cosmicCaption(13))
                 .foregroundStyle(Color.cosmicTextSecondary)
 
-            Spacer()
-
-            Label("\(matchedCount)/\(totalPairs) paires", systemImage: "checkmark.circle")
+            Label("\(matchedCount)/\(totalPairs)", systemImage: "checkmark.circle")
                 .font(.cosmicCaption(13))
                 .foregroundStyle(Color.cosmicPurple)
 
-            if showHint {
-                Button {
-                    highlightHint()
-                } label: {
-                    HStack(spacing: 4) {
-                        Image(systemName: "lightbulb.fill")
-                            .font(.system(size: 10))
-                        Text("Indice")
-                            .font(.cosmicCaption(11))
-                    }
-                    .foregroundStyle(Color.cosmicGold)
+            Spacer()
+
+            // Shuffle button
+            Button {
+                if hasValidPair() {
+                    // There are still valid pairs, no need to shuffle
+                } else if shufflesRemaining > 0 {
+                    shuffleRemainingTiles()
                 }
-                .buttonStyle(.plain)
+            } label: {
+                HStack(spacing: 4) {
+                    Image(systemName: "shuffle")
+                        .font(.system(size: 12))
+                    Text("Melanger (\(shufflesRemaining))")
+                        .font(.cosmicCaption(11))
+                }
+                .foregroundStyle(shufflesRemaining > 0 ? Color.cosmicGold : Color.cosmicTextSecondary.opacity(0.5))
             }
+            .buttonStyle(.plain)
+            .disabled(shufflesRemaining <= 0)
         }
         .padding(.horizontal, 20)
         .padding(.vertical, 14)
@@ -301,7 +337,6 @@ struct MahjongGameView: View {
         allTiles.shuffle()
         gridColumns = difficulty.columns
 
-        // Assign row/col positions
         for (i, _) in allTiles.enumerated() {
             let row = i / gridColumns
             let col = i % gridColumns
@@ -313,9 +348,14 @@ struct MahjongGameView: View {
         totalPairs = difficulty.pairCount
         matchedCount = 0
         moves = 0
+        shufflesRemaining = 3
         selectedTile = nil
-        showHint = true
+        showWin = false
+        showGameOver = false
         started = true
+
+        // Check if initial layout has valid pairs (it should, but just in case)
+        checkForDeadlock()
     }
 
     private func isTileFree(index: Int) -> Bool {
@@ -325,7 +365,6 @@ struct MahjongGameView: View {
         let row = tile.row
         let col = tile.col
 
-        // A tile is free if it has at least one exposed horizontal side
         let leftFree = col == 0 || neighborRemoved(row: row, col: col - 1)
         let rightFree = col == gridColumns - 1 || neighborRemoved(row: row, col: col + 1)
 
@@ -333,16 +372,61 @@ struct MahjongGameView: View {
     }
 
     private func neighborRemoved(row: Int, col: Int) -> Bool {
-        guard let idx = tiles.firstIndex(where: { $0.row == row && $0.col == col && !$0.isRemoved }) else {
-            return true // no tile there = free
+        guard tiles.contains(where: { $0.row == row && $0.col == col && !$0.isRemoved }) else {
+            return true
         }
         return false
+    }
+
+    private func hasValidPair() -> Bool {
+        let freeIndices = tiles.enumerated().filter { !$0.element.isRemoved && isTileFree(index: $0.offset) }
+
+        for i in 0..<freeIndices.count {
+            for j in (i + 1)..<freeIndices.count {
+                if freeIndices[i].element.card.matchID == freeIndices[j].element.card.matchID {
+                    return true
+                }
+            }
+        }
+        return false
+    }
+
+    private func checkForDeadlock() {
+        // Small delay to let UI settle
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+            guard matchedCount < totalPairs else { return }
+            if !hasValidPair() {
+                showDeadlockAlert = true
+            }
+        }
+    }
+
+    private func shuffleRemainingTiles() {
+        guard shufflesRemaining > 0 else { return }
+        shufflesRemaining -= 1
+        selectedTile = nil
+
+        // Collect remaining (non-removed) tiles' cards
+        let remainingIndices = tiles.enumerated().filter { !$0.element.isRemoved }.map(\.offset)
+        var remainingCards = remainingIndices.map { tiles[$0].card }
+        remainingCards.shuffle()
+
+        // Reassign shuffled cards to the same grid positions
+        for (i, tileIndex) in remainingIndices.enumerated() {
+            tiles[tileIndex] = MahjongTile(
+                card: remainingCards[i],
+                row: tiles[tileIndex].row,
+                col: tiles[tileIndex].col
+            )
+        }
+
+        // Check again after shuffle
+        checkForDeadlock()
     }
 
     private func tapTile(index: Int) {
         if let selected = selectedTile {
             if selected == index {
-                // Deselect
                 selectedTile = nil
                 return
             }
@@ -351,7 +435,6 @@ struct MahjongGameView: View {
             let second = tiles[index]
 
             if first.card.matchID == second.card.matchID {
-                // Match!
                 withAnimation(.easeOut(duration: 0.3)) {
                     tiles[selected].isRemoved = true
                     tiles[index].isRemoved = true
@@ -365,33 +448,16 @@ struct MahjongGameView: View {
                         gameManager.rewardWin(game: .mahjong, sphereManager: sphereManager)
                         showWin = true
                     }
+                } else {
+                    // Check for deadlock after each match
+                    checkForDeadlock()
                 }
             } else {
-                // No match
                 moves += 1
                 selectedTile = index
             }
         } else {
             selectedTile = index
-        }
-    }
-
-    private func highlightHint() {
-        // Find a valid pair
-        let freeIndices = tiles.enumerated().filter { !$0.element.isRemoved && isTileFree(index: $0.offset) }
-
-        for i in 0..<freeIndices.count {
-            for j in (i + 1)..<freeIndices.count {
-                if freeIndices[i].element.card.matchID == freeIndices[j].element.card.matchID {
-                    selectedTile = freeIndices[i].offset
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-                        if selectedTile == freeIndices[i].offset {
-                            selectedTile = nil
-                        }
-                    }
-                    return
-                }
-            }
         }
     }
 }

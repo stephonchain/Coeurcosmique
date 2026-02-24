@@ -14,6 +14,7 @@ struct MemoryGameView: View {
     @State private var moves: Int = 0
     @State private var isChecking = false
     @State private var showWin = false
+    @State private var lastWinEarnedSphere = false
     @State private var difficulty: MemoryDifficulty = .medium
 
     enum MemoryDifficulty: String, CaseIterable {
@@ -67,6 +68,8 @@ struct MemoryGameView: View {
             if showWin {
                 GameWinOverlay(
                     gameType: .memory,
+                    spheresEarned: lastWinEarnedSphere ? 1 : 0,
+                    subtitle: lastWinEarnedSphere ? nil : "\(gameManager.memoryWinProgress)/\(MiniGameManager.memoryWinsNeeded) victoires pour 1 Sphere",
                     onDismiss: onDismiss,
                     onPlayAgain: {
                         showWin = false
@@ -139,7 +142,7 @@ struct MemoryGameView: View {
                 Image(systemName: "diamond.fill")
                     .font(.system(size: 12))
                     .foregroundStyle(.cyan)
-                Text("+\(MiniGameManager.memoryReward) Spheres par victoire")
+                Text("1 Sphere toutes les 3 victoires (\(gameManager.memoryWinProgress)/3)")
                     .font(.cosmicCaption(13))
                     .foregroundStyle(.cyan)
             }
@@ -322,7 +325,7 @@ struct MemoryGameView: View {
 
                     if matchedIDs.count == difficulty.pairCount {
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                            gameManager.rewardWin(game: .memory, sphereManager: sphereManager)
+                            lastWinEarnedSphere = gameManager.rewardMemoryWin(sphereManager: sphereManager)
                             showWin = true
                         }
                     }
