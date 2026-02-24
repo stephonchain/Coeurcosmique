@@ -19,6 +19,18 @@ struct CoeurCosmiqueApp: App {
                     .onReceive(storeManager.$isPremium) { isPremium in
                         collectionManager.isPremium = isPremium
                     }
+                    .onAppear {
+                        // Grant 100 spheres when premium is first activated
+                        storeManager.onPremiumActivated = {
+                            let sphereManager = CosmicSphereManager.shared
+                            // Only grant once per activation (check a flag)
+                            let key = "premiumSpheresBonusGranted"
+                            if !UserDefaults.standard.bool(forKey: key) {
+                                sphereManager.add(100)
+                                UserDefaults.standard.set(true, forKey: key)
+                            }
+                        }
+                    }
             } else {
                 OnboardingView(
                     hasCompletedOnboarding: $hasCompletedOnboarding,

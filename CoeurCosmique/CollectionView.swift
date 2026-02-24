@@ -230,7 +230,11 @@ struct CollectibleDeckGrid: View {
     let showAllRarities: Bool
     @ObservedObject var viewModel: AppViewModel
     @EnvironmentObject var collectionManager: CardCollectionManager
+    @EnvironmentObject var storeManager: StoreManager
     @State private var selectedCardNumber: Int?
+    @State private var selectedOracleCard: OracleCard?
+    @State private var selectedQuantumCard: QuantumOracleCard?
+    @State private var selectedRuneCard: RuneCard?
 
     private let columns = [
         GridItem(.flexible(), spacing: 10),
@@ -317,6 +321,29 @@ struct CollectibleDeckGrid: View {
                 .padding(.horizontal, 16)
                 .padding(.bottom, 100)
             }
+        }
+        .sheet(item: $selectedOracleCard) { card in
+            OracleDetailView(card: card)
+                .environmentObject(storeManager)
+        }
+        .sheet(item: $selectedQuantumCard) { card in
+            QuantumCardDetailView(card: card, deck: viewModel.quantumOracleDeck)
+                .environmentObject(storeManager)
+        }
+        .sheet(item: $selectedRuneCard) { card in
+            RuneDetailView(card: card)
+        }
+        .onChange(of: selectedCardNumber) { _, number in
+            guard let number else { return }
+            switch deck {
+            case .oracle:
+                selectedOracleCard = viewModel.oracleDeck.first { $0.number == number }
+            case .quantum:
+                selectedQuantumCard = viewModel.quantumOracleDeck.first { $0.number == number }
+            case .rune:
+                selectedRuneCard = RuneDeck.allCards.first { $0.number == number }
+            }
+            selectedCardNumber = nil
         }
     }
 

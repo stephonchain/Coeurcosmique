@@ -93,34 +93,7 @@ final class BoosterManager: ObservableObject {
     func openBooster(collectionManager: CardCollectionManager) -> [BoosterCard] {
         guard canOpenBooster else { return [] }
 
-        var cards: [BoosterCard] = []
-
-        // Build card pool: all oracle + quantum + rune cards
-        var pool: [(CollectibleDeck, Int)] = []
-        for n in 1...CollectibleDeck.oracle.totalCards {
-            pool.append((.oracle, n))
-        }
-        for n in 1...CollectibleDeck.quantum.totalCards {
-            pool.append((.quantum, n))
-        }
-        for n in 1...CollectibleDeck.rune.totalCards {
-            pool.append((.rune, n))
-        }
-
-        // Pull 5 random cards
-        let shuffled = pool.shuffled()
-        for i in 0..<Self.boosterSize {
-            let (deck, number) = shuffled[i % shuffled.count]
-            let rarity = rollRarity()
-            let isNew = collectionManager.addCard(deck: deck, number: number, rarity: rarity)
-
-            cards.append(BoosterCard(
-                deck: deck,
-                number: number,
-                rarity: rarity,
-                isNew: isNew
-            ))
-        }
+        let cards = generateBoosterCards(collectionManager: collectionManager)
 
         // Save state
         let now = Date()
@@ -148,27 +121,7 @@ final class BoosterManager: ObservableObject {
     // MARK: - Sphere Booster (no cooldown impact)
 
     func openSphereBooster(collectionManager: CardCollectionManager) -> [BoosterCard] {
-        var cards: [BoosterCard] = []
-
-        var pool: [(CollectibleDeck, Int)] = []
-        for n in 1...CollectibleDeck.oracle.totalCards {
-            pool.append((.oracle, n))
-        }
-        for n in 1...CollectibleDeck.quantum.totalCards {
-            pool.append((.quantum, n))
-        }
-        for n in 1...CollectibleDeck.rune.totalCards {
-            pool.append((.rune, n))
-        }
-
-        let shuffled = pool.shuffled()
-        for i in 0..<Self.boosterSize {
-            let (deck, number) = shuffled[i % shuffled.count]
-            let rarity = rollRarity()
-            let isNew = collectionManager.addCard(deck: deck, number: number, rarity: rarity)
-            cards.append(BoosterCard(deck: deck, number: number, rarity: rarity, isNew: isNew))
-        }
-
+        let cards = generateBoosterCards(collectionManager: collectionManager)
         lastBoosterCards = cards
         return cards
     }
@@ -182,27 +135,7 @@ final class BoosterManager: ObservableObject {
     }
 
     func openPremiumBooster(collectionManager: CardCollectionManager) -> [BoosterCard] {
-        // Temporarily enable and open
-        var cards: [BoosterCard] = []
-
-        var pool: [(CollectibleDeck, Int)] = []
-        for n in 1...CollectibleDeck.oracle.totalCards {
-            pool.append((.oracle, n))
-        }
-        for n in 1...CollectibleDeck.quantum.totalCards {
-            pool.append((.quantum, n))
-        }
-        for n in 1...CollectibleDeck.rune.totalCards {
-            pool.append((.rune, n))
-        }
-
-        let shuffled = pool.shuffled()
-        for i in 0..<Self.boosterSize {
-            let (deck, number) = shuffled[i % shuffled.count]
-            let rarity = rollRarity()
-            let isNew = collectionManager.addCard(deck: deck, number: number, rarity: rarity)
-            cards.append(BoosterCard(deck: deck, number: number, rarity: rarity, isNew: isNew))
-        }
+        let cards = generateBoosterCards(collectionManager: collectionManager)
 
         let today = todayString()
         boostersOpenedToday = 2
@@ -213,21 +146,62 @@ final class BoosterManager: ObservableObject {
         return cards
     }
 
-    // MARK: - Rarity Roll
+    // MARK: - Card Generation
 
-    private func rollRarity() -> CardRarity {
+    /// Generate 5 booster cards: exactly 1 rare+ card, 4 commons
+    private func generateBoosterCards(collectionManager: CardCollectionManager) -> [BoosterCard] {
+        let pool = buildCardPool()
+        let shuffled = pool.shuffled()
+        var cards: [BoosterCard] = []
+
+        // Card 0: guaranteed rare or higher
+        let (rareDeck, rareNumber) = shuffled[0]
+        let rareRarity = rollRareOrHigher()
+        let rareIsNew = collectionManager.addCard(deck: rareDeck, number: rareNumber, rarity: rareRarity)
+        cards.append(BoosterCard(deck: rareDeck, number: rareNumber, rarity: rareRarity, isNew: rareIsNew))
+
+        // Cards 1-4: common
+        for i in 1..<Self.boosterSize {
+            let (deck, number) = shuffled[i % shuffled.count]
+            let isNew = collectionManager.addCard(deck: deck, number: number, rarity: .common)
+            cards.append(BoosterCard(deck: deck, number: number, rarity: .common, isNew: isNew))
+        }
+
+        // Shuffle so the rare isn't always first
+        return cards.shuffled()
+    }
+
+    private func buildCardPool() -> [(CollectibleDeck, Int)] {
+        var pool: [(CollectibleDeck, Int)] = []
+        for n in 1...CollectibleDeck.oracle.totalCards {
+            pool.append((.oracle, n))
+        }
+        for n in 1...CollectibleDeck.quantum.totalCards {
+            pool.append((.quantum, n))
+        }
+        for n in 1...CollectibleDeck.rune.totalCards {
+            pool.append((.rune, n))
+        }
+        return pool
+    }
+
+    /// Roll rarity for the guaranteed rare+ slot
+    private func rollRareOrHigher() -> CardRarity {
         let roll = Double.random(in: 0..<1)
-        // Streak bonus: +1% golden per streak day (max +10%)
         let goldenBonus = min(Double(streak) * 0.01, 0.10)
 
-        if roll < CardRarity.golden.weight + goldenBonus {
+        // Proportional among rare/holo/golden only
+        let goldenWeight = CardRarity.golden.weight + goldenBonus
+        let holoWeight = CardRarity.holographic.weight
+        let rareWeight = CardRarity.rare.weight
+        let total = goldenWeight + holoWeight + rareWeight
+
+        if roll < goldenWeight / total {
             return .golden
-        } else if roll < CardRarity.golden.weight + goldenBonus + CardRarity.holographic.weight {
+        } else if roll < (goldenWeight + holoWeight) / total {
             return .holographic
-        } else if roll < CardRarity.golden.weight + goldenBonus + CardRarity.holographic.weight + CardRarity.rare.weight {
-            return .rare
         } else {
-            return .common
+            return .rare
         }
     }
 

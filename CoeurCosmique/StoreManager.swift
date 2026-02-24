@@ -29,6 +29,9 @@ final class StoreManager: ObservableObject {
     @Published var purchaseInProgress: Bool = false
     @Published var errorMessage: String?
 
+    /// Called when premium is first activated (purchase or restore). Use to grant bonus spheres.
+    var onPremiumActivated: (() -> Void)?
+
     // MARK: - Private
 
     private var transactionListener: Task<Void, Never>?
@@ -36,8 +39,10 @@ final class StoreManager: ObservableObject {
     // MARK: - Init
 
     init() {
+        // Do NOT check entitlements on init.
+        // Premium is only activated when the user triggers a purchase or restore.
+        // This prevents Apple from auto-detecting a prior subscription on reinstall.
         transactionListener = listenForTransactions()
-        Task { await checkEntitlements() }
     }
 
     deinit {
@@ -93,10 +98,14 @@ final class StoreManager: ObservableObject {
     // MARK: - Entitlements
 
     func checkEntitlements() async {
+        let wasPremium = isPremium
         for await result in Transaction.currentEntitlements {
             if let transaction = try? checkVerified(result) {
                 if Self.subscriptionIDs.contains(transaction.productID) {
                     isPremium = true
+                    if !wasPremium {
+                        onPremiumActivated?()
+                    }
                     return
                 }
             }
@@ -111,7 +120,11 @@ final class StoreManager: ObservableObject {
             for await result in Transaction.updates {
                 if let transaction = try? await self?.checkVerified(result) {
                     await transaction.finish()
-                    await self?.checkEntitlements()
+                    // Only update premium if user already activated it this session
+                    // (i.e. they triggered a purchase or restore)
+                    if await self?.isPremium == true {
+                        await self?.checkEntitlements()
+                    }
                 }
             }
         }
