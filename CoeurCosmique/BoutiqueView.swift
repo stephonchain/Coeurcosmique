@@ -215,7 +215,7 @@ struct BoutiqueView: View {
                             .font(.cosmicHeadline(16))
                             .foregroundStyle(Color.cosmicGold)
 
-                        Text("+1 booster quotidien, tirages illimites, carte Collector")
+                        Text("108 cartes debloquees, +1 booster/jour, tirages illimites")
                             .font(.cosmicCaption(12))
                             .foregroundStyle(Color.cosmicTextSecondary)
                     }
@@ -262,9 +262,9 @@ struct BoutiqueView: View {
 
                         // Benefits
                         VStack(alignment: .leading, spacing: 8) {
+                            premiumBenefit(icon: "square.grid.2x2.fill", text: "108 cartes des 3 oracles debloquees")
                             premiumBenefit(icon: "gift.fill", text: "+1 booster supplementaire par jour")
-                            premiumBenefit(icon: "sparkles", text: "Tirages de cartes illimites")
-                            premiumBenefit(icon: "star.fill", text: "Carte Collector exclusive")
+                            premiumBenefit(icon: "sparkles", text: "Tirages illimites")
                             premiumBenefit(icon: "brain.head.profile", text: "Interpretations IA illimitees")
                         }
                     }

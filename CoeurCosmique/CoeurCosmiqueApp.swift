@@ -16,6 +16,9 @@ struct CoeurCosmiqueApp: App {
                     .environmentObject(creditManager)
                     .environmentObject(collectionManager)
                     .environmentObject(boosterManager)
+                    .onReceive(storeManager.$isPremium) { isPremium in
+                        collectionManager.isPremium = isPremium
+                    }
             } else {
                 OnboardingView(
                     hasCompletedOnboarding: $hasCompletedOnboarding,

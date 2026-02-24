@@ -159,24 +159,24 @@ struct PaywallView: View {
     private var premiumFeatures: some View {
         VStack(spacing: 18) {
             premiumFeatureRow(
+                icon: "square.grid.2x2.fill",
+                title: "Toutes les cartes débloquées",
+                subtitle: "108 cartes des 3 oracles accessibles immédiatement"
+            )
+            premiumFeatureRow(
                 icon: "infinity",
                 title: "Tirages illimités",
-                subtitle: "Consulte le Tarot autant que tu veux"
+                subtitle: "Consulte le Tarot et les Oracles sans limite"
             )
             premiumFeatureRow(
-                icon: "book.closed.fill",
-                title: "Journal complet",
-                subtitle: "Retrouve toutes tes lectures passées"
+                icon: "gift.fill",
+                title: "+1 booster par jour",
+                subtitle: "Un booster supplémentaire quotidien"
             )
             premiumFeatureRow(
-                icon: "sparkles.rectangle.stack.fill",
-                title: "Descriptions détaillées",
-                subtitle: "Accède aux interprétations de chaque carte"
-            )
-            premiumFeatureRow(
-                icon: "books.vertical.fill",
-                title: "Bibliothèque du Tarot",
-                subtitle: "Approfondis tes connaissances"
+                icon: "sparkles",
+                title: "Interprétations IA",
+                subtitle: "Analyses personnalisées illimitées"
             )
         }
         .padding(.horizontal, 32)
@@ -214,15 +214,15 @@ struct PaywallView: View {
             planCard(
                 id: StoreManager.yearlyID,
                 label: "Annuel",
-                price: priceText(for: StoreManager.yearlyID, fallback: "9,99 €"),
+                price: priceText(for: StoreManager.yearlyID, fallback: "19,99 €"),
                 period: "/ an",
-                badge: "7 jours d'essai gratuit",
+                badge: "1 semaine d'essai gratuit",
                 highlight: true
             )
             planCard(
                 id: StoreManager.monthlyID,
                 label: "Mensuel",
-                price: priceText(for: StoreManager.monthlyID, fallback: "1,99 €"),
+                price: priceText(for: StoreManager.monthlyID, fallback: "4,99 €"),
                 period: "/ mois",
                 badge: nil,
                 highlight: false
@@ -230,7 +230,7 @@ struct PaywallView: View {
             planCard(
                 id: StoreManager.weeklyID,
                 label: "Hebdomadaire",
-                price: priceText(for: StoreManager.weeklyID, fallback: "0,99 €"),
+                price: priceText(for: StoreManager.weeklyID, fallback: "1,99 €"),
                 period: "/ semaine",
                 badge: nil,
                 highlight: false
@@ -341,7 +341,7 @@ struct PaywallView: View {
                         .tint(Color.cosmicBackground)
                 } else {
                     Text(selectedPlan == StoreManager.yearlyID
-                         ? "Essayer gratuitement"
+                         ? "Essayer 1 semaine gratuite"
                          : "S'abonner")
                         .font(.cosmicHeadline(18))
                         .foregroundStyle(Color.cosmicBackground)

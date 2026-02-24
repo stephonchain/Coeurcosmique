@@ -96,9 +96,24 @@ struct CollectionView: View {
     private var collectionStatsBar: some View {
         VStack(spacing: 8) {
             HStack {
-                Text("\(collectionManager.totalOwned())/\(CardCollectionManager.totalCollectible) cartes")
-                    .font(.cosmicHeadline(14))
-                    .foregroundStyle(Color.cosmicGold)
+                if collectionManager.isPremium {
+                    HStack(spacing: 4) {
+                        Image(systemName: "crown.fill")
+                            .font(.system(size: 10))
+                            .foregroundStyle(Color.cosmicGold)
+                        Text("Premium")
+                            .font(.cosmicCaption(10))
+                            .foregroundStyle(Color.cosmicGold)
+                    }
+
+                    Text("(\(collectionManager.totalPulled()) piochees)")
+                        .font(.cosmicCaption(10))
+                        .foregroundStyle(Color.cosmicTextSecondary)
+                } else {
+                    Text("\(collectionManager.totalOwned())/\(CardCollectionManager.totalCollectible) cartes")
+                        .font(.cosmicHeadline(14))
+                        .foregroundStyle(Color.cosmicGold)
+                }
 
                 Spacer()
 
@@ -107,7 +122,7 @@ struct CollectionView: View {
                         Circle()
                             .fill(deck.accentColor)
                             .frame(width: 6, height: 6)
-                        Text("\(collectionManager.ownedCount(deck: deck))/\(deck.totalCards)")
+                        Text("\(collectionManager.pulledCount(deck: deck))/\(deck.totalCards)")
                             .font(.cosmicCaption(10))
                             .foregroundStyle(Color.cosmicTextSecondary)
                     }
@@ -115,7 +130,7 @@ struct CollectionView: View {
             }
             .padding(.horizontal, 20)
 
-            ProgressView(value: Double(collectionManager.totalOwned()), total: Double(CardCollectionManager.totalCollectible))
+            ProgressView(value: Double(collectionManager.totalPulled()), total: Double(CardCollectionManager.totalCollectible))
                 .tint(Color.cosmicGold)
                 .padding(.horizontal, 20)
         }
