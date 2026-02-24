@@ -6,6 +6,7 @@ struct QuantumOracleDrawView: View {
     @ObservedObject var viewModel: AppViewModel
     @EnvironmentObject var storeManager: StoreManager
     @EnvironmentObject var creditManager: CreditManager
+    @EnvironmentObject var collectionManager: CardCollectionManager
     @State private var selectedSpread: QuantumSpreadType = .lienDesAmes
     @State private var question: String = ""
     @State private var isDrawing = false
@@ -24,7 +25,16 @@ struct QuantumOracleDrawView: View {
         // Quantum Oracle is Premium only
         !storeManager.isPremium
     }
-    
+
+    private var hasCompleteCollection: Bool {
+        collectionManager.hasCompleteDeck(.quantum)
+    }
+
+    private func spreadRequiresCollection(_ spread: QuantumSpreadType) -> Bool {
+        // All quantum spreads have 3+ cards, so all require collection
+        !hasCompleteCollection
+    }
+
     var body: some View {
         Group {
             if let reading = viewModel.currentQuantumReading, showReading {
@@ -321,8 +331,34 @@ struct QuantumOracleDrawView: View {
     // MARK: - Draw Button
     
     private var quantumDrawButton: some View {
+        VStack(spacing: 10) {
+            if spreadRequiresCollection(selectedSpread) {
+                HStack(spacing: 8) {
+                    Image(systemName: "lock.fill")
+                        .font(.system(size: 12))
+                        .foregroundStyle(Color.cosmicPurple)
+
+                    Text("Complète ta collection Quantique (\(collectionManager.ownedCount(deck: .quantum))/\(CollectibleDeck.quantum.totalCards)) pour débloquer les tirages")
+                        .font(.cosmicCaption(11))
+                        .foregroundStyle(Color.cosmicTextSecondary)
+                        .multilineTextAlignment(.leading)
+                }
+                .padding(12)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(Color.cosmicPurple.opacity(0.08))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 12)
+                                .strokeBorder(Color.cosmicPurple.opacity(0.2), lineWidth: 1)
+                        )
+                )
+            }
+
         Button {
-            if hasReachedFreeLimit {
+            if spreadRequiresCollection(selectedSpread) {
+                // Locked
+            } else if hasReachedFreeLimit {
                 showPaywall = true
             } else {
                 performQuantumDraw()
@@ -363,9 +399,11 @@ struct QuantumOracleDrawView: View {
             .glow(.cosmicPurple, radius: isDrawing ? 4 : 8)
         }
         .buttonStyle(.plain)
-        .disabled(isDrawing)
+        .disabled(isDrawing || spreadRequiresCollection(selectedSpread))
+        .opacity(spreadRequiresCollection(selectedSpread) ? 0.5 : 1)
+        } // close VStack
     }
-    
+
     // MARK: - Card View
     
     private func quantumCardView(

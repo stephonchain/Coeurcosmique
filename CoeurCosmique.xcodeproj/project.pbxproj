@@ -67,6 +67,10 @@
 		AA00000001000045 /* RuneDeck.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000002000045 /* RuneDeck.swift */; };
 		AA00000001000046 /* RuneDrawView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000002000046 /* RuneDrawView.swift */; };
 		AA00000001000047 /* SpreadLayoutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000002000047 /* SpreadLayoutView.swift */; };
+		AA00000001000048 /* CardRarity.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000002000048 /* CardRarity.swift */; };
+		AA00000001000049 /* CardCollectionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000002000049 /* CardCollectionManager.swift */; };
+		AA00000001000050 /* BoosterManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000002000050 /* BoosterManager.swift */; };
+		AA00000001000051 /* BoosterOpeningView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000002000051 /* BoosterOpeningView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -131,6 +135,10 @@
 		AA00000002000045 /* RuneDeck.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuneDeck.swift; sourceTree = "<group>"; };
 		AA00000002000046 /* RuneDrawView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuneDrawView.swift; sourceTree = "<group>"; };
 		AA00000002000047 /* SpreadLayoutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpreadLayoutView.swift; sourceTree = "<group>"; };
+		AA00000002000048 /* CardRarity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardRarity.swift; sourceTree = "<group>"; };
+		AA00000002000049 /* CardCollectionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardCollectionManager.swift; sourceTree = "<group>"; };
+		AA00000002000050 /* BoosterManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoosterManager.swift; sourceTree = "<group>"; };
+		AA00000002000051 /* BoosterOpeningView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoosterOpeningView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -157,6 +165,10 @@
 			children = (
 				AA00000002000041 /* ActivityViewController.swift */,
 				AA00000002000038 /* AIInterpretationService.swift */,
+				AA00000002000050 /* BoosterManager.swift */,
+				AA00000002000051 /* BoosterOpeningView.swift */,
+				AA00000002000049 /* CardCollectionManager.swift */,
+				AA00000002000048 /* CardRarity.swift */,
 				9703C1102F44AC0F005D49C6 /* AffirmationEngine.swift */,
 				AA00000002000003 /* AppViewModel.swift */,
 				AA00000002000019 /* Assets.xcassets */,
@@ -371,6 +383,10 @@
 				AA00000001000045 /* RuneDeck.swift in Sources */,
 				AA00000001000046 /* RuneDrawView.swift in Sources */,
 				AA00000001000047 /* SpreadLayoutView.swift in Sources */,
+				AA00000001000048 /* CardRarity.swift in Sources */,
+				AA00000001000049 /* CardCollectionManager.swift in Sources */,
+				AA00000001000050 /* BoosterManager.swift in Sources */,
+				AA00000001000051 /* BoosterOpeningView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

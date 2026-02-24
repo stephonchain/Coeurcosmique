@@ -6,7 +6,8 @@ struct RuneDrawView: View {
     @ObservedObject var viewModel: AppViewModel
     @EnvironmentObject var storeManager: StoreManager
     @EnvironmentObject var creditManager: CreditManager
-    @State private var selectedSpread: RuneSpreadType = .ceintureOrion
+    @EnvironmentObject var collectionManager: CardCollectionManager
+    @State private var selectedSpread: RuneSpreadType = .pulsar
     @State private var question: String = ""
     @State private var isDrawing = false
     @State private var revealedCards: Set<Int> = []
@@ -19,6 +20,14 @@ struct RuneDrawView: View {
     @State private var aiInterpretation: String?
     @State private var isLoadingAI = false
     @State private var aiError: String?
+
+    private var hasCompleteCollection: Bool {
+        collectionManager.hasCompleteDeck(.rune)
+    }
+
+    private func spreadRequiresCollection(_ spread: RuneSpreadType) -> Bool {
+        spread.cardCount > 1 && !hasCompleteCollection
+    }
 
     private var hasReachedFreeLimit: Bool {
         // Runes are Premium only
@@ -320,8 +329,34 @@ struct RuneDrawView: View {
     // MARK: - Draw Button
 
     private var runeDrawButton: some View {
+        VStack(spacing: 10) {
+            if spreadRequiresCollection(selectedSpread) {
+                HStack(spacing: 8) {
+                    Image(systemName: "lock.fill")
+                        .font(.system(size: 12))
+                        .foregroundStyle(Color.cosmicGold)
+
+                    Text("Complète ta collection Runes (\(collectionManager.ownedCount(deck: .rune))/\(CollectibleDeck.rune.totalCards)) pour débloquer ce tirage")
+                        .font(.cosmicCaption(11))
+                        .foregroundStyle(Color.cosmicTextSecondary)
+                        .multilineTextAlignment(.leading)
+                }
+                .padding(12)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(Color.cosmicGold.opacity(0.08))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 12)
+                                .strokeBorder(Color.cosmicGold.opacity(0.2), lineWidth: 1)
+                        )
+                )
+            }
+
         Button {
-            if hasReachedFreeLimit {
+            if spreadRequiresCollection(selectedSpread) {
+                // Locked
+            } else if hasReachedFreeLimit {
                 showPaywall = true
             } else {
                 performRuneDraw()
@@ -362,7 +397,9 @@ struct RuneDrawView: View {
             .glow(.cosmicGold, radius: isDrawing ? 4 : 8)
         }
         .buttonStyle(.plain)
-        .disabled(isDrawing)
+        .disabled(isDrawing || spreadRequiresCollection(selectedSpread))
+        .opacity(spreadRequiresCollection(selectedSpread) ? 0.5 : 1)
+        } // close VStack
     }
 
     // MARK: - Card View

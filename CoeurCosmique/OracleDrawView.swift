@@ -80,6 +80,7 @@ struct OracleDrawView: View {
     @ObservedObject var viewModel: AppViewModel
     @EnvironmentObject var storeManager: StoreManager
     @EnvironmentObject var creditManager: CreditManager
+    @EnvironmentObject var collectionManager: CardCollectionManager
     @State private var selectedSpread: OracleSpreadType = .singleGuidance
     @State private var question: String = ""
     @State private var isDrawing = false
@@ -96,6 +97,14 @@ struct OracleDrawView: View {
 
     private var hasReachedFreeLimit: Bool {
         !storeManager.isPremium && viewModel.todayOracleDrawCount >= AppViewModel.freeOracleDailyLimit
+    }
+
+    private var hasCompleteCollection: Bool {
+        collectionManager.hasCompleteDeck(.oracle)
+    }
+
+    private func spreadRequiresCollection(_ spread: OracleSpreadType) -> Bool {
+        spread.cardCount > 1 && !hasCompleteCollection
     }
 
     var body: some View {
@@ -395,8 +404,35 @@ struct OracleDrawView: View {
     // MARK: - Draw Button
 
     private var oracleDrawButton: some View {
+        VStack(spacing: 10) {
+            // Collection gating banner
+            if spreadRequiresCollection(selectedSpread) {
+                HStack(spacing: 8) {
+                    Image(systemName: "lock.fill")
+                        .font(.system(size: 12))
+                        .foregroundStyle(Color.cosmicRose)
+
+                    Text("Complète ta collection Oracle (\(collectionManager.ownedCount(deck: .oracle))/\(CollectibleDeck.oracle.totalCards)) pour débloquer ce tirage")
+                        .font(.cosmicCaption(11))
+                        .foregroundStyle(Color.cosmicTextSecondary)
+                        .multilineTextAlignment(.leading)
+                }
+                .padding(12)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(Color.cosmicRose.opacity(0.08))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 12)
+                                .strokeBorder(Color.cosmicRose.opacity(0.2), lineWidth: 1)
+                        )
+                )
+            }
+
         Button {
-            if hasReachedFreeLimit {
+            if spreadRequiresCollection(selectedSpread) {
+                // Do nothing - locked
+            } else if hasReachedFreeLimit {
                 showPaywall = true
             } else {
                 performOracleDraw()
@@ -437,7 +473,9 @@ struct OracleDrawView: View {
             .glow(.cosmicRose, radius: isDrawing ? 4 : 8)
         }
         .buttonStyle(.plain)
-        .disabled(isDrawing)
+        .disabled(isDrawing || spreadRequiresCollection(selectedSpread))
+        .opacity(spreadRequiresCollection(selectedSpread) ? 0.5 : 1)
+        } // close VStack
     }
 
     private func singleOracleCardView(_ drawn: DrawnOracleCard, label: String, index: Int) -> some View {

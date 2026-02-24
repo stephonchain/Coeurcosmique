@@ -2,33 +2,49 @@ import SwiftUI
 
 struct HomeView: View {
     @ObservedObject var viewModel: AppViewModel
+    @EnvironmentObject var storeManager: StoreManager
+    @EnvironmentObject var collectionManager: CardCollectionManager
+    @EnvironmentObject var boosterManager: BoosterManager
     @StateObject private var gratitudeStore = GratitudeStore()
     @State private var isCardFlipped = false
     @State private var showMotivation = false
     @State private var appeared = false
     @State private var fullScreenCardContent: FullScreenCardView.CardContent? = nil
     @State private var showGratitudeSheet = false
+    @State private var showBoosterOpening = false
 
     var body: some View {
         ScrollView(showsIndicators: false) {
-            VStack(spacing: 28) {
+            VStack(spacing: 24) {
                 // Header
                 headerSection
                     .opacity(appeared ? 1 : 0)
                     .offset(y: appeared ? 0 : 20)
 
-                // Motivational message
-                motivationSection
+                // BOOSTER - Hero Section
+                boosterSection
+                    .opacity(appeared ? 1 : 0)
+                    .offset(y: appeared ? 0 : 25)
+
+                // Collection Progress
+                collectionProgressSection
                     .opacity(appeared ? 1 : 0)
                     .offset(y: appeared ? 0 : 30)
 
-                // Daily card
-                dailyCardSection
+                // Streak
+                if boosterManager.streak > 1 {
+                    streakSection
+                        .opacity(appeared ? 1 : 0)
+                        .offset(y: appeared ? 0 : 35)
+                }
+
+                // Motivational message
+                motivationSection
                     .opacity(appeared ? 1 : 0)
                     .offset(y: appeared ? 0 : 40)
-                
-                // Gratitude Quick-Add
-                gratitudeSection
+
+                // Daily card
+                dailyCardSection
                     .opacity(appeared ? 1 : 0)
                     .offset(y: appeared ? 0 : 45)
 
@@ -58,6 +74,14 @@ struct HomeView: View {
                 }
             }
         }
+        .fullScreenCover(isPresented: $showBoosterOpening) {
+            BoosterOpeningView(
+                collectionManager: collectionManager,
+                boosterManager: boosterManager,
+                onDismiss: { showBoosterOpening = false }
+            )
+            .environmentObject(storeManager)
+        }
         .sheet(isPresented: $showGratitudeSheet) {
             GratitudeQuickView(isPresented: $showGratitudeSheet)
         }
@@ -81,102 +105,220 @@ struct HomeView: View {
         .padding(.top, 8)
     }
 
+    // MARK: - Booster Section (HERO)
+
+    private var boosterSection: some View {
+        Button {
+            showBoosterOpening = true
+        } label: {
+            VStack(spacing: 16) {
+                HStack {
+                    VStack(alignment: .leading, spacing: 6) {
+                        HStack(spacing: 8) {
+                            Image(systemName: "gift.fill")
+                                .font(.system(size: 18))
+                                .foregroundStyle(Color.cosmicGold)
+
+                            Text("Booster Cosmique")
+                                .font(.cosmicHeadline(18))
+                                .foregroundStyle(Color.cosmicText)
+                        }
+
+                        if boosterManager.canOpenBooster {
+                            Text("Un booster est disponible !")
+                                .font(.cosmicCaption(13))
+                                .foregroundStyle(.green)
+                        } else if boosterManager.hasPremiumBoosterAvailable(isPremium: storeManager.isPremium) {
+                            Text("Booster Premium disponible !")
+                                .font(.cosmicCaption(13))
+                                .foregroundStyle(Color.cosmicGold)
+                        } else {
+                            Text("Prochain dans \(boosterManager.formattedTimeRemaining)")
+                                .font(.system(size: 13, design: .monospaced))
+                                .foregroundStyle(Color.cosmicTextSecondary)
+                        }
+                    }
+
+                    Spacer()
+
+                    // Visual booster icon
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(
+                                LinearGradient(
+                                    colors: [.cosmicPurple, .cosmicRose],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
+                            )
+                            .frame(width: 60, height: 80)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .strokeBorder(Color.cosmicGold.opacity(0.5), lineWidth: 1.5)
+                            )
+
+                        VStack(spacing: 4) {
+                            Image(systemName: "sparkles")
+                                .font(.system(size: 18))
+                                .foregroundStyle(.white)
+                            Text("x5")
+                                .font(.system(size: 11, weight: .bold))
+                                .foregroundStyle(.white.opacity(0.8))
+                        }
+                    }
+                    .shadow(color: boosterManager.canOpenBooster ? .cosmicGold.opacity(0.4) : .clear, radius: 8)
+                }
+
+                // Open button
+                if boosterManager.canOpenBooster || boosterManager.hasPremiumBoosterAvailable(isPremium: storeManager.isPremium) {
+                    HStack(spacing: 8) {
+                        Image(systemName: "hand.tap.fill")
+                            .font(.system(size: 14))
+                        Text("Ouvrir maintenant")
+                            .font(.cosmicHeadline(14))
+                    }
+                    .foregroundStyle(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 12)
+                    .background(
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(
+                                LinearGradient(
+                                    colors: [.cosmicPurple, .cosmicRose],
+                                    startPoint: .leading,
+                                    endPoint: .trailing
+                                )
+                            )
+                    )
+                }
+            }
+            .padding(16)
+            .cosmicCard(cornerRadius: 16)
+            .overlay(
+                RoundedRectangle(cornerRadius: 16)
+                    .strokeBorder(
+                        boosterManager.canOpenBooster
+                            ? Color.cosmicGold.opacity(0.5)
+                            : Color.clear,
+                        lineWidth: 1.5
+                    )
+            )
+        }
+        .buttonStyle(.plain)
+    }
+
+    // MARK: - Collection Progress
+
+    private var collectionProgressSection: some View {
+        VStack(spacing: 14) {
+            HStack {
+                Text("Ma Collection")
+                    .font(.cosmicHeadline(16))
+                    .foregroundStyle(Color.cosmicText)
+
+                Spacer()
+
+                Text("\(collectionManager.totalOwned())/\(CardCollectionManager.totalCollectible)")
+                    .font(.cosmicCaption(13))
+                    .foregroundStyle(Color.cosmicGold)
+            }
+
+            ProgressView(value: Double(collectionManager.totalOwned()), total: Double(CardCollectionManager.totalCollectible))
+                .tint(Color.cosmicGold)
+
+            ForEach(CollectibleDeck.allCases, id: \.rawValue) { deck in
+                deckProgressRow(deck: deck)
+            }
+        }
+        .padding(16)
+        .cosmicCard(cornerRadius: 16)
+    }
+
+    private func deckProgressRow(deck: CollectibleDeck) -> some View {
+        HStack(spacing: 12) {
+            Circle()
+                .fill(deck.accentColor)
+                .frame(width: 8, height: 8)
+
+            Text(deck.title)
+                .font(.cosmicCaption(12))
+                .foregroundStyle(Color.cosmicTextSecondary)
+                .lineLimit(1)
+
+            Spacer()
+
+            Text("\(collectionManager.ownedCount(deck: deck))/\(deck.totalCards)")
+                .font(.cosmicCaption(12))
+                .foregroundStyle(deck.accentColor)
+
+            if collectionManager.hasCompleteDeck(deck) {
+                Image(systemName: "checkmark.seal.fill")
+                    .font(.system(size: 14))
+                    .foregroundStyle(.green)
+            }
+        }
+    }
+
+    // MARK: - Streak
+
+    private var streakSection: some View {
+        HStack(spacing: 12) {
+            Image(systemName: "flame.fill")
+                .font(.system(size: 22))
+                .foregroundStyle(.orange)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Streak de \(boosterManager.streak) jours")
+                    .font(.cosmicHeadline(14))
+                    .foregroundStyle(Color.cosmicText)
+
+                Text("+\(min(boosterManager.streak, 10))% de chance de carte dorée")
+                    .font(.cosmicCaption(11))
+                    .foregroundStyle(Color.cosmicGold)
+            }
+
+            Spacer()
+
+            HStack(spacing: 3) {
+                ForEach(0..<min(boosterManager.streak, 7), id: \.self) { _ in
+                    Circle()
+                        .fill(Color.orange)
+                        .frame(width: 6, height: 6)
+                }
+            }
+        }
+        .padding(14)
+        .cosmicCard(cornerRadius: 14)
+        .overlay(
+            RoundedRectangle(cornerRadius: 14)
+                .strokeBorder(Color.orange.opacity(0.3), lineWidth: 1)
+        )
+    }
+
     // MARK: - Motivation
 
     private var motivationSection: some View {
         VStack(spacing: 12) {
-            Text("✦")
-                .font(.system(size: 14))
-                .foregroundStyle(Color.cosmicGold)
-
             Text(MotivationalMessages.messageForDate())
-                .font(.cosmicBody(15))
+                .font(.cosmicBody(14))
                 .foregroundStyle(Color.cosmicText.opacity(0.9))
                 .multilineTextAlignment(.center)
                 .lineSpacing(4)
                 .fixedSize(horizontal: false, vertical: true)
         }
         .padding(.horizontal, 24)
-        .padding(.vertical, 20)
+        .padding(.vertical, 16)
         .frame(maxWidth: .infinity)
         .cosmicCard()
     }
 
-    // MARK: - Gratitude Quick-Add
-    
-    private var gratitudeSection: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            HStack(spacing: 8) {
-                Image(systemName: "sparkles")
-                    .font(.system(size: 14))
-                    .foregroundStyle(Color.cosmicGold)
-                
-                Text("Gratitude")
-                    .font(.cosmicHeadline(16))
-                    .foregroundStyle(Color.cosmicText)
-                
-                Spacer()
-                
-                Button {
-                    showGratitudeSheet = true
-                } label: {
-                    Image(systemName: "plus.circle.fill")
-                        .font(.system(size: 20))
-                        .foregroundStyle(Color.cosmicGold)
-                }
-                .buttonStyle(.plain)
-            }
-            
-            if !gratitudeStore.entries.isEmpty {
-                VStack(spacing: 8) {
-                    ForEach(gratitudeStore.entries.prefix(3)) { entry in
-                        HStack(spacing: 10) {
-                            Text("✨")
-                                .font(.system(size: 14))
-                            
-                            Text(entry.text)
-                                .font(.cosmicBody(13))
-                                .foregroundStyle(Color.cosmicTextSecondary)
-                                .lineLimit(1)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                        }
-                        .padding(.vertical, 8)
-                        .padding(.horizontal, 12)
-                        .background(
-                            RoundedRectangle(cornerRadius: 10)
-                                .fill(Color.cosmicGold.opacity(0.06))
-                        )
-                    }
-                }
-            } else {
-                VStack(spacing: 6) {
-                    Text("Ajoute tes premières gratitudes")
-                        .font(.cosmicCaption(13))
-                        .foregroundStyle(Color.cosmicTextSecondary.opacity(0.7))
-                    
-                    Text("Cultive un état d'esprit positif ✨")
-                        .font(.cosmicCaption(11))
-                        .foregroundStyle(Color.cosmicTextSecondary.opacity(0.5))
-                }
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 24)
-            }
-        }
-        .padding(16)
-        .cosmicCard(cornerRadius: 16)
-        .overlay(
-            RoundedRectangle(cornerRadius: 16)
-                .strokeBorder(Color.cosmicGold.opacity(0.15), lineWidth: 1)
-        )
-    }
-    
     // MARK: - Daily Card
 
     private var dailyCardSection: some View {
         VStack(spacing: 16) {
             HStack {
                 Text("Ta carte du jour")
-                    .font(.cosmicHeadline(18))
+                    .font(.cosmicHeadline(16))
                     .foregroundStyle(Color.cosmicGold)
 
                 Spacer()
@@ -201,7 +343,7 @@ struct HomeView: View {
             }
 
             if let info = viewModel.dailyCard {
-                VStack(spacing: 20) {
+                VStack(spacing: 16) {
                     dailyFlippableCard(info)
                         .onAppear {
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
@@ -212,35 +354,31 @@ struct HomeView: View {
                         }
 
                     if isCardFlipped {
-                        VStack(spacing: 12) {
+                        VStack(spacing: 10) {
                             Text(info.name)
-                                .font(.cosmicHeadline(20))
+                                .font(.cosmicHeadline(18))
                                 .foregroundStyle(Color.cosmicText)
 
                             if case .tarot(_, let isReversed) = info, isReversed {
                                 Text("Inversée")
-                                    .font(.cosmicCaption(12))
+                                    .font(.cosmicCaption(11))
                                     .foregroundStyle(Color.cosmicRose)
                             }
 
                             Text(info.message)
-                                .font(.cosmicBody(15))
+                                .font(.cosmicBody(14))
                                 .foregroundStyle(Color.cosmicTextSecondary)
                                 .multilineTextAlignment(.center)
                                 .lineSpacing(3)
 
-                            // Keywords
-                            HStack(spacing: 8) {
+                            HStack(spacing: 6) {
                                 ForEach(info.keywords, id: \.self) { keyword in
                                     Text(keyword)
-                                        .font(.cosmicCaption(11))
+                                        .font(.cosmicCaption(10))
                                         .foregroundStyle(Color.cosmicPurple)
-                                        .padding(.horizontal, 10)
-                                        .padding(.vertical, 4)
-                                        .background(
-                                            Capsule()
-                                                .fill(Color.cosmicPurple.opacity(0.12))
-                                        )
+                                        .padding(.horizontal, 8)
+                                        .padding(.vertical, 3)
+                                        .background(Capsule().fill(Color.cosmicPurple.opacity(0.12)))
                                 }
                             }
                         }
@@ -249,7 +387,6 @@ struct HomeView: View {
                 }
                 .padding(.vertical, 8)
             } else {
-                // No card yet - draw one
                 Button {
                     viewModel.drawNewDailyCard()
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
@@ -260,7 +397,6 @@ struct HomeView: View {
                 } label: {
                     VStack(spacing: 16) {
                         TarotCardBack(size: .large)
-
                         Text("Touche pour révéler ta carte")
                             .font(.cosmicCaption())
                             .foregroundStyle(Color.cosmicGold)
@@ -269,11 +405,9 @@ struct HomeView: View {
                 .buttonStyle(.plain)
             }
         }
-        .padding(20)
+        .padding(16)
         .cosmicCard()
     }
-
-    // MARK: - Flippable Card per Deck Type
 
     @ViewBuilder
     private func dailyFlippableCard(_ info: DailyCardInfo) -> some View {
@@ -302,7 +436,7 @@ struct HomeView: View {
             )
         }
     }
-    
+
     // MARK: - Quick Actions
 
     private var quickActionsSection: some View {
@@ -318,27 +452,16 @@ struct HomeView: View {
                 QuickActionButton(
                     icon: "sparkles",
                     title: "Tirage",
-                    subtitle: "Nouvelle lecture",
+                    subtitle: "Tarot complet",
                     color: .cosmicPurple
                 ) {
                     viewModel.selectedTab = .draw
                 }
 
                 QuickActionButton(
-                    icon: "heart.circle.fill",
-                    title: "Oracle",
-                    subtitle: "42 cartes",
-                    color: .cosmicRose
-                ) {
-                    viewModel.selectedTab = .oracle
-                }
-            }
-
-            HStack(spacing: 12) {
-                QuickActionButton(
                     icon: "square.grid.2x2",
                     title: "Collection",
-                    subtitle: "78 + 42 cartes",
+                    subtitle: "\(collectionManager.totalOwned())/\(CardCollectionManager.totalCollectible)",
                     color: .cosmicGold
                 ) {
                     viewModel.selectedTab = .collection
