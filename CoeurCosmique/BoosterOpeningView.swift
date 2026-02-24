@@ -11,6 +11,7 @@ struct BoosterOpeningView: View {
 
     @State private var phase: BoosterPhase = .ready
     @State private var cards: [BoosterCard] = []
+    @State private var boosterType: BoosterType = .commun
     @State private var currentRevealIndex: Int = 0
     @State private var dragOffset: CGFloat = 0
     @State private var packScale: CGFloat = 0.9
@@ -201,12 +202,12 @@ struct BoosterOpeningView: View {
 
             VStack(spacing: 16) {
                 ProgressView()
-                    .tint(.cosmicGold)
+                    .tint(boosterType.color)
                     .scaleEffect(2)
 
                 Text("Ouverture...")
                     .font(.cosmicCaption(14))
-                    .foregroundStyle(Color.cosmicGold)
+                    .foregroundStyle(boosterType.color)
             }
         }
     }
@@ -215,15 +216,34 @@ struct BoosterOpeningView: View {
 
     private var swipeRevealPhase: some View {
         VStack(spacing: 0) {
+            // Booster type badge
+            if boosterType != .commun {
+                Text(boosterType.label)
+                    .font(.system(size: 14, weight: .bold))
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 6)
+                    .background(
+                        Capsule().fill(
+                            LinearGradient(
+                                colors: boosterType.gradientColors,
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                    )
+                    .padding(.top, 50)
+            }
+
             // Progress dots
             HStack(spacing: 8) {
                 ForEach(0..<cards.count, id: \.self) { index in
                     Circle()
-                        .fill(index <= currentRevealIndex ? Color.cosmicGold : Color.cosmicTextSecondary.opacity(0.3))
+                        .fill(index <= currentRevealIndex ? boosterType.color : Color.cosmicTextSecondary.opacity(0.3))
                         .frame(width: 8, height: 8)
                 }
             }
-            .padding(.top, 60)
+            .padding(.top, boosterType == .commun ? 60 : 12)
 
             Text("\(currentRevealIndex + 1)/\(cards.count)")
                 .font(.cosmicCaption(12))
@@ -300,10 +320,29 @@ struct BoosterOpeningView: View {
 
     private var crossLayoutPhase: some View {
         VStack(spacing: 0) {
-            Text("Tes cartes !")
-                .font(.cosmicTitle(24))
-                .foregroundStyle(Color.cosmicGold)
-                .padding(.top, 40)
+            VStack(spacing: 6) {
+                if boosterType != .commun {
+                    Text(boosterType.shortLabel)
+                        .font(.system(size: 12, weight: .bold))
+                        .foregroundStyle(.white)
+                        .kerning(3)
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 4)
+                        .background(
+                            Capsule().fill(
+                                LinearGradient(
+                                    colors: boosterType.gradientColors,
+                                    startPoint: .leading,
+                                    endPoint: .trailing
+                                )
+                            )
+                        )
+                }
+                Text("Tes cartes !")
+                    .font(.cosmicTitle(24))
+                    .foregroundStyle(boosterType == .cosmique ? Color.cosmicGold : Color.cosmicGold)
+            }
+            .padding(.top, 40)
 
             Spacer()
 
@@ -434,10 +473,29 @@ struct BoosterOpeningView: View {
     private var resultsPhase: some View {
         ScrollView(showsIndicators: false) {
             VStack(spacing: 24) {
-                Text("Booster ouvert !")
-                    .font(.cosmicTitle(26))
-                    .foregroundStyle(Color.cosmicGold)
-                    .padding(.top, 30)
+                VStack(spacing: 8) {
+                    if boosterType != .commun {
+                        Text(boosterType.shortLabel)
+                            .font(.system(size: 13, weight: .bold))
+                            .foregroundStyle(.white)
+                            .kerning(4)
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 5)
+                            .background(
+                                Capsule().fill(
+                                    LinearGradient(
+                                        colors: boosterType.gradientColors,
+                                        startPoint: .leading,
+                                        endPoint: .trailing
+                                    )
+                                )
+                            )
+                    }
+                    Text("Booster ouvert !")
+                        .font(.cosmicTitle(26))
+                        .foregroundStyle(Color.cosmicGold)
+                }
+                .padding(.top, 30)
 
                 HStack(spacing: 20) {
                     statBadge(
@@ -742,6 +800,7 @@ struct BoosterOpeningView: View {
             } else {
                 cards = boosterManager.openBooster(collectionManager: collectionManager)
             }
+            boosterType = boosterManager.lastBoosterType
             currentRevealIndex = 0
             withAnimation {
                 phase = .revealing
@@ -799,7 +858,7 @@ struct BoosterOpeningView: View {
         let total = collectionManager.totalOwned()
         let max = CardCollectionManager.totalCollectible
 
-        var text = "Je viens d'ouvrir un Booster Cosmique !\n\n"
+        var text = "Je viens d'ouvrir un \(boosterType.label) !\n\n"
         for card in cards {
             let emoji = card.isNew ? " (NOUVELLE)" : ""
             let rarity = card.rarity == .common ? "" : " \(card.rarity.label)"

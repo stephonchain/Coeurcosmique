@@ -17,6 +17,7 @@ final class BoosterManager: ObservableObject {
     @Published private(set) var nextBoosterDate: Date? = nil
     @Published private(set) var boostersOpenedToday: Int = 0
     @Published private(set) var lastBoosterCards: [BoosterCard] = []
+    @Published private(set) var lastBoosterType: BoosterType = .commun
     @Published private(set) var streak: Int = 0
 
     // MARK: - Storage Keys
@@ -148,26 +149,64 @@ final class BoosterManager: ObservableObject {
 
     // MARK: - Card Generation
 
-    /// Generate 5 booster cards: exactly 1 rare+ card, 4 commons
+    /// Generate 5 booster cards based on randomly rolled booster type
     private func generateBoosterCards(collectionManager: CardCollectionManager) -> [BoosterCard] {
-        let pool = buildCardPool()
-        let shuffled = pool.shuffled()
+        let boosterType = BoosterType.roll()
+        lastBoosterType = boosterType
+        return generateCards(for: boosterType, collectionManager: collectionManager)
+    }
+
+    /// Generate cards for a specific booster type
+    private func generateCards(for boosterType: BoosterType, collectionManager: CardCollectionManager) -> [BoosterCard] {
+        let pool = buildCardPool().shuffled()
         var cards: [BoosterCard] = []
 
-        // Card 0: guaranteed rare or higher
-        let (rareDeck, rareNumber) = shuffled[0]
-        let rareRarity = rollRareOrHigher()
-        let rareIsNew = collectionManager.addCard(deck: rareDeck, number: rareNumber, rarity: rareRarity)
-        cards.append(BoosterCard(deck: rareDeck, number: rareNumber, rarity: rareRarity, isNew: rareIsNew))
+        switch boosterType {
+        case .commun:
+            // 4 commons + 1 rare or higher
+            let (rareDeck, rareNumber) = pool[0]
+            let rareRarity = rollRareOrHigher()
+            let rareIsNew = collectionManager.addCard(deck: rareDeck, number: rareNumber, rarity: rareRarity)
+            cards.append(BoosterCard(deck: rareDeck, number: rareNumber, rarity: rareRarity, isNew: rareIsNew))
 
-        // Cards 1-4: common
-        for i in 1..<Self.boosterSize {
-            let (deck, number) = shuffled[i % shuffled.count]
-            let isNew = collectionManager.addCard(deck: deck, number: number, rarity: .common)
-            cards.append(BoosterCard(deck: deck, number: number, rarity: .common, isNew: isNew))
+            for i in 1..<Self.boosterSize {
+                let (deck, number) = pool[i % pool.count]
+                let isNew = collectionManager.addCard(deck: deck, number: number, rarity: .common)
+                cards.append(BoosterCard(deck: deck, number: number, rarity: .common, isNew: isNew))
+            }
+
+        case .rare:
+            // 2 commons + 2 rares + 1 holo or golden
+            // Slot 0: holo or golden
+            let (deck0, num0) = pool[0]
+            let topRarity = rollHoloOrGolden()
+            let isNew0 = collectionManager.addCard(deck: deck0, number: num0, rarity: topRarity)
+            cards.append(BoosterCard(deck: deck0, number: num0, rarity: topRarity, isNew: isNew0))
+
+            // Slots 1-2: rare
+            for i in 1...2 {
+                let (deck, number) = pool[i]
+                let isNew = collectionManager.addCard(deck: deck, number: number, rarity: .rare)
+                cards.append(BoosterCard(deck: deck, number: number, rarity: .rare, isNew: isNew))
+            }
+
+            // Slots 3-4: common
+            for i in 3...4 {
+                let (deck, number) = pool[i % pool.count]
+                let isNew = collectionManager.addCard(deck: deck, number: number, rarity: .common)
+                cards.append(BoosterCard(deck: deck, number: number, rarity: .common, isNew: isNew))
+            }
+
+        case .cosmique:
+            // 5 cards all rare/holo/golden in any ratio
+            for i in 0..<Self.boosterSize {
+                let (deck, number) = pool[i % pool.count]
+                let rarity = rollRareOrHigher()
+                let isNew = collectionManager.addCard(deck: deck, number: number, rarity: rarity)
+                cards.append(BoosterCard(deck: deck, number: number, rarity: rarity, isNew: isNew))
+            }
         }
 
-        // Shuffle so the rare isn't always first
         return cards.shuffled()
     }
 
@@ -185,12 +224,11 @@ final class BoosterManager: ObservableObject {
         return pool
     }
 
-    /// Roll rarity for the guaranteed rare+ slot
+    /// Roll rarity among rare/holo/golden (proportional with streak bonus)
     private func rollRareOrHigher() -> CardRarity {
         let roll = Double.random(in: 0..<1)
         let goldenBonus = min(Double(streak) * 0.01, 0.10)
 
-        // Proportional among rare/holo/golden only
         let goldenWeight = CardRarity.golden.weight + goldenBonus
         let holoWeight = CardRarity.holographic.weight
         let rareWeight = CardRarity.rare.weight
@@ -202,6 +240,22 @@ final class BoosterManager: ObservableObject {
             return .holographic
         } else {
             return .rare
+        }
+    }
+
+    /// Roll between holographic and golden only (for Rare booster top slot)
+    private func rollHoloOrGolden() -> CardRarity {
+        let roll = Double.random(in: 0..<1)
+        let goldenBonus = min(Double(streak) * 0.01, 0.10)
+
+        let goldenWeight = CardRarity.golden.weight + goldenBonus
+        let holoWeight = CardRarity.holographic.weight
+        let total = goldenWeight + holoWeight
+
+        if roll < goldenWeight / total {
+            return .golden
+        } else {
+            return .holographic
         }
     }
 

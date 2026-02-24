@@ -35,13 +35,13 @@ enum CardRarity: String, CaseIterable, Codable, Comparable {
         }
     }
 
-    // Pull probability in a booster
+    // Relative weight for rarity rolls (not a probability — normalized at usage)
     var weight: Double {
         switch self {
-        case .common: return 0.60
-        case .rare: return 0.25
-        case .holographic: return 0.10
-        case .golden: return 0.05
+        case .common: return 1.00     // 100%
+        case .rare: return 0.20       // 20%
+        case .holographic: return 0.10 // 10%
+        case .golden: return 0.01     // 1%
         }
     }
 
@@ -119,6 +119,58 @@ struct BoosterCard: Identifiable, Equatable {
 
     static func == (lhs: BoosterCard, rhs: BoosterCard) -> Bool {
         lhs.id == rhs.id
+    }
+}
+
+// MARK: - Booster Type
+
+enum BoosterType: String, CaseIterable {
+    case commun
+    case rare
+    case cosmique
+
+    var label: String {
+        switch self {
+        case .commun: return "Booster Commun"
+        case .rare: return "Booster Rare"
+        case .cosmique: return "Booster Cosmique"
+        }
+    }
+
+    var shortLabel: String {
+        switch self {
+        case .commun: return "COMMUN"
+        case .rare: return "RARE"
+        case .cosmique: return "COSMIQUE"
+        }
+    }
+
+    var color: Color {
+        switch self {
+        case .commun: return .cosmicTextSecondary
+        case .rare: return .cosmicPurple
+        case .cosmique: return .cosmicGold
+        }
+    }
+
+    var gradientColors: [Color] {
+        switch self {
+        case .commun: return [.cosmicPurple, .cosmicRose]
+        case .rare: return [.purple, .cyan]
+        case .cosmique: return [.cosmicGold, .orange, .cosmicGold]
+        }
+    }
+
+    /// Roll a random booster type: Commun ~95.9%, Rare 4%, Cosmique 0.1%
+    static func roll() -> BoosterType {
+        let r = Double.random(in: 0..<1)
+        if r < 0.001 {
+            return .cosmique  // 0.1%
+        } else if r < 0.041 {
+            return .rare      // 4%
+        } else {
+            return .commun    // ~95.9%
+        }
     }
 }
 
