@@ -78,6 +78,8 @@
 		AA00000001000073 /* MahjongGameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000002000073 /* MahjongGameView.swift */; };
 		AA00000001000080 /* FlashCardManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000002000080 /* FlashCardManager.swift */; };
 		AA00000001000081 /* FlashCosmiqueView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000002000081 /* FlashCosmiqueView.swift */; };
+		AA00000001000090 /* CompteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000002000090 /* CompteView.swift */; };
+		AA00000001000091 /* Cœur_Cosmique_Booster.usdz in Resources */ = {isa = PBXBuildFile; fileRef = AA00000002000091 /* Cœur_Cosmique_Booster.usdz */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -153,6 +155,8 @@
 		AA00000002000073 /* MahjongGameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MahjongGameView.swift; sourceTree = "<group>"; };
 		AA00000002000080 /* FlashCardManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlashCardManager.swift; sourceTree = "<group>"; };
 		AA00000002000081 /* FlashCosmiqueView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlashCosmiqueView.swift; sourceTree = "<group>"; };
+		AA00000002000090 /* CompteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompteView.swift; sourceTree = "<group>"; };
+		AA00000002000091 /* Cœur_Cosmique_Booster.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = "Cœur_Cosmique_Booster.usdz"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -194,8 +198,10 @@
 				AA00000002000003 /* AppViewModel.swift */,
 				AA00000002000019 /* Assets.xcassets */,
 				AA00000002000015 /* CardDetailView.swift */,
+				AA00000002000091 /* Cœur_Cosmique_Booster.usdz */,
 				AA00000002000001 /* CoeurCosmiqueApp.swift */,
 				AA00000002000014 /* CollectionView.swift */,
+				AA00000002000090 /* CompteView.swift */,
 				AA00000002000002 /* ContentView.swift */,
 				AA00000002000018 /* CosmicBackground.swift */,
 				AA00000002000004 /* CosmicTheme.swift */,
@@ -338,6 +344,7 @@
 				AA00000001000019 /* Assets.xcassets in Resources */,
 				AA00000001000025 /* onboarding-welcome.mp4 in Resources */,
 				AA00000001000026 /* onboarding-spreads.mp4 in Resources */,
+				AA00000001000091 /* Cœur_Cosmique_Booster.usdz in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -415,6 +422,7 @@
 				AA00000001000073 /* MahjongGameView.swift in Sources */,
 				AA00000001000080 /* FlashCardManager.swift in Sources */,
 				AA00000001000081 /* FlashCosmiqueView.swift in Sources */,
+				AA00000001000090 /* CompteView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
