@@ -161,7 +161,7 @@ struct MissingCardGameView: View {
                 Image(systemName: "diamond.fill")
                     .font(.system(size: 12))
                     .foregroundStyle(.cyan)
-                Text("+\(MiniGameManager.missingCardReward) Sphere par victoire")
+                Text("+\(MiniGameManager.sphereReward) Sphere par victoire")
                     .font(.cosmicCaption(13))
                     .foregroundStyle(.cyan)
             }
