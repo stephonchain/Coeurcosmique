@@ -61,23 +61,26 @@ struct FlashCosmiqueView: View {
         VStack(spacing: 0) {
             gameHeader
 
-            switch phase {
-            case .deckSelection:
-                deckSelectionView
-            case .difficultySelection:
-                difficultySelectionView
-            case .quiz:
-                ZStack(alignment: .bottom) {
-                    quizView
+            Group {
+                switch phase {
+                case .deckSelection:
+                    deckSelectionView
+                case .difficultySelection:
+                    difficultySelectionView
+                case .quiz:
+                    ZStack(alignment: .bottom) {
+                        quizView
 
-                    if showResult, currentIndex < quizItems.count {
-                        resultPopup(correctItem: quizItems[currentIndex])
-                            .transition(.move(edge: .bottom).combined(with: .opacity))
+                        if showResult, currentIndex < quizItems.count {
+                            resultPopup(correctItem: quizItems[currentIndex])
+                                .transition(.move(edge: .bottom).combined(with: .opacity))
+                        }
                     }
+                case .sessionSummary:
+                    sessionSummaryView
                 }
-            case .sessionSummary:
-                sessionSummaryView
             }
+            .frame(maxHeight: .infinity)
         }
         .background(Color.cosmicBackground.ignoresSafeArea())
     }
