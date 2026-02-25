@@ -20,6 +20,7 @@ struct BoosterOpeningView: View {
     @State private var floatOffset: CGFloat = 0
     @State private var fullScreenCard: BoosterCard? = nil
     @State private var showShareSheet = false
+    @State private var boosterScene: SCNScene?
 
     enum BoosterPhase {
         case ready
@@ -153,9 +154,7 @@ struct BoosterOpeningView: View {
 
     private var boosterPackVisual: some View {
         Group {
-            if let url = Bundle.main.url(forResource: "Cœur_Cosmique_Booster", withExtension: "usdz"),
-               let scene = try? SCNScene(url: url) {
-                // 3D model
+            if let scene = boosterScene {
                 SceneView(
                     scene: scene,
                     options: [.autoenablesDefaultLighting, .allowsCameraControl]
@@ -213,6 +212,22 @@ struct BoosterOpeningView: View {
                     .scaleEffect(packScale)
                 }
                 .offset(y: floatOffset)
+            }
+        }
+        .onAppear {
+            loadBoosterScene()
+        }
+    }
+
+    private func loadBoosterScene() {
+        guard boosterScene == nil else { return }
+        DispatchQueue.global(qos: .userInitiated).async {
+            if let url = Bundle.main.url(forResource: "Cœur_Cosmique_Booster", withExtension: "usdz"),
+               let scene = try? SCNScene(url: url) {
+                scene.background.contents = UIColor.clear
+                DispatchQueue.main.async {
+                    boosterScene = scene
+                }
             }
         }
     }
