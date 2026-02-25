@@ -136,70 +136,41 @@ struct FlashCosmiqueView: View {
     // MARK: - Deck Selection
 
     private var deckSelectionView: some View {
-        ScrollView(showsIndicators: false) {
-            VStack(spacing: 24) {
-                Image(systemName: "brain.head.profile")
-                    .font(.system(size: 50, weight: .light))
-                    .foregroundStyle(Color.cosmicGold.opacity(0.6))
-                    .padding(.top, 10)
+        VStack(spacing: 20) {
+            Spacer()
 
-                Text("Flash Cosmique")
-                    .font(.cosmicTitle(24))
-                    .foregroundStyle(Color.cosmicText)
+            Image(systemName: "brain.head.profile")
+                .font(.system(size: 50, weight: .light))
+                .foregroundStyle(Color.cosmicGold.opacity(0.6))
 
-                Text("Apprends les cartes par repetition espacee.\nMaitrise une carte pour l'obtenir en GOLD !")
-                    .font(.cosmicBody(14))
-                    .foregroundStyle(Color.cosmicTextSecondary)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal, 30)
+            Text("Flash Cosmique")
+                .font(.cosmicTitle(24))
+                .foregroundStyle(Color.cosmicText)
 
-                // Deck cards
-                VStack(spacing: 14) {
-                    ForEach(CollectibleDeck.allCases, id: \.rawValue) { deck in
-                        deckCard(deck: deck)
-                    }
+            Text("Apprends les cartes par repetition espacee.\nMaitrise une carte pour l'obtenir en GOLD !")
+                .font(.cosmicBody(14))
+                .foregroundStyle(Color.cosmicTextSecondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 30)
+
+            // Deck cards
+            VStack(spacing: 14) {
+                ForEach(CollectibleDeck.allCases, id: \.rawValue) { deck in
+                    deckCard(deck: deck)
                 }
-                .padding(.horizontal, 20)
-                .padding(.top, 10)
-
-                // Legend
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("SYSTEME DE REPETITION ESPACEE")
-                        .font(.system(size: 10, weight: .bold))
-                        .foregroundStyle(Color.cosmicTextSecondary)
-                        .kerning(2)
-
-                    HStack(spacing: 16) {
-                        srsLevelBadge("J0", color: .cosmicTextSecondary)
-                        Image(systemName: "arrow.right")
-                            .font(.system(size: 8))
-                            .foregroundStyle(Color.cosmicTextSecondary)
-                        srsLevelBadge("J1", color: .cyan)
-                        Image(systemName: "arrow.right")
-                            .font(.system(size: 8))
-                            .foregroundStyle(Color.cosmicTextSecondary)
-                        srsLevelBadge("J3", color: .blue)
-                        Image(systemName: "arrow.right")
-                            .font(.system(size: 8))
-                            .foregroundStyle(Color.cosmicTextSecondary)
-                        srsLevelBadge("J7", color: .cosmicPurple)
-                        Image(systemName: "arrow.right")
-                            .font(.system(size: 8))
-                            .foregroundStyle(Color.cosmicTextSecondary)
-                        srsLevelBadge("J31", color: .cosmicGold)
-                    }
-
-                    Text("Bonne reponse = niveau suivant\nMauvaise reponse = retour a J0")
-                        .font(.cosmicCaption(11))
-                        .foregroundStyle(Color.cosmicTextSecondary)
-                        .lineSpacing(3)
-                }
-                .padding(16)
-                .cosmicCard(cornerRadius: 14)
-                .padding(.horizontal, 20)
-
-                Spacer(minLength: 40)
             }
+            .padding(.horizontal, 20)
+
+            // SRS legend compact
+            HStack(spacing: 12) {
+                srsLevelBadge("J0", color: .cosmicTextSecondary)
+                srsLevelBadge("J1", color: .cyan)
+                srsLevelBadge("J3", color: .blue)
+                srsLevelBadge("J7", color: .cosmicPurple)
+                srsLevelBadge("J31", color: .cosmicGold)
+            }
+
+            Spacer()
         }
     }
 
@@ -606,179 +577,169 @@ struct FlashCosmiqueView: View {
     // MARK: - Session Summary
 
     private var sessionSummaryView: some View {
-        ScrollView(showsIndicators: false) {
-            VStack(spacing: 24) {
-                Image(systemName: "brain.head.profile")
-                    .font(.system(size: 50, weight: .light))
-                    .foregroundStyle(Color.cosmicGold)
-                    .padding(.top, 10)
+        VStack(spacing: 16) {
+            Spacer()
 
-                Text("Session terminee !")
-                    .font(.cosmicTitle(24))
-                    .foregroundStyle(Color.cosmicGold)
+            Image(systemName: "brain.head.profile")
+                .font(.system(size: 40, weight: .light))
+                .foregroundStyle(Color.cosmicGold)
 
-                // Stats
-                HStack(spacing: 20) {
-                    VStack(spacing: 4) {
-                        Text("\(sessionCorrect)")
-                            .font(.cosmicHeadline(24))
-                            .foregroundStyle(.green)
-                        Text("Correctes")
-                            .font(.cosmicCaption(10))
-                            .foregroundStyle(Color.cosmicTextSecondary)
-                    }
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 16)
-                    .cosmicCard(cornerRadius: 12)
+            Text("Session terminee !")
+                .font(.cosmicTitle(22))
+                .foregroundStyle(Color.cosmicGold)
 
-                    VStack(spacing: 4) {
-                        Text("\(sessionTotal - sessionCorrect)")
-                            .font(.cosmicHeadline(24))
-                            .foregroundStyle(.red)
-                        Text("Incorrectes")
-                            .font(.cosmicCaption(10))
-                            .foregroundStyle(Color.cosmicTextSecondary)
-                    }
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 16)
-                    .cosmicCard(cornerRadius: 12)
+            // Stats
+            HStack(spacing: 16) {
+                VStack(spacing: 4) {
+                    Text("\(sessionCorrect)")
+                        .font(.cosmicHeadline(22))
+                        .foregroundStyle(.green)
+                    Text("Correctes")
+                        .font(.cosmicCaption(10))
+                        .foregroundStyle(Color.cosmicTextSecondary)
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 12)
+                .cosmicCard(cornerRadius: 12)
 
-                    VStack(spacing: 4) {
-                        Text("\(sessionTotal > 0 ? sessionCorrect * 100 / sessionTotal : 0)%")
-                            .font(.cosmicHeadline(24))
+                VStack(spacing: 4) {
+                    Text("\(sessionTotal - sessionCorrect)")
+                        .font(.cosmicHeadline(22))
+                        .foregroundStyle(.red)
+                    Text("Incorrectes")
+                        .font(.cosmicCaption(10))
+                        .foregroundStyle(Color.cosmicTextSecondary)
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 12)
+                .cosmicCard(cornerRadius: 12)
+
+                VStack(spacing: 4) {
+                    Text("\(sessionTotal > 0 ? sessionCorrect * 100 / sessionTotal : 0)%")
+                        .font(.cosmicHeadline(22))
+                        .foregroundStyle(Color.cosmicGold)
+                    Text("Precision")
+                        .font(.cosmicCaption(10))
+                        .foregroundStyle(Color.cosmicTextSecondary)
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 12)
+                .cosmicCard(cornerRadius: 12)
+            }
+            .padding(.horizontal, 20)
+
+            // Newly mastered cards
+            if !newlyMastered.isEmpty {
+                VStack(spacing: 8) {
+                    HStack(spacing: 6) {
+                        Image(systemName: "crown.fill")
                             .foregroundStyle(Color.cosmicGold)
-                        Text("Precision")
-                            .font(.cosmicCaption(10))
-                            .foregroundStyle(Color.cosmicTextSecondary)
+                        Text("Cartes maitrisees !")
+                            .font(.cosmicHeadline(14))
+                            .foregroundStyle(Color.cosmicGold)
                     }
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 16)
-                    .cosmicCard(cornerRadius: 12)
+
+                    ForEach(newlyMastered, id: \.1) { (deck, number, name) in
+                        HStack(spacing: 8) {
+                            Image(systemName: "crown.fill")
+                                .font(.system(size: 10))
+                                .foregroundStyle(Color.cosmicGold)
+                            Text(name)
+                                .font(.cosmicBody(13))
+                                .foregroundStyle(Color.cosmicText)
+                            Spacer()
+                            Text("GOLD")
+                                .font(.system(size: 9, weight: .bold))
+                                .foregroundStyle(Color.cosmicGold)
+                                .padding(.horizontal, 6)
+                                .padding(.vertical, 2)
+                                .background(Capsule().fill(Color.cosmicGold.opacity(0.2)))
+                        }
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 8)
+                        .cosmicCard(cornerRadius: 10)
+                    }
                 }
                 .padding(.horizontal, 20)
-
-                // Newly mastered cards
-                if !newlyMastered.isEmpty {
-                    VStack(spacing: 12) {
-                        HStack(spacing: 6) {
-                            Image(systemName: "crown.fill")
-                                .foregroundStyle(Color.cosmicGold)
-                            Text("Cartes maitrisees !")
-                                .font(.cosmicHeadline(16))
-                                .foregroundStyle(Color.cosmicGold)
-                        }
-
-                        ForEach(newlyMastered, id: \.1) { (deck, number, name) in
-                            HStack(spacing: 10) {
-                                Image(systemName: "crown.fill")
-                                    .font(.system(size: 12))
-                                    .foregroundStyle(Color.cosmicGold)
-                                Text(name)
-                                    .font(.cosmicBody(14))
-                                    .foregroundStyle(Color.cosmicText)
-                                Spacer()
-                                Text("GOLD")
-                                    .font(.system(size: 10, weight: .bold))
-                                    .foregroundStyle(Color.cosmicGold)
-                                    .padding(.horizontal, 8)
-                                    .padding(.vertical, 3)
-                                    .background(Capsule().fill(Color.cosmicGold.opacity(0.2)))
-                            }
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 10)
-                            .cosmicCard(cornerRadius: 10)
-                        }
-                    }
-                    .padding(.horizontal, 20)
-                }
-
-                // Deck progress
-                if let deck = selectedDeck {
-                    VStack(spacing: 10) {
-                        Text("Progression \(deck.title)")
-                            .font(.cosmicHeadline(14))
-                            .foregroundStyle(Color.cosmicText)
-
-                        ProgressView(
-                            value: Double(flashManager.memorizedCount(deck: deck)),
-                            total: Double(deck.totalCards)
-                        )
-                        .tint(deck.accentColor)
-
-                        Text("\(flashManager.memorizedCount(deck: deck))/\(deck.totalCards) cartes maitrisees")
-                            .font(.cosmicCaption(12))
-                            .foregroundStyle(Color.cosmicTextSecondary)
-
-                        if flashManager.isDeckMastered(deck: deck) {
-                            HStack(spacing: 6) {
-                                Image(systemName: "sparkles")
-                                    .foregroundStyle(Color.cosmicGold)
-                                Text("Oracle maitrise ! Toutes les cartes GOLD obtenues !")
-                                    .font(.cosmicCaption(12))
-                                    .foregroundStyle(Color.cosmicGold)
-                            }
-                            .padding(10)
-                            .background(
-                                RoundedRectangle(cornerRadius: 10)
-                                    .fill(Color.cosmicGold.opacity(0.1))
-                            )
-                        }
-                    }
-                    .padding(16)
-                    .cosmicCard(cornerRadius: 14)
-                    .padding(.horizontal, 20)
-                }
-
-                // Buttons
-                VStack(spacing: 12) {
-                    if let deck = selectedDeck, flashManager.cardsDueForReview(deck: deck).count > 0 {
-                        Button {
-                            startSession()
-                        } label: {
-                            HStack(spacing: 8) {
-                                Image(systemName: "arrow.clockwise")
-                                Text("Continuer la revision")
-                                    .font(.cosmicHeadline(14))
-                            }
-                            .foregroundStyle(.white)
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 16)
-                            .background(
-                                RoundedRectangle(cornerRadius: 16)
-                                    .fill(
-                                        LinearGradient(
-                                            colors: [.cosmicPurple, .cosmicRose],
-                                            startPoint: .leading,
-                                            endPoint: .trailing
-                                        )
-                                    )
-                            )
-                        }
-                        .buttonStyle(.plain)
-                    }
-
-                    Button {
-                        phase = .deckSelection
-                    } label: {
-                        Text("Choisir un autre oracle")
-                            .font(.cosmicCaption(14))
-                            .foregroundStyle(Color.cosmicTextSecondary)
-                    }
-                    .buttonStyle(.plain)
-
-                    Button {
-                        onDismiss()
-                    } label: {
-                        Text("Retour a l'accueil")
-                            .font(.cosmicCaption(13))
-                            .foregroundStyle(Color.cosmicTextSecondary.opacity(0.7))
-                    }
-                    .buttonStyle(.plain)
-                }
-                .padding(.horizontal, 30)
-
-                Spacer(minLength: 40)
             }
+
+            // Deck progress
+            if let deck = selectedDeck {
+                VStack(spacing: 8) {
+                    ProgressView(
+                        value: Double(flashManager.memorizedCount(deck: deck)),
+                        total: Double(deck.totalCards)
+                    )
+                    .tint(deck.accentColor)
+
+                    Text("\(flashManager.memorizedCount(deck: deck))/\(deck.totalCards) cartes maitrisees — \(deck.title)")
+                        .font(.cosmicCaption(11))
+                        .foregroundStyle(Color.cosmicTextSecondary)
+
+                    if flashManager.isDeckMastered(deck: deck) {
+                        HStack(spacing: 6) {
+                            Image(systemName: "sparkles")
+                                .foregroundStyle(Color.cosmicGold)
+                            Text("Oracle maitrise ! Toutes les cartes GOLD obtenues !")
+                                .font(.cosmicCaption(11))
+                                .foregroundStyle(Color.cosmicGold)
+                        }
+                    }
+                }
+                .padding(14)
+                .cosmicCard(cornerRadius: 12)
+                .padding(.horizontal, 20)
+            }
+
+            // Buttons
+            VStack(spacing: 10) {
+                if let deck = selectedDeck, flashManager.cardsDueForReview(deck: deck).count > 0 {
+                    Button {
+                        startSession()
+                    } label: {
+                        HStack(spacing: 8) {
+                            Image(systemName: "arrow.clockwise")
+                            Text("Continuer la revision")
+                                .font(.cosmicHeadline(14))
+                        }
+                        .foregroundStyle(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 14)
+                        .background(
+                            RoundedRectangle(cornerRadius: 14)
+                                .fill(
+                                    LinearGradient(
+                                        colors: [.cosmicPurple, .cosmicRose],
+                                        startPoint: .leading,
+                                        endPoint: .trailing
+                                    )
+                                )
+                        )
+                    }
+                    .buttonStyle(.plain)
+                }
+
+                Button {
+                    phase = .deckSelection
+                } label: {
+                    Text("Choisir un autre oracle")
+                        .font(.cosmicCaption(14))
+                        .foregroundStyle(Color.cosmicTextSecondary)
+                }
+                .buttonStyle(.plain)
+
+                Button {
+                    onDismiss()
+                } label: {
+                    Text("Retour a l'accueil")
+                        .font(.cosmicCaption(13))
+                        .foregroundStyle(Color.cosmicTextSecondary.opacity(0.7))
+                }
+                .buttonStyle(.plain)
+            }
+            .padding(.horizontal, 30)
+
+            Spacer()
         }
     }
 
