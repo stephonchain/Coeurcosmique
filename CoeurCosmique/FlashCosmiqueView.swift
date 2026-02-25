@@ -136,22 +136,13 @@ struct FlashCosmiqueView: View {
     // MARK: - Deck Selection
 
     private var deckSelectionView: some View {
-        VStack(spacing: 20) {
-            Spacer()
-
-            Image(systemName: "brain.head.profile")
-                .font(.system(size: 50, weight: .light))
-                .foregroundStyle(Color.cosmicGold.opacity(0.6))
-
-            Text("Flash Cosmique")
-                .font(.cosmicTitle(24))
-                .foregroundStyle(Color.cosmicText)
-
-            Text("Apprends les cartes par repetition espacee.\nMaitrise une carte pour l'obtenir en GOLD !")
-                .font(.cosmicBody(14))
+        VStack(spacing: 16) {
+            Text("Maitrise une carte pour l'obtenir en GOLD !")
+                .font(.cosmicBody(13))
                 .foregroundStyle(Color.cosmicTextSecondary)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 30)
+                .padding(.top, 8)
 
             // Deck cards
             VStack(spacing: 14) {
@@ -578,15 +569,10 @@ struct FlashCosmiqueView: View {
 
     private var sessionSummaryView: some View {
         VStack(spacing: 16) {
-            Spacer()
-
-            Image(systemName: "brain.head.profile")
-                .font(.system(size: 40, weight: .light))
-                .foregroundStyle(Color.cosmicGold)
-
             Text("Session terminee !")
                 .font(.cosmicTitle(22))
                 .foregroundStyle(Color.cosmicGold)
+                .padding(.top, 10)
 
             // Stats
             HStack(spacing: 16) {
