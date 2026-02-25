@@ -58,31 +58,32 @@ struct FlashCosmiqueView: View {
     }
 
     var body: some View {
-        VStack(spacing: 0) {
-            gameHeader
+        ZStack {
+            Color.cosmicBackground.ignoresSafeArea()
 
-            Group {
-                switch phase {
-                case .deckSelection:
+            VStack(spacing: 0) {
+                gameHeader
+
+                if phase == .deckSelection {
                     deckSelectionView
-                case .difficultySelection:
+                } else if phase == .difficultySelection {
                     difficultySelectionView
-                case .quiz:
-                    ZStack(alignment: .bottom) {
-                        quizView
-
-                        if showResult, currentIndex < quizItems.count {
-                            resultPopup(correctItem: quizItems[currentIndex])
-                                .transition(.move(edge: .bottom).combined(with: .opacity))
-                        }
-                    }
-                case .sessionSummary:
+                } else if phase == .quiz {
+                    quizView
+                } else {
                     sessionSummaryView
                 }
             }
-            .frame(maxHeight: .infinity)
+
+            // Quiz result popup overlay
+            if phase == .quiz, showResult, currentIndex < quizItems.count {
+                VStack {
+                    Spacer()
+                    resultPopup(correctItem: quizItems[currentIndex])
+                        .transition(.move(edge: .bottom).combined(with: .opacity))
+                }
+            }
         }
-        .background(Color.cosmicBackground.ignoresSafeArea())
     }
 
     // MARK: - Header
