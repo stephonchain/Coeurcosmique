@@ -63,10 +63,10 @@ final class MiniGameManager: ObservableObject {
 enum MiniGameType: String, CaseIterable, Identifiable {
     var id: String { rawValue }
 
+    case flashCosmique
     case memory
     case missingCard
     case mahjong
-    case flashCosmique
 
     var title: String {
         switch self {

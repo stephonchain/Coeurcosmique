@@ -18,8 +18,8 @@ struct ContentView: View {
                     CollectionView(viewModel: viewModel)
                 case .boutique:
                     BoutiqueView(viewModel: viewModel)
-                case .journal:
-                    JournalView(viewModel: viewModel)
+                case .compte:
+                    CompteView(viewModel: viewModel)
                 }
             }
             .animation(.easeInOut(duration: 0.15), value: viewModel.selectedTab)
@@ -93,7 +93,7 @@ struct ContentView: View {
         case .oracle: return viewModel.selectedTab == tab ? "sparkles" : "sparkles"
         case .collection: return viewModel.selectedTab == tab ? "square.grid.2x2.fill" : "square.grid.2x2"
         case .boutique: return viewModel.selectedTab == tab ? "bag.fill" : "bag"
-        case .journal: return viewModel.selectedTab == tab ? "book.fill" : "book"
+        case .compte: return viewModel.selectedTab == tab ? "person.fill" : "person"
         }
     }
 
@@ -103,7 +103,7 @@ struct ContentView: View {
         case .oracle: return "Oracle"
         case .collection: return "Collection"
         case .boutique: return "Boutique"
-        case .journal: return "Journal"
+        case .compte: return "Compte"
         }
     }
 }

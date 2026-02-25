@@ -5,7 +5,7 @@ enum AppTab: String, CaseIterable {
     case oracle
     case collection
     case boutique
-    case journal
+    case compte
 }
 
 @MainActor

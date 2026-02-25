@@ -70,11 +70,19 @@ struct FlashCosmiqueView: View {
                 case .difficultySelection:
                     difficultySelectionView
                 case .quiz:
-                    quizView
+                    ZStack(alignment: .bottom) {
+                        quizView
+
+                        if showResult, currentIndex < quizItems.count {
+                            resultPopup(correctItem: quizItems[currentIndex])
+                                .transition(.move(edge: .bottom).combined(with: .opacity))
+                        }
+                    }
                 case .sessionSummary:
                     sessionSummaryView
                 }
             }
+            .frame(maxHeight: .infinity, alignment: .top)
         }
     }
 
@@ -133,7 +141,7 @@ struct FlashCosmiqueView: View {
                 Image(systemName: "brain.head.profile")
                     .font(.system(size: 50, weight: .light))
                     .foregroundStyle(Color.cosmicGold.opacity(0.6))
-                    .padding(.top, 30)
+                    .padding(.top, 10)
 
                 Text("Flash Cosmique")
                     .font(.cosmicTitle(24))
@@ -190,7 +198,7 @@ struct FlashCosmiqueView: View {
                 .cosmicCard(cornerRadius: 14)
                 .padding(.horizontal, 20)
 
-                Spacer(minLength: 100)
+                Spacer(minLength: 40)
             }
         }
     }
@@ -403,13 +411,14 @@ struct FlashCosmiqueView: View {
                             }
                         }
 
-                        // Description
-                        Text(item.description)
+                        // Description (card name redacted until answer)
+                        Text(showResult ? item.description : redactDescription(item.description, hiding: item.name))
                             .font(.cosmicBody(14))
                             .foregroundStyle(Color.cosmicText.opacity(0.9))
                             .multilineTextAlignment(.center)
                             .lineSpacing(4)
                             .fixedSize(horizontal: false, vertical: true)
+                            .animation(.easeInOut(duration: 0.3), value: showResult)
                     }
                     .padding(20)
                     .frame(maxWidth: .infinity)
@@ -433,12 +442,8 @@ struct FlashCosmiqueView: View {
                     }
                     .padding(.horizontal, 20)
 
-                    // Result feedback
-                    if showResult {
-                        resultFeedback(correctItem: item)
-                    }
-
-                    Spacer(minLength: 40)
+                    // Extra space at bottom for popup overlay
+                    Spacer(minLength: showResult ? 160 : 40)
                 }
             }
         }
@@ -497,51 +502,63 @@ struct FlashCosmiqueView: View {
         .disabled(showResult)
     }
 
-    private func resultFeedback(correctItem: FlashQuizItem) -> some View {
-        VStack(spacing: 8) {
+    private func resultPopup(correctItem: FlashQuizItem) -> some View {
+        VStack(spacing: 10) {
+            // Drag indicator
+            RoundedRectangle(cornerRadius: 2)
+                .fill(Color.cosmicTextSecondary.opacity(0.4))
+                .frame(width: 40, height: 4)
+
             if isCorrect {
-                HStack(spacing: 6) {
+                HStack(spacing: 8) {
                     Image(systemName: "checkmark.circle.fill")
                         .foregroundStyle(.green)
+                        .font(.system(size: 22))
                     Text("Correct !")
                         .font(.cosmicHeadline(16))
                         .foregroundStyle(.green)
-                }
 
-                let newLevel = flashManager.level(deck: correctItem.deck, number: correctItem.number)
-                if newLevel >= FlashCardManager.maxLevel {
-                    HStack(spacing: 6) {
-                        Image(systemName: "crown.fill")
-                            .foregroundStyle(Color.cosmicGold)
-                        Text("Carte maitrisee ! Obtenue en GOLD")
-                            .font(.cosmicCaption(12))
-                            .foregroundStyle(Color.cosmicGold)
+                    Spacer()
+
+                    let newLevel = flashManager.level(deck: correctItem.deck, number: correctItem.number)
+                    if newLevel >= FlashCardManager.maxLevel {
+                        HStack(spacing: 4) {
+                            Image(systemName: "crown.fill")
+                                .font(.system(size: 10))
+                            Text("GOLD")
+                                .font(.system(size: 10, weight: .bold))
+                        }
+                        .foregroundStyle(Color.cosmicGold)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(Capsule().fill(Color.cosmicGold.opacity(0.2)))
+                    } else {
+                        let entry = FlashCardEntry(deckType: "", cardNumber: 0, level: newLevel, nextReviewDate: Date())
+                        Text(entry.levelLabel)
+                            .font(.cosmicCaption(11))
+                            .foregroundStyle(entry.levelColor)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                            .background(Capsule().fill(entry.levelColor.opacity(0.15)))
                     }
-                    .padding(.horizontal, 14)
-                    .padding(.vertical, 6)
-                    .background(Capsule().fill(Color.cosmicGold.opacity(0.15)))
-                } else {
-                    let entry = FlashCardEntry(deckType: "", cardNumber: 0, level: newLevel, nextReviewDate: Date())
-                    Text("Niveau suivant: \(entry.levelLabel)")
-                        .font(.cosmicCaption(12))
-                        .foregroundStyle(entry.levelColor)
                 }
             } else {
-                HStack(spacing: 6) {
+                HStack(spacing: 8) {
                     Image(systemName: "xmark.circle.fill")
                         .foregroundStyle(.red)
-                    Text("Incorrect")
-                        .font(.cosmicHeadline(16))
-                        .foregroundStyle(.red)
+                        .font(.system(size: 22))
+
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Incorrect")
+                            .font(.cosmicHeadline(14))
+                            .foregroundStyle(.red)
+                        Text("C'etait : \(correctItem.name) — Retour a J0")
+                            .font(.cosmicCaption(11))
+                            .foregroundStyle(Color.cosmicTextSecondary)
+                    }
+
+                    Spacer()
                 }
-
-                Text("C'etait : \(correctItem.name)")
-                    .font(.cosmicCaption(13))
-                    .foregroundStyle(Color.cosmicTextSecondary)
-
-                Text("Retour a J0")
-                    .font(.cosmicCaption(11))
-                    .foregroundStyle(Color.cosmicRose)
             }
 
             Button {
@@ -551,9 +568,9 @@ struct FlashCosmiqueView: View {
                     .font(.cosmicHeadline(14))
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity)
-                    .padding(.vertical, 14)
+                    .padding(.vertical, 12)
                     .background(
-                        RoundedRectangle(cornerRadius: 14)
+                        RoundedRectangle(cornerRadius: 12)
                             .fill(
                                 LinearGradient(
                                     colors: [.cosmicPurple, .cosmicRose],
@@ -564,9 +581,26 @@ struct FlashCosmiqueView: View {
                     )
             }
             .buttonStyle(.plain)
-            .padding(.horizontal, 20)
         }
-        .padding(.vertical, 12)
+        .padding(16)
+        .background(
+            RoundedRectangle(cornerRadius: 18)
+                .fill(Color.cosmicBackground)
+                .shadow(color: .black.opacity(0.5), radius: 20, y: -5)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 18)
+                .strokeBorder(isCorrect ? Color.green.opacity(0.3) : Color.red.opacity(0.3), lineWidth: 1)
+        )
+        .padding(.horizontal, 12)
+        .padding(.bottom, 8)
+    }
+
+    // MARK: - Helpers
+
+    private func redactDescription(_ text: String, hiding name: String) -> String {
+        let redacted = String(repeating: "●", count: min(name.count, 10))
+        return text.replacingOccurrences(of: name, with: redacted, options: [.caseInsensitive])
     }
 
     // MARK: - Session Summary
@@ -577,7 +611,7 @@ struct FlashCosmiqueView: View {
                 Image(systemName: "brain.head.profile")
                     .font(.system(size: 50, weight: .light))
                     .foregroundStyle(Color.cosmicGold)
-                    .padding(.top, 30)
+                    .padding(.top, 10)
 
                 Text("Session terminee !")
                     .font(.cosmicTitle(24))
@@ -743,7 +777,7 @@ struct FlashCosmiqueView: View {
                 }
                 .padding(.horizontal, 30)
 
-                Spacer(minLength: 100)
+                Spacer(minLength: 40)
             }
         }
     }
@@ -838,11 +872,15 @@ struct FlashCosmiqueView: View {
             flashManager.markWrong(deck: correctItem.deck, number: correctItem.number)
         }
 
-        showResult = true
+        withAnimation(.spring(response: 0.4, dampingFraction: 0.85)) {
+            showResult = true
+        }
     }
 
     private func advanceToNext() {
-        showResult = false
+        withAnimation(.spring(response: 0.3, dampingFraction: 0.85)) {
+            showResult = false
+        }
         selectedChoice = nil
         currentIndex += 1
 

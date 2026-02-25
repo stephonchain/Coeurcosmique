@@ -10,6 +10,7 @@ enum JournalSection: String, CaseIterable {
 struct JournalView: View {
     @ObservedObject var viewModel: AppViewModel
     @EnvironmentObject var storeManager: StoreManager
+    var onDismiss: (() -> Void)? = nil
     @State private var showPaywall = false
     @State private var selectedSection: JournalSection = .tarot
 
@@ -47,11 +48,29 @@ struct JournalView: View {
             VStack(spacing: 20) {
                 // Header
                 VStack(spacing: 6) {
+                    if let onDismiss {
+                        HStack {
+                            Button {
+                                onDismiss()
+                            } label: {
+                                HStack(spacing: 6) {
+                                    Image(systemName: "chevron.left")
+                                        .font(.system(size: 14, weight: .semibold))
+                                    Text("Retour")
+                                        .font(.cosmicCaption(14))
+                                }
+                                .foregroundStyle(Color.cosmicTextSecondary)
+                            }
+                            .buttonStyle(.plain)
+                            Spacer()
+                        }
+                    }
+
                     Text("Journal")
                         .font(.cosmicTitle(28))
                         .foregroundStyle(Color.cosmicText)
 
-                    Text("Tes lectures passées")
+                    Text("Tes lectures passees")
                         .font(.cosmicCaption())
                         .foregroundStyle(Color.cosmicTextSecondary)
                 }
