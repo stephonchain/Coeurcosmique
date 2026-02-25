@@ -1,4 +1,5 @@
 import SwiftUI
+import SceneKit
 
 // MARK: - Booster Opening View
 
@@ -16,6 +17,7 @@ struct BoosterOpeningView: View {
     @State private var dragOffset: CGFloat = 0
     @State private var packScale: CGFloat = 0.9
     @State private var packGlow: Bool = false
+    @State private var floatOffset: CGFloat = 0
     @State private var fullScreenCard: BoosterCard? = nil
     @State private var showShareSheet = false
 
@@ -63,49 +65,8 @@ struct BoosterOpeningView: View {
         VStack(spacing: 0) {
             Spacer()
 
-            // Booster pack visual - fills ~40% of screen
-            ZStack {
-                RoundedRectangle(cornerRadius: 24)
-                    .fill(
-                        LinearGradient(
-                            colors: [.cosmicPurple, .cosmicRose, .cosmicGold],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-                    .frame(
-                        width: UIScreen.main.bounds.width * 0.65,
-                        height: UIScreen.main.bounds.height * 0.40
-                    )
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 24)
-                            .strokeBorder(Color.cosmicGold.opacity(0.6), lineWidth: 2.5)
-                    )
-                    .shadow(color: packGlow ? .cosmicGold.opacity(0.6) : .clear, radius: packGlow ? 25 : 0)
-                    .scaleEffect(packScale)
-
-                VStack(spacing: 20) {
-                    Image(systemName: "sparkles")
-                        .font(.system(size: 50, weight: .light))
-                        .foregroundStyle(Color.white.opacity(0.9))
-
-                    Text("BOOSTER")
-                        .font(.system(size: 32, weight: .bold, design: .serif))
-                        .foregroundStyle(.white)
-                        .kerning(6)
-
-                    Text("COSMIQUE")
-                        .font(.system(size: 18, weight: .medium))
-                        .foregroundStyle(.white.opacity(0.7))
-                        .kerning(8)
-
-                    Text("5 CARTES")
-                        .font(.cosmicCaption(13))
-                        .foregroundStyle(.white.opacity(0.5))
-                        .padding(.top, 8)
-                }
-                .scaleEffect(packScale)
-            }
+            // Booster pack visual - 3D model or fallback
+            boosterPackVisual
 
             Spacer()
 
@@ -181,6 +142,77 @@ struct BoosterOpeningView: View {
             withAnimation(.easeInOut(duration: 1.5).repeatForever(autoreverses: true)) {
                 packScale = 0.95
                 packGlow = true
+            }
+            withAnimation(.easeInOut(duration: 2.5).repeatForever(autoreverses: true)) {
+                floatOffset = -12
+            }
+        }
+    }
+
+    // MARK: - Booster 3D Visual
+
+    private var boosterPackVisual: some View {
+        Group {
+            if let url = Bundle.main.url(forResource: "Cœur_Cosmique_Booster", withExtension: "usdz"),
+               let scene = try? SCNScene(url: url) {
+                // 3D model
+                SceneView(
+                    scene: scene,
+                    options: [.autoenablesDefaultLighting, .allowsCameraControl]
+                )
+                .frame(
+                    width: UIScreen.main.bounds.width * 0.75,
+                    height: UIScreen.main.bounds.height * 0.40
+                )
+                .background(Color.clear)
+                .offset(y: floatOffset)
+                .shadow(color: packGlow ? .cosmicGold.opacity(0.4) : .clear, radius: packGlow ? 20 : 0)
+                .scaleEffect(packScale)
+            } else {
+                // Fallback: gradient rectangle
+                ZStack {
+                    RoundedRectangle(cornerRadius: 24)
+                        .fill(
+                            LinearGradient(
+                                colors: [.cosmicPurple, .cosmicRose, .cosmicGold],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                        .frame(
+                            width: UIScreen.main.bounds.width * 0.65,
+                            height: UIScreen.main.bounds.height * 0.40
+                        )
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 24)
+                                .strokeBorder(Color.cosmicGold.opacity(0.6), lineWidth: 2.5)
+                        )
+                        .shadow(color: packGlow ? .cosmicGold.opacity(0.6) : .clear, radius: packGlow ? 25 : 0)
+                        .scaleEffect(packScale)
+
+                    VStack(spacing: 20) {
+                        Image(systemName: "sparkles")
+                            .font(.system(size: 50, weight: .light))
+                            .foregroundStyle(Color.white.opacity(0.9))
+
+                        Text("BOOSTER")
+                            .font(.system(size: 32, weight: .bold, design: .serif))
+                            .foregroundStyle(.white)
+                            .kerning(6)
+
+                        Text("COSMIQUE")
+                            .font(.system(size: 18, weight: .medium))
+                            .foregroundStyle(.white.opacity(0.7))
+                            .kerning(8)
+
+                        Text("5 CARTES")
+                            .font(.cosmicCaption(13))
+                            .foregroundStyle(.white.opacity(0.5))
+                            .padding(.top, 8)
+                    }
+                    .scaleEffect(packScale)
+                }
+                .offset(y: floatOffset)
             }
         }
     }
