@@ -31,6 +31,9 @@ struct CompteView: View {
                 // Niveau Cosmique
                 niveauCosmiqueSection
 
+                // Legal links
+                legalSection
+
                 Spacer(minLength: 100)
             }
             .padding(.horizontal, 20)
@@ -284,6 +287,78 @@ struct CompteView: View {
             RoundedRectangle(cornerRadius: 8)
                 .fill(color.opacity(0.08))
         )
+    }
+
+    // MARK: - Legal
+
+    private var legalSection: some View {
+        VStack(spacing: 12) {
+            HStack {
+                Image(systemName: "doc.text")
+                    .font(.system(size: 18))
+                    .foregroundStyle(Color.cosmicTextSecondary)
+                Text("Informations legales")
+                    .font(.cosmicHeadline(16))
+                    .foregroundStyle(Color.cosmicText)
+                Spacer()
+            }
+
+            Link(destination: URL(string: "https://stephonchain.github.io/Coeurcosmique/terms.html")!) {
+                HStack {
+                    Text("Conditions d'utilisation (EULA)")
+                        .font(.cosmicBody(14))
+                        .foregroundStyle(Color.cosmicText)
+                    Spacer()
+                    Image(systemName: "arrow.up.right")
+                        .font(.system(size: 12))
+                        .foregroundStyle(Color.cosmicTextSecondary)
+                }
+                .padding(14)
+                .background(
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(Color.cosmicCard)
+                )
+            }
+
+            Link(destination: URL(string: "https://stephonchain.github.io/Coeurcosmique/privacy.html")!) {
+                HStack {
+                    Text("Politique de confidentialite")
+                        .font(.cosmicBody(14))
+                        .foregroundStyle(Color.cosmicText)
+                    Spacer()
+                    Image(systemName: "arrow.up.right")
+                        .font(.system(size: 12))
+                        .foregroundStyle(Color.cosmicTextSecondary)
+                }
+                .padding(14)
+                .background(
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(Color.cosmicCard)
+                )
+            }
+
+            Button {
+                Task { await storeManager.restorePurchases() }
+            } label: {
+                HStack {
+                    Text("Restaurer mes achats")
+                        .font(.cosmicBody(14))
+                        .foregroundStyle(Color.cosmicText)
+                    Spacer()
+                    Image(systemName: "arrow.clockwise")
+                        .font(.system(size: 12))
+                        .foregroundStyle(Color.cosmicTextSecondary)
+                }
+                .padding(14)
+                .background(
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(Color.cosmicCard)
+                )
+            }
+            .buttonStyle(.plain)
+        }
+        .padding(16)
+        .cosmicCard(cornerRadius: 16)
     }
 
     // MARK: - Helpers
