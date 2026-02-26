@@ -225,6 +225,11 @@ struct BoosterOpeningView: View {
             if let url = Bundle.main.url(forResource: "Cœur_Cosmique_Booster", withExtension: "usdz"),
                let scene = try? SCNScene(url: url) {
                 scene.background.contents = UIColor.clear
+                // Disable subdivision on all geometries to prevent std::bad_alloc crash
+                scene.rootNode.enumerateChildNodes { node, _ in
+                    node.geometry?.subdivisionLevel = 0
+                    node.geometry?.wantsAdaptiveSubdivision = false
+                }
                 DispatchQueue.main.async {
                     boosterScene = scene
                 }
