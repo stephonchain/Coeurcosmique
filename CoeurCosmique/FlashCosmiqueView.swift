@@ -136,32 +136,33 @@ struct FlashCosmiqueView: View {
     // MARK: - Deck Selection
 
     private var deckSelectionView: some View {
-        VStack(spacing: 16) {
-            Text("Maitrise une carte pour l'obtenir en GOLD !")
-                .font(.cosmicBody(13))
-                .foregroundStyle(Color.cosmicTextSecondary)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, 30)
-                .padding(.top, 8)
+        ScrollView(showsIndicators: false) {
+            VStack(spacing: 16) {
+                Text("Maitrise une carte pour l'obtenir en GOLD !")
+                    .font(.cosmicBody(13))
+                    .foregroundStyle(Color.cosmicTextSecondary)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 30)
+                    .padding(.top, 8)
 
-            // Deck cards
-            VStack(spacing: 14) {
-                ForEach(CollectibleDeck.allCases, id: \.rawValue) { deck in
-                    deckCard(deck: deck)
+                // Deck cards
+                VStack(spacing: 14) {
+                    ForEach(CollectibleDeck.allCases, id: \.rawValue) { deck in
+                        deckCard(deck: deck)
+                    }
                 }
-            }
-            .padding(.horizontal, 20)
+                .padding(.horizontal, 20)
 
-            // SRS legend compact
-            HStack(spacing: 12) {
-                srsLevelBadge("J0", color: .cosmicTextSecondary)
-                srsLevelBadge("J1", color: .cyan)
-                srsLevelBadge("J3", color: .blue)
-                srsLevelBadge("J7", color: .cosmicPurple)
-                srsLevelBadge("J31", color: .cosmicGold)
+                // SRS legend compact
+                HStack(spacing: 12) {
+                    srsLevelBadge("J0", color: .cosmicTextSecondary)
+                    srsLevelBadge("J1", color: .cyan)
+                    srsLevelBadge("J3", color: .blue)
+                    srsLevelBadge("J7", color: .cosmicPurple)
+                    srsLevelBadge("J31", color: .cosmicGold)
+                }
+                .padding(.bottom, 20)
             }
-
-            Spacer()
         }
     }
 
