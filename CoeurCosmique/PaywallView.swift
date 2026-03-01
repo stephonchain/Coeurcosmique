@@ -10,6 +10,7 @@ struct PaywallView: View {
     @State private var featuresOpacity: Double = 0
     @State private var plansOpacity: Double = 0
     @State private var buttonOpacity: Double = 0
+    @State private var showOfferCodeRedemption = false
 
     private let isSheet: Bool
 
@@ -91,6 +92,21 @@ struct PaywallView: View {
             }
         }
         .preferredColorScheme(.dark)
+        .offerCodeRedemption(isPresented: $showOfferCodeRedemption) { result in
+            switch result {
+            case .success:
+                Task {
+                    await storeManager.restorePurchases()
+                    if storeManager.isPremium {
+                        handleDismiss()
+                    }
+                }
+            case .failure:
+                break
+            @unknown default:
+                break
+            }
+        }
         .onAppear {
             Task { await storeManager.loadProducts() }
             animateIn()
@@ -363,19 +379,33 @@ struct PaywallView: View {
 
     private var footerLinks: some View {
         VStack(spacing: 8) {
-            Button {
-                Task {
-                    await storeManager.restorePurchases()
-                    if storeManager.isPremium {
-                        handleDismiss()
+            HStack(spacing: 20) {
+                Button {
+                    Task {
+                        await storeManager.restorePurchases()
+                        if storeManager.isPremium {
+                            handleDismiss()
+                        }
                     }
+                } label: {
+                    Text("Restaurer mes achats")
+                        .font(.cosmicCaption(13))
+                        .foregroundStyle(Color.cosmicTextSecondary)
                 }
-            } label: {
-                Text("Restaurer mes achats")
-                    .font(.cosmicCaption(13))
-                    .foregroundStyle(Color.cosmicTextSecondary)
+                .buttonStyle(.plain)
+
+                Text("·")
+                    .foregroundStyle(Color.cosmicTextSecondary.opacity(0.4))
+
+                Button {
+                    showOfferCodeRedemption = true
+                } label: {
+                    Text("Code promo")
+                        .font(.cosmicCaption(13))
+                        .foregroundStyle(Color.cosmicGold)
+                }
+                .buttonStyle(.plain)
             }
-            .buttonStyle(.plain)
 
             HStack(spacing: 16) {
                 Link("Conditions d'utilisation",

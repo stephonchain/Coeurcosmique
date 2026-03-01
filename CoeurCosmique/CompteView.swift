@@ -9,6 +9,7 @@ struct CompteView: View {
     @StateObject private var flashManager = FlashCardManager.shared
     @State private var showPaywall = false
     @State private var showJournal = false
+    @State private var showOfferCodeRedemption = false
 
     var body: some View {
         ScrollView(showsIndicators: false) {
@@ -44,6 +45,16 @@ struct CompteView: View {
         .fullScreenCover(isPresented: $showJournal) {
             JournalView(viewModel: viewModel, onDismiss: { showJournal = false })
                 .environmentObject(storeManager)
+        }
+        .offerCodeRedemption(isPresented: $showOfferCodeRedemption) { result in
+            switch result {
+            case .success:
+                Task { await storeManager.restorePurchases() }
+            case .failure:
+                break
+            @unknown default:
+                break
+            }
         }
     }
 
@@ -353,6 +364,26 @@ struct CompteView: View {
                 .background(
                     RoundedRectangle(cornerRadius: 12)
                         .fill(Color.cosmicCard)
+                )
+            }
+            .buttonStyle(.plain)
+
+            Button {
+                showOfferCodeRedemption = true
+            } label: {
+                HStack {
+                    Text("Utiliser un code promo")
+                        .font(.cosmicBody(14))
+                        .foregroundStyle(Color.cosmicGold)
+                    Spacer()
+                    Image(systemName: "ticket")
+                        .font(.system(size: 12))
+                        .foregroundStyle(Color.cosmicGold.opacity(0.7))
+                }
+                .padding(14)
+                .background(
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(Color.cosmicGold.opacity(0.08))
                 )
             }
             .buttonStyle(.plain)
